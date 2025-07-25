@@ -1,7 +1,15 @@
 {
   "dependencies": {
+    "@types/d3": "^7.4.3",
+    "@types/node": "^24.1.0",
+    "d3": "^7.9.0",
     "esbuild": "^0.25.8",
-    "esbuild-plugin-less": "^1.3.25"
+    "esbuild-plugin-less": "^1.3.25",
+    "graphology": "^0.26.0",
+    "graphology-layout": "^0.6.1",
+    "graphology-layout-forceatlas2": "^0.10.1",
+    "graphology-layout-noverlap": "^0.4.2",
+    "sigma": "^3.0.2"
   },
   "scripts": {
     "build": "bun run build.ts"

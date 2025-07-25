@@ -2,7 +2,10 @@ import * as esbuild from "esbuild";
 import { lessLoader } from "esbuild-plugin-less";
 
 const ctx = await esbuild.context({
-  entryPoints: ["src/better-comments-view/better-comments-view.user.ts"],
+  entryPoints: [
+    "src/better-comments-view/better-comments-view.user.ts",
+    "src/wiki-article-graph/wiki-article-graph.ts",
+  ],
   bundle: true,
   outdir: "build",
   plugins: [lessLoader()],
