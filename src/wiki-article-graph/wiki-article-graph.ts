@@ -8,6 +8,8 @@ import forceAtlas2 from "graphology-layout-forceatlas2";
 import FA2Layout from "graphology-layout-forceatlas2/worker.js";
 import NoverlapLayout from "graphology-layout-noverlap/worker.js";
 import Sigma from "sigma";
+import { workerifyClient } from "../common/workerify.js";
+import type { wikiGraphWorkerInterface } from "./wiki-article-graph-worker-interface.js";
 
 type WikiGraph = Record<
   string,
@@ -69,7 +71,7 @@ function rgb2hex([r, g, b]: number[]) {
 }
 
 function lerp(a: number, b: number, x: number) {
-  return a * x + b * (1 - x);
+  return a * (1 - x) + b * x;
 }
 
 let angleOffsets: number[] = [];
@@ -95,7 +97,7 @@ function applyCircleIteration(graph: graphology.DirectedGraph) {
     let angleOffset = angleOffsets[i];
     for (let i = 0; i < neighborCount; i++) {
       let angle = (Math.PI * 2 * i) / neighborCount + angleOffset;
-      const rad = Math.pow(neighborCount, 0.6) + 25;
+      const rad = Math.pow(neighborCount, 0.3) + 200;
       let nx = Math.cos(angle) * rad + nodeData.x;
       let ny = Math.sin(angle) * rad + nodeData.y;
 
@@ -111,15 +113,36 @@ function applyCircleIteration(graph: graphology.DirectedGraph) {
       graph.setNodeAttribute(neighbors[i], "y", lerp(attribs.y, ny, influence));
     }
 
-    // graph.setNodeAttribute(node, "x", nodeData.x * 1.1);
-    // graph.setNodeAttribute(node, "y", nodeData.y * 1.1);
+    graph.setNodeAttribute(node, "x", nodeData.x * 1.02);
+    graph.setNodeAttribute(node, "y", nodeData.y * 1.02);
     i++;
   }
 }
 
-(async () => {
-  const graphRaw: WikiGraph = await (await fetch("../build/links.json")).json();
-  // console.log(graph);
+const worker = new Worker(
+  "../build/wiki-article-graph/wiki-article-graph-worker.js"
+);
+
+let positions: { id: string; x: number; y: number }[] = [];
+
+const workerClient = workerifyClient<typeof wikiGraphWorkerInterface>(
+  "graph",
+  (req) => {
+    worker.addEventListener("message", (e) => req(e.data));
+    return () => {};
+  },
+  (res) => {
+    worker.postMessage(res);
+  }
+);
+
+void (async () => {
+  let graphRaw: WikiGraph = await (await fetch("../build/links.json")).json();
+
+  // graphRaw = Object.fromEntries(
+  //   Object.entries(graphRaw).filter(([k, v]) => !!k.match(/\/scp-\d{1,4}$/g))
+  // );
+
   const graph = new graphology.DirectedGraph();
 
   const data: Data = { nodes: [], links: [] };
@@ -130,17 +153,12 @@ function applyCircleIteration(graph: graphology.DirectedGraph) {
   const graphCount = Object.entries(graphRaw).length;
 
   for (const [url, article] of Object.entries(graphRaw)) {
-    // data.nodes.push({
-    //   id: url,
-    //   group: "1",
-    //   radius: 1,
-    // });
     nodeColors.set(url, [i / graphCount, 1, 0.6]);
     const colorRgb = hslToRgb(...nodeColors.get(url)!);
     const color = rgb2hex(colorRgb);
     graph.addNode(url, {
       label: url,
-      size: Math.pow(article.links.length, 0.25) + 1,
+      size: Math.pow(article.links.length, 0.4) + 1,
       color,
     });
     i++;
@@ -158,183 +176,95 @@ function applyCircleIteration(graph: graphology.DirectedGraph) {
           size: 0.01,
           color: rgb2hex(hslToRgb(...color)),
         });
-        // data.links.push({
-        //   source: url,
-        //   target: targetUrl,
-        //   value: 1,
-        // });
       }
     }
   }
 
-  random.assign(graph);
-  // setInterval(() => {
-  // console.log(graph.nodes().length);
+  random.assign(graph, {
+    dimensions: ["x", "y"],
+    scale: 1000,
+  });
+
   applyCircleIteration(graph);
-  // console.log(graph.nodes().length);
-  // }, 500);
-  // forceAtlas2.assign(graph, {
-  //   iterations: 100,
-  //   settings: {
-  //     gravity: 10,
-  //   },
-  // });
+  await workerClient.setGraph(graph.export());
 
-  // const layout = new FA2Layout(graph, {
-  //   settings: { gravity: 1 },
-  // });
-  // const layout = new NoverlapLayout(graph, {
-  //   settings: {
-  //     gridSize: 10,
-  //   },
-  // });
+  let iters = 1;
+  void (async () => {
+    while (true) {
+      positions = await workerClient.applyIteration(
+        Math.min(iters * 0.01, 0.5),
+        15 / Math.sqrt(iters)
+      );
+      iters++;
+    }
+  })();
 
-  // layout.start();
+  let idx = 0;
+
+  // let iters = 0;
+  // let interval = setInterval(() => {
+  //   iters++;
+  //   applyCoordinateDescentForceIteration(graph, {
+  //     repulsion: 0.5,
+  //     neighborAttraction: 20 / Math.sqrt(iters + 1),
+  //   });
+  //   if (iters > 1000) {
+  //     clearInterval(interval);
+  //   }
+  // }, 100);
 
   document.body.style.height = "100vh";
 
   const sigma = new Sigma(graph, document.body);
+
+  let animLoop = (t: number) => {
+    // console.log(t);
+    // let offset1 = (idx * 5000) % positions.length;
+    // let offset2 = ((idx + 1) * 5000) % positions.length;
+    // if (offset2 < offset1) offset2 += positions.length;
+    // for (const p of [...positions, ...positions].slice(offset1, offset2)) {
+    for (const p of positions) {
+      const attribs = graph.getNodeAttributes(p.id);
+      graph.setNodeAttribute(p.id, "x", lerp(attribs.x, p.x, 0.1));
+      graph.setNodeAttribute(p.id, "y", lerp(attribs.y, p.y, 0.1));
+    }
+    sigma.scheduleRefresh();
+    idx++;
+    setTimeout(animLoop);
+  };
+
+  animLoop(0);
+
+  let oldEdgeSettings: { id: string; color: string; size: number }[] = [];
+
+  sigma.on("enterNode", (e) => {
+    const neighbors = graph.outboundEdges(e.node);
+    for (const n of neighbors) {
+      oldEdgeSettings.push({
+        color: graph.getEdgeAttribute(n, "color"),
+        size: graph.getEdgeAttribute(n, "size"),
+        id: n,
+      });
+      graph.setEdgeAttribute(n, "color", "orange");
+      graph.setEdgeAttribute(n, "size", 5);
+    }
+    const neighborsIn = graph.inboundEdges(e.node);
+    for (const n of neighborsIn) {
+      oldEdgeSettings.push({
+        color: graph.getEdgeAttribute(n, "color"),
+        size: graph.getEdgeAttribute(n, "size"),
+        id: n,
+      });
+      graph.setEdgeAttribute(n, "color", "blue");
+      graph.setEdgeAttribute(n, "size", 5);
+    }
+  });
+
+  sigma.on("leaveNode", (e) => {
+    for (const c of oldEdgeSettings) {
+      graph.setEdgeAttribute(c.id, "color", c.color);
+      graph.setEdgeAttribute(c.id, "size", c.size);
+    }
+    oldEdgeSettings = [];
+  });
 })();
-// const data = {
-//   nodes: [
-//     {
-//       id: "a",
-//       group: "a",
-//       radius: 1,
-//     },
-//     {
-//       id: "b",
-//       group: "a",
-//       radius: 1,
-//     },
-//     {
-//       id: "c",
-//       group: "a",
-//       radius: 1,
-//     },
-//   ],
-
-//   links: [
-//     { source: "a", target: "b", value: 1 },
-//     { source: "b", target: "c", value: 1 },
-//     { source: "c", target: "a", value: 1 },
-//   ],
-// };
-
-//   {
-//     // Specify the dimensions of the chart.
-//     const width = 928;
-//     const height = 680;
-
-//     // Specify the color scale.
-//     const color = d3.scaleOrdinal(d3.schemeCategory10);
-
-//     // The force simulation mutates links and nodes, so create a copy
-//     // so that re-evaluating this cell produces the same result.
-//     const links = data.links.map((d) => ({ ...d })) as LinkType[];
-//     const nodes = data.nodes.map((d) => ({ ...d })) as NodeType[];
-
-//     type NodeType = (typeof data.nodes)[0] & d3.SimulationNodeDatum;
-
-//     type LinkType = {
-//       source: NodeType;
-//       target: NodeType;
-//       index: number;
-//       value: number;
-//     } & d3.SimulationLinkDatum<NodeType>;
-
-//     // Create a simulation with several forces.
-//     const simulation = d3
-//       .forceSimulation<NodeType, LinkType>(nodes)
-//       .force(
-//         "link",
-//         d3
-//           .forceLink<NodeType, LinkType>(links as unknown as LinkType[])
-//           .id((d) => d.id)
-//       )
-//       .force("charge", d3.forceManyBody())
-//       .force("x", d3.forceX())
-//       .force("y", d3.forceY());
-
-//     // Create the SVG container.
-//     const svg = d3
-//       .create("svg")
-//       .attr("width", width * 4)
-//       .attr("height", height * 4)
-//       .attr("viewBox", [
-//         (-width / 2) * 4,
-//         (-height / 2) * 4,
-//         width * 4,
-//         height * 4,
-//       ])
-//       .attr("style", "max-width: 100%; height: auto;");
-
-//     // Add a line for each link, and a circle for each node.
-//     const link = svg
-//       .append("g")
-//       .attr("stroke", "#999")
-//       .attr("stroke-opacity", 0.6)
-//       .selectAll("line")
-//       .data(links)
-//       .join("line")
-//       .attr("stroke-width", (d) => Math.sqrt(d.value));
-
-//     const node = svg
-//       .append("g")
-//       .attr("stroke", "#fff")
-//       .attr("stroke-width", 1.5)
-//       .selectAll("circle")
-//       .data(nodes)
-//       .join("circle")
-//       .attr("r", 5)
-//       .attr("fill", (d) => color(d.group));
-
-//     node.append("title").text((d) => d.id);
-
-//     // // Add a drag behavior.
-//     // node.call(
-//     //   d3.drag().on("start", dragstarted).on("drag", dragged).on("end", dragended)
-//     // );
-
-//     // Set the position attributes of links and nodes each time the simulation ticks.
-//     simulation.on("tick", () => {
-//       link
-//         .attr("x1", (d) => d.source.x ?? 0)
-//         .attr("y1", (d) => d.source.y ?? 0)
-//         .attr("x2", (d) => d.target.x ?? 0)
-//         .attr("y2", (d) => d.target.y ?? 0);
-
-//       node.attr("cx", (d) => d.x ?? 0).attr("cy", (d) => d.y ?? 0);
-//     });
-
-//     // Reheat the simulation when drag starts, and fix the subject position.
-//     // function dragstarted(event) {
-//     //   if (!event.active) simulation.alphaTarget(0.3).restart();
-//     //   event.subject.fx = event.subject.x;
-//     //   event.subject.fy = event.subject.y;
-//     // }
-
-//     // // Update the subject (dragged node) position during drag.
-//     // function dragged(event) {
-//     //   event.subject.fx = event.x;
-//     //   event.subject.fy = event.y;
-//     // }
-
-//     // // Restore the target alpha so the simulation cools after dragging ends.
-//     // // Unfix the subject position now that it’s no longer being dragged.
-//     // function dragended(event) {
-//     //   if (!event.active) simulation.alphaTarget(0);
-//     //   event.subject.fx = null;
-//     //   event.subject.fy = null;
-//     // }
-
-//     // When this cell is re-run, stop the previous simulation. (This doesn’t
-//     // really matter since the target alpha is zero and the simulation will
-//     // stop naturally, but it’s a good practice.)
-//     // invalidation.then(() => simulation.stop());
-
-//     document.body.appendChild(svg.node()!);
-
-//     // return svg.node();
-//   }
-// })();
