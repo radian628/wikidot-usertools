@@ -109,8 +109,27 @@ export function applyCoordinateDescentForceIteration(
     neighborAttraction: number;
   }
 ) {
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+
+  for (const node of graph.nodes()) {
+    const attribs = graph.getNodeAttributes(node);
+
+    minX = Math.min(minX, attribs.x);
+    maxX = Math.max(maxX, attribs.x);
+    minY = Math.min(minY, attribs.y);
+    maxY = Math.max(maxY, attribs.y);
+  }
+
+  console.time("a");
+  console.time("c");
   const ht = makeSpatialHashTable(graph, 100, 100);
   let repulsionRadius = 50;
+  console.timeEnd("c");
+
+  let nodesChecked = 0;
 
   // make nodes go away from each other
   for (const node of graph.nodes()) {
@@ -128,6 +147,7 @@ export function applyCoordinateDescentForceIteration(
 
     for (const bkt of buckets) {
       for (const targetNode of bkt) {
+        nodesChecked++;
         const targetAttribs = graph.getNodeAttributes(targetNode);
         const dx = targetAttribs.x - attribs.x;
         const dy = targetAttribs.y - attribs.y;
@@ -140,10 +160,14 @@ export function applyCoordinateDescentForceIteration(
         }
       }
     }
+
     graph.setNodeAttribute(node, "x", x);
     graph.setNodeAttribute(node, "y", y);
   }
+  console.timeEnd("a");
+  console.log("checked:", nodesChecked / graph.nodes().length);
 
+  console.time("b");
   // move nodes toward their neighbors
   for (const node of graph.nodes()) {
     const neighbors = graph
@@ -171,4 +195,5 @@ export function applyCoordinateDescentForceIteration(
     graph.setNodeAttribute(node, "x", x);
     graph.setNodeAttribute(node, "y", y);
   }
+  console.timeEnd("b");
 }

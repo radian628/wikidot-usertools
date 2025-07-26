@@ -157,7 +157,7 @@ void (async () => {
     const colorRgb = hslToRgb(...nodeColors.get(url)!);
     const color = rgb2hex(colorRgb);
     graph.addNode(url, {
-      label: url,
+      label: url.replace("http://scp-wiki.wikidot.com/", ""),
       size: Math.pow(article.links.length, 0.4) + 1,
       color,
     });
@@ -192,7 +192,7 @@ void (async () => {
   void (async () => {
     while (true) {
       positions = await workerClient.applyIteration(
-        Math.min(iters * 0.01, 0.5),
+        Math.min(iters * 0.01 + 1, 1),
         15 / Math.sqrt(iters)
       );
       iters++;
