@@ -75,7 +75,7 @@ export function workerifyClient<I extends InterfaceWithMethods>(
         };
 
         return new Promise((resolve, reject) => {
-          onReceive((res) => {
+          const unsub = onReceive((res) => {
             if (!res || res._discriminator !== discriminator) {
               return;
             }
@@ -84,6 +84,7 @@ export function workerifyClient<I extends InterfaceWithMethods>(
 
             if (typedRes.id === id) {
               resolve(typedRes.contents);
+              unsub();
             }
           });
           send(req);

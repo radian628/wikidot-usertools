@@ -131,8 +131,11 @@ let positions: { id: string; x: number; y: number }[] = [];
 const workerClient = workerifyClient<typeof wikiGraphWorkerInterface>(
   "graph",
   (req) => {
-    worker.addEventListener("message", (e) => req(e.data));
-    return () => {};
+    const listener = (e: MessageEvent) => req(e.data);
+    worker.addEventListener("message", listener);
+    return () => {
+      worker.removeEventListener("message", listener);
+    };
   },
   (res) => {
     worker.postMessage(res);
