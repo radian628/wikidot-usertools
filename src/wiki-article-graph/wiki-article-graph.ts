@@ -143,8 +143,8 @@ void (async () => {
   let graphRaw: WikiGraph = await (await fetch("../build/links.json")).json();
 
   graphRaw = Object.fromEntries(
-    Object.entries(graphRaw)
-      // .slice(0, 3000)
+    Object.entries(graphRaw) //
+      // .slice(0, 30000)
       .filter(([k, v]) => !!k.match(/\/scp-\d{1,4}$/g))
   );
 
@@ -214,9 +214,9 @@ void (async () => {
     while (true) {
       positions = await workerClient.applyIteration(
         // Math.min(iters * 0.01 + 1, 1),
-        Math.min(3000, iters * 10) / Math.pow(iters, 0.6),
+        Math.min(3000, iters * 10) / Math.pow(iters, 0.8),
         // 0
-        (100 / Math.pow(iters, 0.6)) * (iters % 50 === 0 ? 10 : 1)
+        (100 / Math.pow(iters, 0.8)) * (iters % 50 === 0 ? 10 : 1)
         // (350 / Math.sqrt(iters)) * 0.1
       );
       iters++;
@@ -227,7 +227,9 @@ void (async () => {
 
   document.body.style.height = "100vh";
 
-  const sigma = new Sigma(graph, document.body);
+  const sigma = new Sigma(graph, document.body, {
+    zIndex: true,
+  });
 
   let animLoop = (t: number) => {
     for (const p of positions) {
@@ -242,10 +244,23 @@ void (async () => {
 
   animLoop(0);
 
-  let oldEdgeSettings: { id: string; color: string; size: number }[] = [];
+  let oldEdgeSettings: {
+    id: string;
+    color: string;
+    size: number;
+    zIndex: number | undefined;
+  }[] = [];
+
+  let oldNodeSettings: {
+    id: string;
+    zIndex: number | undefined;
+    hidden: boolean;
+    color: string;
+  }[] = [];
 
   function highlightNeighbors(node: string, maxDepth: number) {
     const visited = new Set<string>();
+    const visitedNodes = new Set<string>();
 
     const queue: { depth: number; node: string }[] = [
       {
@@ -258,8 +273,11 @@ void (async () => {
       const qi = queue.shift()!;
       if (qi.depth === maxDepth) continue;
       const color = rgb2hex(hslToRgb(0.5 + 0.1 * qi.depth, 1, 0.5));
+      const nodeColor = rgb2hex(hslToRgb(0.5 + 0.1 * qi.depth, 1, 0.75));
       const node = qi.node;
       for (const n of graph.neighbors(node)) {
+        if (visitedNodes.has(n)) continue;
+        visitedNodes.add(n);
         const edgeOut = graph.edge(node, n);
         const edgeIn = graph.edge(n, node);
 
@@ -270,6 +288,15 @@ void (async () => {
 
         if (isvisited) continue;
 
+        oldNodeSettings.push({
+          id: n,
+          hidden: graph.getNodeAttribute(n, "hidden"),
+          zIndex: graph.getNodeAttribute(n, "zIndex"),
+          color: graph.getNodeAttribute(n, "color"),
+        });
+        graph.setNodeAttribute(n, "zIndex", 1);
+        graph.setNodeAttribute(n, "color", nodeColor);
+
         for (const edge of [
           ...(edgeOut ? [edgeOut] : []),
           ...(edgeIn ? [edgeIn] : []),
@@ -277,47 +304,72 @@ void (async () => {
           oldEdgeSettings.push({
             color: graph.getEdgeAttribute(edge, "color"),
             size: graph.getEdgeAttribute(edge, "size"),
+            zIndex: graph.getEdgeAttribute(edge, "zIndex"),
             id: edge,
           });
           graph.setEdgeAttribute(edge, "color", color);
           graph.setEdgeAttribute(edge, "size", 14 / qi.depth);
+          graph.setEdgeAttribute(edge, "zIndex", 8 - qi.depth);
           visited.add(edge);
         }
 
         queue.push({ depth: qi.depth + 1, node: n });
       }
     }
+
+    for (const n of graph.nodes()) {
+      if (visitedNodes.has(n)) continue;
+
+      oldNodeSettings.push({
+        id: n,
+        hidden: graph.getNodeAttribute(n, "hidden"),
+        zIndex: graph.getNodeAttribute(n, "zIndex"),
+        color: graph.getNodeAttribute(n, "color"),
+      });
+
+      graph.setNodeAttribute(n, "color", "#ccc");
+    }
   }
 
   sigma.on("enterNode", (e) => {
     highlightNeighbors(e.node, 7);
-    // const neighbors = graph.outboundEdges(e.node);
-    // for (const n of neighbors) {
-    //   oldEdgeSettings.push({
-    //     color: graph.getEdgeAttribute(n, "color"),
-    //     size: graph.getEdgeAttribute(n, "size"),
-    //     id: n,
-    //   });
-    //   graph.setEdgeAttribute(n, "color", "orange");
-    //   graph.setEdgeAttribute(n, "size", 5);
-    // }
-    // const neighborsIn = graph.inboundEdges(e.node);
-    // for (const n of neighborsIn) {
-    //   oldEdgeSettings.push({
-    //     color: graph.getEdgeAttribute(n, "color"),
-    //     size: graph.getEdgeAttribute(n, "size"),
-    //     id: n,
-    //   });
-    //   graph.setEdgeAttribute(n, "color", "blue");
-    //   graph.setEdgeAttribute(n, "size", 5);
-    // }
   });
 
   sigma.on("leaveNode", (e) => {
     for (const c of oldEdgeSettings) {
       graph.setEdgeAttribute(c.id, "color", c.color);
       graph.setEdgeAttribute(c.id, "size", c.size);
+      graph.setEdgeAttribute(c.id, "zIndex", c.zIndex);
     }
     oldEdgeSettings = [];
+
+    for (const c of oldNodeSettings) {
+      graph.setNodeAttribute(c.id, "hidden", c.hidden);
+      graph.setNodeAttribute(c.id, "zIndex", c.zIndex);
+      graph.setNodeAttribute(c.id, "color", c.color);
+    }
+    oldNodeSettings = [];
   });
+
+  let lastClickedNode: string | undefined = undefined;
+
+  // let isDraggingNode = false;
+
+  // sigma.on("downStage", e => {
+  //   console.log("downstage");
+  //   e.preventSigmaDefault()
+  // }
+  // )
+
+  // sigma.on("clickStage", (e) => {
+  //   console.log("got here too", e.event.x, e.event.y);
+  //   // let bounds = sigma.getBBox();
+  //   // const view = sigma.getCamera();
+
+  //   // console.log(view);
+  //   if (lastClickedNode) {
+  //     const graphcoords = sigma.viewportToGraph(e.event);
+  //     workerClient.moveNodeTo(lastClickedNode, graphcoords.x, graphcoords.y);
+  //   }
+  // });
 })();

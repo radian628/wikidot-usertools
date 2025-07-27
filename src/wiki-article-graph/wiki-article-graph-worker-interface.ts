@@ -35,6 +35,12 @@ export const wikiGraphWorkerInterface = {
       };
     });
   },
+  moveNodeTo(node: string, x: number, y: number) {
+    graph.setNodeAttribute(node, "x", x);
+    graph.setNodeAttribute(node, "y", y);
+    graph.setNodeAttribute(node, "x2", x);
+    graph.setNodeAttribute(node, "y2", y);
+  },
 };
 
 function applyForceBetween(
