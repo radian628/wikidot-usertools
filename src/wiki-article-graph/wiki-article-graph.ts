@@ -10,6 +10,7 @@ import NoverlapLayout from "graphology-layout-noverlap/worker.js";
 import Sigma from "sigma";
 import { workerifyClient } from "../common/workerify.js";
 import type { wikiGraphWorkerInterface } from "./wiki-article-graph-worker-interface.js";
+import { getConnectedComponents } from "../common/connected-components.js";
 
 type WikiGraph = Record<
   string,
@@ -79,7 +80,10 @@ for (let i = 0; i < 30000; i++) {
   angleOffsets.push(Math.random() * Math.PI * 2);
 }
 
-function applyCircleIteration(graph: graphology.DirectedGraph) {
+function applyCircleIteration(
+  graph: graphology.DirectedGraph,
+  influence: number
+) {
   let neighborCountMap = new Map<string, number>();
 
   for (const node of graph.nodes()) {
@@ -97,7 +101,7 @@ function applyCircleIteration(graph: graphology.DirectedGraph) {
     let angleOffset = angleOffsets[i];
     for (let i = 0; i < neighborCount; i++) {
       let angle = (Math.PI * 2 * i) / neighborCount + angleOffset;
-      const rad = Math.pow(neighborCount, 0.3) + 200;
+      const rad = Math.pow(neighborCount, 0.7) + 200;
       let nx = Math.cos(angle) * rad + nodeData.x;
       let ny = Math.sin(angle) * rad + nodeData.y;
 
@@ -107,7 +111,6 @@ function applyCircleIteration(graph: graphology.DirectedGraph) {
       //   -1 / (neighborCountMap.get(neighbors[i])! + 1),
       //   50
       // );
-      let influence = 0.01;
 
       graph.setNodeAttribute(neighbors[i], "x", lerp(attribs.x, nx, influence));
       graph.setNodeAttribute(neighbors[i], "y", lerp(attribs.y, ny, influence));
@@ -139,9 +142,11 @@ const workerClient = workerifyClient<typeof wikiGraphWorkerInterface>(
 void (async () => {
   let graphRaw: WikiGraph = await (await fetch("../build/links.json")).json();
 
-  // graphRaw = Object.fromEntries(
-  //   Object.entries(graphRaw).filter(([k, v]) => !!k.match(/\/scp-\d{1,4}$/g))
-  // );
+  graphRaw = Object.fromEntries(
+    Object.entries(graphRaw)
+      // .slice(0, 3000)
+      .filter(([k, v]) => !!k.match(/\/scp-\d{1,4}$/g))
+  );
 
   const graph = new graphology.DirectedGraph();
 
@@ -158,7 +163,6 @@ void (async () => {
     const color = rgb2hex(colorRgb);
     graph.addNode(url, {
       label: url.replace("http://scp-wiki.wikidot.com/", ""),
-      size: Math.pow(article.links.length, 0.4) + 1,
       color,
     });
     i++;
@@ -173,27 +177,47 @@ void (async () => {
           .concat() as any;
         color[2] = 0.85;
         graph.addDirectedEdge(url, targetUrl, {
-          size: 0.01,
+          size: 1,
           color: rgb2hex(hslToRgb(...color)),
         });
       }
     }
   }
 
+  for (const node of graph.nodes()) {
+    const degree = graph.degree(node);
+    graph.setNodeAttribute(node, "size", 1 + 5 * degree ** 0.3);
+  }
+
   random.assign(graph, {
     dimensions: ["x", "y"],
-    scale: 1000,
+    scale: 4000,
   });
 
-  applyCircleIteration(graph);
+  // for (let i = 1; i < 10; i++) applyCircleIteration(graph, 1 / i);
+  const comps = getConnectedComponents(graph);
+
+  let largestComponent = [...new Set(comps.values())].reduce((prev, curr) =>
+    prev.size > curr.size ? prev : curr
+  );
+
+  for (const node of graph.nodes()) {
+    if (!largestComponent.has(node)) {
+      graph.dropNode(node);
+    }
+  }
+
   await workerClient.setGraph(graph.export());
 
   let iters = 1;
   void (async () => {
     while (true) {
       positions = await workerClient.applyIteration(
-        Math.min(iters * 0.01 + 1, 1),
-        15 / Math.sqrt(iters)
+        // Math.min(iters * 0.01 + 1, 1),
+        Math.min(3000, iters * 10) / Math.pow(iters, 0.6),
+        // 0
+        (100 / Math.pow(iters, 0.6)) * (iters % 50 === 0 ? 10 : 1)
+        // (350 / Math.sqrt(iters)) * 0.1
       );
       iters++;
     }
@@ -201,28 +225,11 @@ void (async () => {
 
   let idx = 0;
 
-  // let iters = 0;
-  // let interval = setInterval(() => {
-  //   iters++;
-  //   applyCoordinateDescentForceIteration(graph, {
-  //     repulsion: 0.5,
-  //     neighborAttraction: 20 / Math.sqrt(iters + 1),
-  //   });
-  //   if (iters > 1000) {
-  //     clearInterval(interval);
-  //   }
-  // }, 100);
-
   document.body.style.height = "100vh";
 
   const sigma = new Sigma(graph, document.body);
 
   let animLoop = (t: number) => {
-    // console.log(t);
-    // let offset1 = (idx * 5000) % positions.length;
-    // let offset2 = ((idx + 1) * 5000) % positions.length;
-    // if (offset2 < offset1) offset2 += positions.length;
-    // for (const p of [...positions, ...positions].slice(offset1, offset2)) {
     for (const p of positions) {
       const attribs = graph.getNodeAttributes(p.id);
       graph.setNodeAttribute(p.id, "x", lerp(attribs.x, p.x, 0.1));
@@ -237,27 +244,73 @@ void (async () => {
 
   let oldEdgeSettings: { id: string; color: string; size: number }[] = [];
 
+  function highlightNeighbors(node: string, maxDepth: number) {
+    const visited = new Set<string>();
+
+    const queue: { depth: number; node: string }[] = [
+      {
+        node,
+        depth: 1,
+      },
+    ];
+
+    while (queue.length > 0) {
+      const qi = queue.shift()!;
+      if (qi.depth === maxDepth) continue;
+      const color = rgb2hex(hslToRgb(0.5 + 0.1 * qi.depth, 1, 0.5));
+      const node = qi.node;
+      for (const n of graph.neighbors(node)) {
+        const edgeOut = graph.edge(node, n);
+        const edgeIn = graph.edge(n, node);
+
+        let isvisited = false;
+
+        if (edgeOut && visited.has(edgeOut)) isvisited = true;
+        if (edgeIn && visited.has(edgeIn)) isvisited = true;
+
+        if (isvisited) continue;
+
+        for (const edge of [
+          ...(edgeOut ? [edgeOut] : []),
+          ...(edgeIn ? [edgeIn] : []),
+        ]) {
+          oldEdgeSettings.push({
+            color: graph.getEdgeAttribute(edge, "color"),
+            size: graph.getEdgeAttribute(edge, "size"),
+            id: edge,
+          });
+          graph.setEdgeAttribute(edge, "color", color);
+          graph.setEdgeAttribute(edge, "size", 14 / qi.depth);
+          visited.add(edge);
+        }
+
+        queue.push({ depth: qi.depth + 1, node: n });
+      }
+    }
+  }
+
   sigma.on("enterNode", (e) => {
-    const neighbors = graph.outboundEdges(e.node);
-    for (const n of neighbors) {
-      oldEdgeSettings.push({
-        color: graph.getEdgeAttribute(n, "color"),
-        size: graph.getEdgeAttribute(n, "size"),
-        id: n,
-      });
-      graph.setEdgeAttribute(n, "color", "orange");
-      graph.setEdgeAttribute(n, "size", 5);
-    }
-    const neighborsIn = graph.inboundEdges(e.node);
-    for (const n of neighborsIn) {
-      oldEdgeSettings.push({
-        color: graph.getEdgeAttribute(n, "color"),
-        size: graph.getEdgeAttribute(n, "size"),
-        id: n,
-      });
-      graph.setEdgeAttribute(n, "color", "blue");
-      graph.setEdgeAttribute(n, "size", 5);
-    }
+    highlightNeighbors(e.node, 7);
+    // const neighbors = graph.outboundEdges(e.node);
+    // for (const n of neighbors) {
+    //   oldEdgeSettings.push({
+    //     color: graph.getEdgeAttribute(n, "color"),
+    //     size: graph.getEdgeAttribute(n, "size"),
+    //     id: n,
+    //   });
+    //   graph.setEdgeAttribute(n, "color", "orange");
+    //   graph.setEdgeAttribute(n, "size", 5);
+    // }
+    // const neighborsIn = graph.inboundEdges(e.node);
+    // for (const n of neighborsIn) {
+    //   oldEdgeSettings.push({
+    //     color: graph.getEdgeAttribute(n, "color"),
+    //     size: graph.getEdgeAttribute(n, "size"),
+    //     id: n,
+    //   });
+    //   graph.setEdgeAttribute(n, "color", "blue");
+    //   graph.setEdgeAttribute(n, "size", 5);
+    // }
   });
 
   sigma.on("leaveNode", (e) => {
