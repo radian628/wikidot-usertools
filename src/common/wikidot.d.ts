@@ -21,6 +21,8 @@ declare namespace WIKIDOT {
     }
   }
 
+  let forumThreadId: number | undefined;
+
   namespace page {
     namespace vars {
       let locked: boolean;
@@ -35,6 +37,7 @@ declare namespace WIKIDOT {
         let timeLeft: any;
       }
     }
+    let init: () => void;
 
     namespace listeners {
       let filesClick: (a: any) => any;

@@ -1,6 +1,6 @@
 import * as graphology from "graphology";
-import { lookupQuadtree, makeQuadtree } from "../common/quadtree.js";
 import { getConnectedComponents } from "../common/connected-components.js";
+import { lookupQuadtree, makeQuadtree } from "r628";
 
 let graph: graphology.DirectedGraph;
 
@@ -146,7 +146,7 @@ function makeSpatialHashTable(
 }
 
 function getRepulsionRadius(graph: graphology.DirectedGraph, node: string) {
-  return Math.max(graph.getNodeAttribute(node, "mass") ** 0.9 * 10, 20);
+  return Math.max(graph.getNodeAttribute(node, "mass") ** 0.9 * 10, 20) * 3;
 }
 
 export function applyCoordinateDescentForceIteration(
@@ -253,7 +253,7 @@ export function applyCoordinateDescentForceIteration(
                 graph.getNodeAttribute(pt.id, "mass")) /
                 mag
             )
-          ),
+          ) / 3,
           (Math.random() - 0.5) * options.repulsion * 2
         );
       }
@@ -301,7 +301,9 @@ export function applyCoordinateDescentForceIteration(
     const dy = attrs.y - center.y;
     const mag = Math.hypot(dx, dy);
     if (mag > 0.1) {
-      const forceMag = 0.005 * mag ** 0.5 * options.neighborAttraction;
+      const forceMag =
+        (0.01 * Math.min(mag, 2000) ** 0.9 * options.neighborAttraction) /
+        (1 + graph.degree(node));
       graph.setNodeAttribute(node, "x2", attrs.x2 + (dx / mag) * forceMag);
       graph.setNodeAttribute(node, "y2", attrs.y2 + (dy / mag) * forceMag);
     }

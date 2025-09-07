@@ -9,15 +9,16 @@
 // ==/UserScript==
 */
 
-import {
-  listenForNoSelector,
-  listenForSelector,
-} from "../common/listen-for-element.js";
-import { PubSub } from "../common/pubsub.js";
-import { throttle, Throttled } from "../common/throttle.js";
-import { waitUntil } from "../common/wait.js";
 import { createWikiFilterField } from "./filter-by-wiki.js";
 import { scrollDetector } from "./scroll-detector.js";
+import {
+  Throttled,
+  PubSub,
+  throttle,
+  waitUntil,
+  listenForSelector,
+  listenForNoSelector,
+} from "r628";
 
 type GetUserPageResult = {
   status: "ok";

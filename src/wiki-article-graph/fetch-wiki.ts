@@ -1,5 +1,5 @@
+import { throttle } from "r628";
 import { crom } from "../common/crom.js";
-import { throttle } from "../common/throttle.js";
 import * as fs from "node:fs/promises";
 
 const slowcrom = throttle(crom, {

@@ -2,7 +2,7 @@ import * as fs from "node:fs/promises";
 
 const wikiRaw = await fs.readFile("./build/wiki.json");
 
-type Wiki = {
+export type Wiki = {
   node: {
     wikidotInfo: {
       source: string | null;

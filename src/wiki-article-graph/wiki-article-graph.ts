@@ -1,16 +1,14 @@
 import * as d3 from "d3";
-import { wait } from "../common/wait.js";
 import { crom } from "../common/crom.js";
-import { throttle } from "../common/throttle.js";
 import * as graphology from "graphology";
 import { random } from "graphology-layout";
 import forceAtlas2 from "graphology-layout-forceatlas2";
 import FA2Layout from "graphology-layout-forceatlas2/worker.js";
 import NoverlapLayout from "graphology-layout-noverlap/worker.js";
 import Sigma from "sigma";
-import { workerifyClient } from "../common/workerify.js";
 import type { wikiGraphWorkerInterface } from "./wiki-article-graph-worker-interface.js";
 import { getConnectedComponents } from "../common/connected-components.js";
+import { workerifyClient } from "r628";
 
 type WikiGraph = Record<
   string,
@@ -147,8 +145,8 @@ void (async () => {
 
   graphRaw = Object.fromEntries(
     Object.entries(graphRaw) //
-      // .slice(0, 30000)
-      .filter(([k, v]) => !!k.match(/\/scp-\d{1,4}$/g))
+      .slice(0, 30000)
+    // .filter(([k, v]) => !!k.match(/\/scp-\d{1,4}$/g))
   );
 
   const graph = new graphology.DirectedGraph();
@@ -189,7 +187,10 @@ void (async () => {
 
   for (const node of graph.nodes()) {
     const degree = graph.degree(node);
-    graph.setNodeAttribute(node, "size", 1 + 5 * degree ** 0.3);
+    graph.setNodeAttribute(node, "size", 1 + 2 * degree ** 0.3);
+    if (degree > 30) {
+      graph.dropNode(node);
+    }
   }
 
   random.assign(graph, {
@@ -217,9 +218,9 @@ void (async () => {
     while (true) {
       positions = await workerClient.applyIteration(
         // Math.min(iters * 0.01 + 1, 1),
-        Math.min(3000, iters * 10) / Math.pow(iters, 0.8),
+        Math.min(3000, iters * 10) / Math.pow(iters, 0.5),
         // 0
-        (100 / Math.pow(iters, 0.8)) * (iters % 50 === 0 ? 10 : 1)
+        (100 / Math.pow(iters, 0.5)) * (iters % 50 === 0 ? 10 : 1)
         // (350 / Math.sqrt(iters)) * 0.1
       );
       iters++;

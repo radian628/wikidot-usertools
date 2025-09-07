@@ -1,4 +1,4 @@
-import { workerifyServer } from "../common/workerify.js";
+import { workerifyServer } from "r628";
 import { wikiGraphWorkerInterface } from "./wiki-article-graph-worker-interface.js";
 
 const server = workerifyServer(

@@ -1,5 +1,4 @@
-import { registerStorageItem } from "../common/localstorage-io.js";
-import { stringField } from "../common/string-field.js";
+import { registerStorageItem, stringField } from "r628";
 
 const wikiFilter = registerStorageItem("filter-by-wiki", "");
 
