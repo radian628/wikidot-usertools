@@ -4,6 +4,7 @@
     "module": "nodenext",
     "lib": ["esnext", "dom"],
     "moduleResolution": "nodenext",
-    "target": "esnext"
+    "target": "esnext",
+    "jsx": "react"
   }
 }

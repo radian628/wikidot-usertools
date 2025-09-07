@@ -40,6 +40,7 @@ export const bundledPrecompiledTypescript: esbuild.Plugin = {
 const ctx = await esbuild.context({
   entryPoints: [
     "src/**/*.user.ts",
+    "src/**/*.user.tsx",
     "src/wiki-article-graph/wiki-article-graph.ts",
     "src/wiki-article-graph/wiki-article-graph-worker.ts",
   ],

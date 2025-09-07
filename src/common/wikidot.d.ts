@@ -18,6 +18,10 @@ declare namespace WIKIDOT {
       namespace vars {
         let editMode: any;
       }
+      namespace listeners {
+        let save: any;
+        let cancel: any;
+      }
     }
   }
 
