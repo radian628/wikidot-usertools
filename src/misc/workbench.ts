@@ -37,7 +37,14 @@ export function findIncludeStatement(src: string, name: string) {
   return stmts.find((e) => e.name === name);
 }
 
+let departments = new Set();
+let articleDepartments: Record<string, Set<string>> = {};
+let departmentArticles: Record<string, Set<string>> = {};
+
+let i = 0;
+
 for (const page of wiki) {
+  if (i++ % 500 == 0) console.log(i.toString());
   const s = page.node.wikidotInfo.source;
   // if (s?.includes("content-panel") && s.includes("3law")) {
   //   console.log(page.node.url);
@@ -46,18 +53,34 @@ for (const page of wiki) {
   //   console.log(page.node.url);
   // }
 
-  const cssmodules = [...(s ?? "").matchAll(CSS_MODULE_REGEX)]
-    .map((e) => e[1])
-    .join("");
+  const slug = page.node.url.slice("http://scp-wiki.wikidot.com/".length);
 
-  if (
-    cssmodules.match(".scp-image-block") ||
-    cssmodules.match(".block-left") ||
-    cssmodules.match(".block-right")
-  ) {
-    console.log(page.node.url);
-    count++;
+  const depts1 = s?.matchAll(/department\s+of\s+(\S+)/gi) ?? [];
+  const depts2 = s?.matchAll(/(\S+)\s+department/gi) ?? [];
+  const depts = [...depts1, ...depts2].map((e) => e[1]);
+
+  articleDepartments[slug] = new Set();
+  for (const d of depts) {
+    departments.add(d.toLowerCase());
+    articleDepartments[slug].add(d.toLowerCase());
+    if (!departmentArticles[d.toLowerCase()]) {
+      departmentArticles[d.toLowerCase()] = new Set();
+    }
+    departmentArticles[d.toLowerCase()].add(slug);
   }
+
+  // const cssmodules = [...(s ?? "").matchAll(CSS_MODULE_REGEX)]
+  //   .map((e) => e[1])
+  //   .join("");
+
+  // if (
+  //   cssmodules.match(".scp-image-block") ||
+  //   cssmodules.match(".block-left") ||
+  //   cssmodules.match(".block-right")
+  // ) {
+  //   console.log(page.node.url);
+  //   count++;
+  // }
 
   // try {
   //   const includes = findIncludeStatements(s ?? "");
@@ -86,4 +109,12 @@ for (const page of wiki) {
   // }
 }
 
-console.log(count);
+// console.log([...departments].join("\n"));
+console.log(
+  Object.entries(departmentArticles)
+    .filter(([k, v]) => v.size > 0)
+    .map(([k, v]) => k + "\n" + [...v].map((e) => "  " + e).join("\n"))
+    .join("\n\n")
+);
+
+// console.log(count);
