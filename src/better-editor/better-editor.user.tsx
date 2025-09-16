@@ -56,8 +56,12 @@ export async function setPageSource(url: string, newSource: string) {
     page_id: id,
     mode: "page",
     wiki_page: slug,
-    force_lock: "yes",
   })) as any;
+  if (lock.locked) {
+    window.alert(
+      "Could not save the page, as it is currently locked and being edited by another user."
+    );
+  }
   const dom = new DOMParser().parseFromString(lock.body, "text/html");
   await asyncRequestModule("Empty", {
     action: "WikiPageAction",
