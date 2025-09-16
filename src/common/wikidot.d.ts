@@ -45,6 +45,7 @@ declare namespace WIKIDOT {
 
     namespace listeners {
       let filesClick: (a: any) => any;
+      let editClick: (a: any) => any;
     }
   }
 }

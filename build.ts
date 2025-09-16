@@ -2,6 +2,7 @@ import * as esbuild from "esbuild";
 import { lessLoader } from "esbuild-plugin-less";
 import * as path from "node:path";
 import * as fs from "node:fs/promises";
+import { rawQueryParamPlugin } from "./r628/src-node/esbuild-raw-query-param.js";
 
 export const bundledPrecompiledTypescript: esbuild.Plugin = {
   name: "bpt",
@@ -46,7 +47,7 @@ const ctx = await esbuild.context({
   ],
   bundle: true,
   outdir: "build",
-  plugins: [lessLoader(), bundledPrecompiledTypescript],
+  plugins: [lessLoader(), bundledPrecompiledTypescript, rawQueryParamPlugin],
   minify: true,
   sourcemap: true,
 });

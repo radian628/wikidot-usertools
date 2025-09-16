@@ -145,10 +145,10 @@ After: ${s.set[0].trail()}`,this.ast.start)}}create(){return this.b.options.exte
   <head></head>
   <body>
     <script>
-      window.addEventListener("message", e => {
+      window.addEventListener("message", async (e) => {
         if (e.data && e.data.type === "eval") {
           try {
-            const res = eval(e.data.payload);
+            const res = await eval(e.data.payload);
             e.source.postMessage({
               type: "eval-success",
               payload: res,
