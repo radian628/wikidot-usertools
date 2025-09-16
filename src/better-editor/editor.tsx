@@ -9,12 +9,16 @@ import * as cssParser from "@lezer/css";
 import * as htmlParser from "@lezer/html";
 import * as jsParser from "@lezer/javascript";
 import { ensureSyntaxTree, LRLanguage } from "@codemirror/language";
-import { cssModuleParser } from "./css-module-parser.js";
+import {
+  cssModuleParser,
+  embeddedJSInCssFinderParser,
+} from "./css-module-parser.js";
 import { createWorkerWithInterface } from "../../r628/src/workerify.js";
 import WorkerSource from "./better-editor-worker.ts?bpt";
 import { WorkerBridge } from "./better-editor-worker-bridge.js";
 import { workerifyClientIframe } from "r628";
 import { IframeBridge } from "./better-editor-iframe-bridge.js";
+import { preprocess } from "./preprocess.js";
 
 export function Editor(props: {
   save: (state: string) => void;
@@ -34,6 +38,14 @@ export function Editor(props: {
 
       console.log(worker);
 
+      const extendedCSSParser = cssParser.parser.configure({
+        wrap: parseMixed((node) => {
+          if (node.name === "Comment")
+            return { parser: embeddedJSInCssFinderParser };
+          return null;
+        }),
+      });
+
       const configuredHTMLParser = htmlParser.parser.configure({
         wrap: htmlParser.configureNesting([
           {
@@ -42,7 +54,7 @@ export function Editor(props: {
           },
           {
             tag: "style",
-            parser: cssParser.parser,
+            parser: extendedCSSParser,
           },
         ]),
       });
@@ -50,10 +62,14 @@ export function Editor(props: {
       const embeddedCSSParser = cssModuleParser.configure({
         wrap: parseMixed((node) => {
           if (node.name === "CSSModuleContent") {
-            return { parser: cssParser.parser };
+            return { parser: extendedCSSParser };
           } else if (node.name === "HTMLBlockContent") {
             return {
               parser: configuredHTMLParser,
+            };
+          } else if (node.name === "JSCommentContent") {
+            return {
+              parser: jsParser.parser,
             };
           }
           return null; // aa
@@ -64,10 +80,12 @@ export function Editor(props: {
         parser: embeddedCSSParser,
       });
 
+      const rawPageSource = (await getPageSource(window.location.href))
+        .trimStart()
+        .replaceAll("\xA0", " ");
+
       const view = new EditorView({
-        doc: (await getPageSource(window.location.href))
-          .trimStart()
-          .replaceAll("\xA0", " "),
+        doc: (await preprocess(rawPageSource, 0, false)).str,
         parent: div,
         extensions: [
           EditorView.lineWrapping,
@@ -117,7 +135,8 @@ export function App() {
         <div style={{ height: "100vh", width: `${100 * fract}vw` }}>
           <Editor
             save={async (c) => {
-              await setPageSource(window.location.href, c);
+              const preprocessed = await preprocess(c, 0, true);
+              await setPageSource(window.location.href, preprocessed.str);
               iframeRef.current?.contentWindow?.location.reload();
               console.log("refreshed iframe");
             }}
