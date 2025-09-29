@@ -5,8 +5,12 @@ export async function preprocess(str: string, cursor: number, doEval: boolean) {
   const evalbox = await createEvalbox();
   const res = await smartAsyncReplaceAll(
     str,
-    /\[!--GENERATED START--\][\s\S]*?\[!--GENERATED END--\]|\/\*GENERATED START\*\/[\s\S]*?\/\*GENERATED END\*\/|\[!--js[\s\S]*?--\]|\/\*js[\s\S]*?\*\//g,
+    /\[!--GENERATED START--\][\s\S]*?\[!--GENERATED END--\]|\/\*GENERATED START\*\/[\s\S]*?\/\*GENERATED END\*\/|\[!--js[\s\S]*?--\]|\/\*js[\s\S]*?\*\/|\[\[module css\]\]\s?(\/\*[\S\s]*?\*\/)?/g,
     async (str, pos, cursor) => {
+      if (str.startsWith("[[module")) {
+        return `[[module css]]\n/*${window.location.pathname.slice(1).split("/")[0]}*/`;
+      }
+
       if (str.startsWith("[!--GENERATED") || str.startsWith("/*GENERATED"))
         return "";
 
