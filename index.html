@@ -8,11 +8,16 @@
       }
 
       main {
-        max-width: 40em;
+        max-width: 45em;
         padding: 20px;
         box-sizing: border-box;
         margin: auto;
         margin-top: 100px;
+      }
+
+      .usertool-divider {
+        margin-top: 50px;
+        margin-bottom: 50px;
       }
     </style>
   </head>
@@ -20,15 +25,236 @@
     <main>
       <h1>Radian628 Wikidot Usertools</h1>
       <p>
+        <em
+          >Found a bug?
+          <a href="https://github.com/radian628/wikidot-usertools/"
+            >Open an issue or a PR here!</a
+          ></em
+        >
+      </p>
+      <p>
         Here's a few tools for making Wikidot (mainly the SCP Wiki) more
         bearable to use.
       </p>
 
-      <h2>AutoHTTP</h2>
+      <h2>Usage</h2>
       <p>
-        <a href="build/autohttp/autohttp.user.js">Link</a>
+        Nearly all of these usertools require a UserScript manager to properly
+        use (though some can just be pasted into your developer console). Here
+        are a few UserScript managers I recommend.
       </p>
-      <p></p>
+      <ul>
+        <li><a href="https://violentmonkey.github.io/">Violentmonkey</a></li>
+        <li><a href="https://www.greasespot.net/">Greasemonkey</a></li>
+        <li><a href="https://www.tampermonkey.net/">Tampermonkey</a></li>
+      </ul>
+
+      <h2>Usertools</h2>
+
+      <h3>Local Draft Backup</h3>
+      <p>
+        <a href="build/draft-backup/draft-backer-upper.user.js"
+          >Installation Link</a
+        >
+      </p>
+      <p>
+        Create <em>local</em> backups of your Wikidot drafts while editing, so
+        if Wikidot can't save your work, you won't lose your progress. Drafts
+        are saved every 60 seconds, and are stored locally, on your machine, so
+        you do not need an internet connection for this userscript to work.
+      </p>
+
+      <hr class="usertool-divider" />
+
+      <h3>Better Editor</h3>
+      <p>
+        <a href="build/better-editor/better-editor.user.js"
+          >Installation Link</a
+        >
+      </p>
+      <p>
+        Completely replaces Wikidot's editor with a CodeMirror-powered editor
+        that displays side-by-side with the page you are editing.
+      </p>
+      <p>Supports:</p>
+      <ul>
+        <li>
+          Syntax highlighting for <code>[[module css]]</code> and
+          <code>[[html]]</code> (but not for Wikitext yet, unfortunately).
+        </li>
+        <li>Resizeable layout.</li>
+        <li>
+          Hit <code>Ctrl-S</code> at any moment to save without exiting the
+          editor. The page on the right will automatically refresh.
+        </li>
+        <li>
+          Supports limited hot-reloading capabilities for CSS in CSS modules
+          only. Will likely break if you add/remove a CSS module.
+        </li>
+        <li>
+          Run JavaScript at compile time to generate complex or repetitive
+          instructions with relatively little code.
+          <em
+            >All JavaScript is run in a cross-origin-isolated sandboxed iframe
+            for security purposes. </em
+          >. JavaScript snippets are specified using WikiText or CSS comment
+          syntax, with the string <code>js</code> immediately following the
+          opening comment. So, for example,
+          <code>[!--js "Hello, world!" --]</code> will add the string
+          <code>Hello, world!</code> to your page's source.
+        </li>
+        <li>
+          This editor does <em>not</em> steal the edit lock. Thus, other users
+          can make edits while you're editing. If your version is out-of-date by
+          the time you save, you will see merge conflict markers, which you will
+          need to resolve before the save will go through.
+        </li>
+      </ul>
+
+      <hr class="usertool-divider" />
+
+      <h3>Custom CSS Widget</h3>
+      <p>
+        <a href="build/custom-css-widget/custom-css-widget.user.js"
+          >Installation Link</a
+        >
+      </p>
+      <p>
+        Adds a widget to the bottom right corner of every page, allowing you to
+        quickly and easily inject extra CSS into it. This is primarily intended
+        as a debugging tool for if you want to quickly add CSS to a page to see
+        how it'll affect it in practice, and in a way you can easily copy over
+        into a Wikidot CSS Module.
+      </p>
+      <p>
+        Also, if you highlight/select a CSS selector, all elements matching that
+        selector will be given an outline, thus allowing you to more easily
+        debug your CSS selectors.
+      </p>
+
+      <hr class="usertool-divider" />
+
+      <h3>Better Comments View</h3>
+      <p>
+        <a href="build/better-comments-view/better-comments-view.user.js"
+          >Installation Link</a
+        >
+      </p>
+      <p>
+        Changes comments in <code>user:info</code> profiles into
+        infinitely-scrolling feeds, which can be filtered by wiki.
+      </p>
+
+      <hr class="usertool-divider" />
+
+      <h3>Unfuck All CSS</h3>
+      <p>
+        <a href="build/unfuck-all-css/unfuck-all-css.user.js"
+          >Installation Link</a
+        >
+      </p>
+      <p>
+        This userscript forcibly refreshes all CSS on every Wikidot page you
+        visit, forcing the CSS to load properly. You likely don't need this
+        userscript unless (1) Wikidot pages frequently look broken for you, and
+        (2) clearing your cache does not fix the issue.
+      </p>
+
+      <hr class="usertool-divider" />
+
+      <h3>AutoHTTP</h3>
+      <p>
+        <a href="build/autohttp/autohttp.user.js">Installation Link</a>
+      </p>
+      <h4>Usage Summary</h4>
+      <p>
+        This userscript is controlled by "directives" placed within a page's
+        source (they can be placed within comments). Once one or more directives
+        are in your page's source, a button will appear in the bottom left
+        corner allowing you to activate the userscript.
+      </p>
+      <ul>
+        <li>
+          Use <code>!!!AUTOHTTP link filename!!!</code> to load the resource at
+          URL <code>link</code> to the Wikidot attachment with file name
+          <code>filename</code>. The userscript will refetch all files on each
+          page refresh, only reuploading them to Wikidot if their contents have
+          actually changed.
+        </li>
+        <li>
+          (OPTIONAL) Use <code>!!!AUTOHTTP_BUILDPOLL link!!!</code> to
+          repeatedly poll the HTTP resource at URL <code>link</code>. If this
+          resource changes, the userscript will automatically refetch/reupload
+          the files and then refresh the page, instead of you having to refresh
+          it manually.
+        </li>
+      </ul>
+      <h4>Manual</h4>
+      <p>
+        This userscript automatically fetches files from a local or remote
+        HTTP(S) server and then (re)uploads them as Wikidot file attachments. It
+        is intended to assist in creating automated build pipelines for Wikidot
+        pages.
+      </p>
+      <p>
+        To identify which pages to (re)upload, the userscript analyzes the page
+        source for "directives", which take the form
+        <code>!!!AUTOHTTP link filename!!!</code>. Do NOT include any extra
+        whitespace, as it will not work. Replace <code>link</code> with a full
+        URL to the file hosted on the HTTP(S) server, and replace
+        <code>filename</code> with the name you want the file to have when it is
+        attached.
+      </p>
+      <p>
+        For example, you could use
+        <code>!!!AUTOHTTP http://localhost:8080/hello.png world.png!!!</code> to
+        take the file hosted at the URL
+        <code>http://localhost:8080/hello.png</code> and upload it as the file
+        attachment <code>world.png</code>.
+      </p>
+      <p>
+        Once you create one of these directives (surround it with
+        <code>[!--</code> and <code>--]</code> so it doesn't actually display on
+        the page) and then save the page, a button should appear in the bottom
+        left corner of the screen, allowing you to enable AutoHTTP. This manual
+        step is here to prevent you from accidentally uploading files to other
+        articles.
+      </p>
+      <p>
+        Upon every subsequent page reload, all resources will be re-fetched from
+        your chosen HTTP(S) server(s), and will only be reuploaded to Wikidot if
+        their contents do not match the last-uploaded version.
+      </p>
+      <h5>Hot Reload</h5>
+      <p>
+        Normally, in order for this script to register changes to files you've
+        uploaded, you have to reload the page, at which point it will re-fetch
+        and compare the files to the versions currently hosted on Wikidot. If
+        you instead want it to automatically reupload the files and refresh the
+        page whenever they've changed, you can use hot reloading.
+      </p>
+
+      <p>
+        To enable hot reloading, use the
+        <code>!!!AUTOHTTP_BUILDPOLL link!!!</code> directive, where
+        <code>link</code> is a URL that returns a string representing a "build
+        version". If given, this directive instructs the userscript to
+        repeatedly poll this endpoint. If, while polling this endpoint, it
+        receives a response which is different from prior responses, it assumes
+        that a new build has been released, meaning that some files have
+        changed, meaning that it will re-fetch and re-upload them, before
+        refreshing the page.
+      </p>
+      <p>
+        The reason why this endpoint is separate from the AUTOHTTP endpoint is
+        because some uploaded files might be large and would thus be impractical
+        to repeatedly poll.
+      </p>
+      <h5>Troubleshooting</h5>
+      <p>
+        Make sure the server you're using is CORS-enabled! And make sure you use
+        the full URL (<code>http://</code> or <code>https://</code> included!)
+      </p>
     </main>
   </body>
 </html>
