@@ -4,3 +4,6 @@ wiki.json.gz
 wiki.db
 wiki.json.br
 depts.txt
+*.workbench.*
+imgur-links.txt
+deviantart-links.txt

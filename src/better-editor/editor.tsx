@@ -1,12 +1,6 @@
 import { oneDark } from "@codemirror/theme-one-dark";
 import { EditorView, keymap, lineNumbers } from "@codemirror/view";
 import React, { useEffect, useRef, useState } from "react";
-import {
-  defaultThrottle,
-  getPageId,
-  getPageSource,
-  setPageSource,
-} from "./better-editor.user.js";
 import { defaultKeymap, indentWithTab, history } from "@codemirror/commands";
 import { buildParser } from "@lezer/generator";
 import { parseMixed } from "@lezer/common";
@@ -26,6 +20,12 @@ import { IframeBridge } from "./better-editor-iframe-bridge.js";
 import { preprocess } from "./preprocess.js";
 import { diff } from "@codemirror/merge";
 import { search, searchKeymap } from "@codemirror/search";
+import {
+  defaultThrottle,
+  getPageId,
+  getPageSource,
+  setPageSource,
+} from "../common/wikidot-api-utils.js";
 
 async function getFormattedPageSource(url: string) {
   const rawPageSource = (await getPageSource(window.location.href))
