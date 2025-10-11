@@ -16,81 +16,6 @@ import { getPageSource } from "../common/wikidot-api-utils.js";
 const AUTOHTTP_DIRECTIVE = /\!\!\!AUTOHTTP (\S+) (\S+)\!\!\!/g;
 const BUILDPOLL_DIRECTIVE = /\!\!\!AUTOHTTP_BUILDPOLL (\S+)\!\!\!/g;
 
-function uploadFile(name: string, file: Blob, comments: string) {
-  const formdata = new FormData();
-  formdata.append("action", "FileAction");
-  formdata.append("event", "uploadFile");
-  formdata.append("page_id", WIKIREQUEST.info.pageId);
-  formdata.append("MAX_FILE_SIZE", "209715200");
-  formdata.append("userfile", file);
-  formdata.append("dfilename", name);
-  formdata.append("comments", comments);
-  return fetch(window.location.origin + "/default--flow/files__UploadTarget", {
-    method: "post",
-    body: formdata,
-  });
-}
-
-const requestModuleAsync = async (str: string, payload: any): Promise<any> => {
-  return new Promise((resolve, reject) => {
-    return OZONE.ajax.requestModule(str, payload, (result) => {
-      resolve(result);
-    });
-  });
-};
-
-async function getFiles() {
-  const table = await requestModuleAsync("files/PageFilesModule", {
-    page_id: WIKIREQUEST.info.pageId,
-  });
-  const dom = new DOMParser().parseFromString(table.body, "text/html");
-
-  let idmap = new Map();
-
-  for (const row of Array.from(dom.querySelectorAll("tbody tr"))) {
-    const filename = row.children[0].querySelector("a")!.innerText;
-    const id = row.id.match(/\d+$/g)![0];
-    idmap.set(filename, id);
-  }
-
-  return { ids: idmap };
-}
-
-async function deleteFile(id: string) {
-  await requestModuleAsync("Empty", {
-    file_id: id,
-    action: "FileAction",
-    event: "deleteFile",
-  });
-}
-
-async function replaceFile(name: string, file: Blob) {
-  const { ids } = await getFiles();
-  const id = ids.get(name);
-  if (id) {
-    await deleteFile(id);
-  }
-  await uploadFile(name, file, "");
-}
-
-function compareBytes(a: Uint8Array, b: Uint8Array) {
-  if (a.length !== b.length) return false;
-  for (let i = 0; i < a.length; i++) {
-    if (a[i] !== b[i]) return false;
-  }
-  return true;
-}
-
-function getFileLink(filename: string) {
-  return (
-    window.location.origin +
-    "/local--files/" +
-    window.location.pathname.split("/")[1] +
-    "/" +
-    filename
-  );
-}
-
 const autohttpLocalStorage = registerStorageItem<Record<string, boolean>>(
   "autohttp-enabled",
   {}
@@ -203,3 +128,17 @@ async function attemptFileRefetch(
 
   pollBuildVersions();
 })();
+function getFileLink(filename: string): URL | RequestInfo {
+  throw new Error("Function not implemented.");
+}
+
+function compareBytes(
+  localFile: Uint8Array<ArrayBuffer>,
+  wikidotFile: Uint8Array<ArrayBuffer>
+) {
+  throw new Error("Function not implemented.");
+}
+
+function replaceFile(filename: string, arg1: Blob): any {
+  throw new Error("Function not implemented.");
+}
