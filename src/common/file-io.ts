@@ -32,7 +32,7 @@ export async function getFileIds() {
   return { ids: idmap };
 }
 
-type FileInfo = {
+export type FileInfo = {
   size: number;
   id: string;
   name: string;
