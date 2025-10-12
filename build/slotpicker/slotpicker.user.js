@@ -1097,9 +1097,9 @@ http://scp-wiki.wikidot.com/9000contestjackike
 
 http://scp-wiki.wikidot.com/9000contestalexjohansson
 
-https://scp-wiki.wikidot.com/9000contestmann
+http://scp-wiki.wikidot.com/9000contestmann
 
-https://scp-wiki.wikidot.com/9000contestuncannyon`;function l(r){let o=[];for(let t=0;t<r&&t<1e7;t++)o.push(t);return o}var h='{ url: { startsWith: "http://scp-wiki.wikidot.com"}, wikidotInfo: { tags: { eq: "9000" } } }';window.getRatings=async()=>(await u(h,"{ url, wikidotInfo { rating } }")).filter(o=>!o.url.endsWith("scp9000contesthub"));window.calculatePicks=async r=>{let o=r.sort((i,s)=>s.wikidotInfo.rating-i.wikidotInfo.rating),t=new Map,n=new Map,c=k.split(`
+http://scp-wiki.wikidot.com/9000contestuncannyon`;function l(r){let o=[];for(let t=0;t<r&&t<1e7;t++)o.push(t);return o}var h='{ url: { startsWith: "http://scp-wiki.wikidot.com"}, wikidotInfo: { tags: { eq: "9000" } } }';window.getRatings=async()=>(await u(h,"{ url, wikidotInfo { rating } }")).filter(o=>!o.url.endsWith("scp9000contesthub"));window.calculatePicks=async r=>{let o=r.sort((i,s)=>s.wikidotInfo.rating-i.wikidotInfo.rating),t=new Map,n=new Map,c=k.split(`
 
 `).map(i=>{let s=i.split(`
 `),e=s[0],p=s.slice(1).join(`
