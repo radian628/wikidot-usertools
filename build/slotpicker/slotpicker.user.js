@@ -146,10 +146,9 @@ http://scp-wiki.wikidot.com/9000contestbaddata
 http://scp-wiki.wikidot.com/9000contestbigslothonmyface
 9001
 9002
-9500
-9100
-9998
-9XYZ no_slot 
+999X highest
+9X00
+900X
 
 http://scp-wiki.wikidot.com/9000contestblackmonday
 9006
@@ -824,10 +823,10 @@ http://scp-wiki.wikidot.com/9000contestsailorenoch
 9970
 
 http://scp-wiki.wikidot.com/9000contestseekgull
+900X
 9090
+9X00
 9X9X
-9XX9
-9060
 9966
 
 http://scp-wiki.wikidot.com/9000contestsevencix
@@ -1032,8 +1031,8 @@ http://scp-wiki.wikidot.com/9000contestzoempaws
 9001
 9666
 9333
+9173
 9XX9
-9X9X 
 
 http://scp-wiki.wikidot.com/9000contestzyn
 9333
