@@ -8,7 +8,7 @@
       endCursor
     }
   }
-}`,i=await X(c);if(n.push(...i.data.pages.edges.map(s=>s.node)),!i.data.pages.pageInfo.hasNextPage)break;t=i.data.pages.pageInfo.endCursor}return n}var l=`http://scp-wiki.wikidot.com/9000booblesnoot
+}`,i=await X(c);if(n.push(...i.data.pages.edges.map(s=>s.node)),!i.data.pages.pageInfo.hasNextPage)break;t=i.data.pages.pageInfo.endCursor}return n}var k=`http://scp-wiki.wikidot.com/9000booblesnoot
 9966
 9006
 9886
@@ -1056,7 +1056,7 @@ http://scp-wiki.wikidot.com/9000katyastrangelove
 9400
 9014
 
-http://scp-wiki.wikidot.com/9000contestbattlecruiser12 
+http://scp-wiki.wikidot.com/9000contestbattlecruiser12
 9003
 9100
 9300
@@ -1095,11 +1095,15 @@ http://scp-wiki.wikidot.com/9000contestmrmcguffin
 
 http://scp-wiki.wikidot.com/9000contestjackike
 
-http://scp-wiki.wikidot.com/9000contestalexjohansson`;function k(r){let o=[];for(let t=0;t<r&&t<1e7;t++)o.push(t);return o}var h='{ url: { startsWith: "http://scp-wiki.wikidot.com"}, wikidotInfo: { tags: { eq: "9000" } } }';window.getRatings=async()=>(await u(h,"{ url, wikidotInfo { rating } }")).filter(o=>!o.url.endsWith("scp9000contesthub"));window.calculatePicks=async r=>{let o=r.sort((i,s)=>s.wikidotInfo.rating-i.wikidotInfo.rating),t=new Map,n=new Map,c=l.split(`
+http://scp-wiki.wikidot.com/9000contestalexjohansson
+
+https://scp-wiki.wikidot.com/9000contestmann
+
+https://scp-wiki.wikidot.com/9000contestuncannyon`;function l(r){let o=[];for(let t=0;t<r&&t<1e7;t++)o.push(t);return o}var h='{ url: { startsWith: "http://scp-wiki.wikidot.com"}, wikidotInfo: { tags: { eq: "9000" } } }';window.getRatings=async()=>(await u(h,"{ url, wikidotInfo { rating } }")).filter(o=>!o.url.endsWith("scp9000contesthub"));window.calculatePicks=async r=>{let o=r.sort((i,s)=>s.wikidotInfo.rating-i.wikidotInfo.rating),t=new Map,n=new Map,c=k.split(`
 
 `).map(i=>{let s=i.split(`
 `),e=s[0],p=s.slice(1).join(`
-`),d=f(p);d.invalid.length>0&&console.warn(e,"had invalid preferences: ",d.invalid),n.set(e,d.prefs)});for(let i of o){let s=n.get(i.url);s||(console.warn(i.url,"has no slot preferences listed!"),s=k(998).map(p=>p+9e3).map(p=>p.toString()));let e=s.find(p=>!t.has(p));e===void 0&&console.warn(i.url,": no valid slot found!"),e!=="no_slot"&&e&&t.set(e,i.url)}return Object.fromEntries(Array.from(t.entries()))};async function b(r){let o=await(await fetch(r)).text();return new DOMParser().parseFromString(o,"text/html").querySelector("#discuss-button").href}function T(r,o){let t=new Map;for(let n=1;n<4;n++){let c=r[n],i=o[n];if(c.match(/\d/g)){if(c!==i)return!1}else{let s=t.get(c.toUpperCase());if(s===void 0)t.set(c.toUpperCase(),i);else if(s!==i)return!1}}return!0}function x(r){let o=[];for(let t=9e3;t<=9998;t++){let n=t.toString();T(r,n)&&o.push(n)}return o}function f(r){let o=r.split(`
+`),d=f(p);d.invalid.length>0&&console.warn(e,"had invalid preferences: ",d.invalid),n.set(e,d.prefs)});for(let i of o){let s=n.get(i.url);s||(console.warn(i.url,"has no slot preferences listed!"),s=l(998).map(p=>p+9e3).map(p=>p.toString()));let e=s.find(p=>!t.has(p));e===void 0&&console.warn(i.url,": no valid slot found!"),e!=="no_slot"&&e&&t.set(e,i.url)}return Object.fromEntries(Array.from(t.entries()))};async function b(r){let o=await(await fetch(r)).text();return new DOMParser().parseFromString(o,"text/html").querySelector("#discuss-button").href}function T(r,o){let t=new Map;for(let n=1;n<4;n++){let c=r[n],i=o[n];if(c.match(/\d/g)){if(c!==i)return!1}else{let s=t.get(c.toUpperCase());if(s===void 0)t.set(c.toUpperCase(),i);else if(s!==i)return!1}}return!0}function x(r){let o=[];for(let t=9e3;t<=9998;t++){let n=t.toString();T(r,n)&&o.push(n)}return o}function f(r){let o=r.split(`
 `),t=["9000"],n=[];for(let c of o){if(c.trim().length===0)continue;let i=c.trim().split(/\s+/g),s=/^9[0-9xXyYzZ]{3}$/g;if(!i[0].match(s)){n.push(c);continue}let e=x(i[0]),p=!1;for(let d of i.slice(1))if(d==="highest")e.reverse();else if(d.startsWith("not")){let a=d.slice(3);e=e.filter(m=>m!==a)}else d==="palindrome"?e=e.filter(a=>a===a.split("").reverse().join("")):d==="no_same_digits_and_doesnt_end_with_9_or_0"?e=e.filter(a=>a.endsWith("9")||a.endsWith("0")?!1:new Set(a.split("")).size===4):d==="lowest_4_and_7"?e=e.filter(a=>a.includes("4")&&a.includes("7")):d==="lowest_4_or_7"?e=e.filter(a=>a.includes("4")||a.includes("7")):d==="no_slot"?e=["no_slot"]:(p=!0,n.push(c));p||t.push(...e)}for(let c=9e3;c<=9998;c++)t.push(c.toString());return{prefs:t,invalid:n}}window.parsePrefs=f;async function v(r,o){let t=await b(r);console.log("discussion link",t);let n=await(await fetch(t)).text(),c=new DOMParser().parseFromString(n,"text/html");return Array.from(c.querySelectorAll("#thread-container-posts .post")).filter(i=>{let s=i.querySelector(".printuser a:nth-child(2)");return console.log(s),s&&o.includes(s.innerText)})}window.copyURLToClipboard=r=>o=>{navigator.clipboard.writeText(r).then(()=>{o.style.backgroundColor="green"}).catch(()=>{o.style.backgroundColor="red"}).finally(()=>{setTimeout(()=>{o.style.backgroundColor="#eee"},1e3)})};window.getAllAuthorComments=async()=>{let r=await u(h,"{ url, attributions { user { name } } }"),o=w(v,{limits:[{duration:10,maxRequests:3}],maxConcurrentRequests:3});console.log(r),document.body.innerHTML="",document.body.style="display: flex; flex-wrap: wrap;";for(let t of r){let n=t.url,c=await o(n,t.attributions.map(i=>i.user.name));for(let i of c){let s=i.querySelector(".content");if(i.innerText.match("9")){for(let e of Array.from(s.querySelectorAll("img")))e.parentElement.removeChild(e);if(!s)break;document.body.innerHTML+=`<div style="padding: 10px; margin: 10px; border: 1px solid black; width: 250px; font-family: sans-serif;">
       <p>
       <button style="max-width: 100%; font-size: 125%; word-wrap: break-word" onclick="window.copyURLToClipboard('${n}')(this)">${n}</button> 
