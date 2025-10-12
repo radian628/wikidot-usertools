@@ -139,6 +139,7 @@ http://scp-wiki.wikidot.com/9000contestbigslothonmyface
 9500
 9100
 9998
+9XYZ self_delete
 
 http://scp-wiki.wikidot.com/9000contestblackmonday
 9006
@@ -171,6 +172,8 @@ http://scp-wiki.wikidot.com/9000contestblueeyedfox
 http://scp-wiki.wikidot.com/9000contestcalibold
 900X
 9X00
+9XYZ palindrome highest
+9XYZ
 
 http://scp-wiki.wikidot.com/9000contestcathyautumn
 9001
@@ -283,7 +286,7 @@ http://scp-wiki.wikidot.com/9000contestdoctorcimmerian
 
 http://scp-wiki.wikidot.com/9000contestdoctorlilithsophia
 9000
-9X00 rev
+9X00 highest
 9408
 9049
 
@@ -458,9 +461,9 @@ http://scp-wiki.wikidot.com/9000contestgunpowdr
 
 http://scp-wiki.wikidot.com/9000contestharmacy
 9184
-900X rev
-9X00 rev
-90X0 rev
+900X highest
+9X00 highest
+90X0 highest
 9XYZ
 
 http://scp-wiki.wikidot.com/9000contestharrietfarrar
@@ -550,6 +553,7 @@ http://scp-wiki.wikidot.com/9000contestj-v-g
 900X
 9014
 9X00
+9XYZ palindrome
 
 http://scp-wiki.wikidot.com/9000contestkaelicles
 9001
@@ -834,6 +838,7 @@ http://scp-wiki.wikidot.com/9000contest-shirleysterling
 9321
 
 http://scp-wiki.wikidot.com/9000contestsigyeklette
+9XYZ no_same_digits_and_doesnt_end_with_9_or_0
 
 http://scp-wiki.wikidot.com/9000contestsimartar
 9550
@@ -990,6 +995,8 @@ http://scp-wiki.wikidot.com/9000contestxhawk77x
 9417
 9046
 9548
+9XYZ lowest_4_and_7
+9XYZ lowest_4_or_7
 
 http://scp-wiki.wikidot.com/9000contesty0ssarian
 9101
@@ -1003,6 +1010,12 @@ http://scp-wiki.wikidot.com/9000contestzeekyboogydoog
 9003
 9004
 9005
+900X
+90X0
+9X00
+9XY0
+9X0Y
+90XY
 
 http://scp-wiki.wikidot.com/9000contestzoempaws
 9001

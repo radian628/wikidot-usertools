@@ -69,13 +69,25 @@ function parsePrefs(str: string): {
     let invalidInstructions = false;
 
     for (const instruction of lineSplit.slice(1)) {
-      if (instruction === "rev") {
+      if (instruction === "highest") {
         slots.reverse();
       } else if (instruction.startsWith("not")) {
         const removeThis = instruction.slice(3);
         slots = slots.filter((s) => s !== removeThis);
       } else if (instruction === "palindrome") {
         slots = slots.filter((s) => s === s.split("").reverse().join(""));
+      } else if (instruction === "no_same_digits_and_doesnt_end_with_9_or_0") {
+        slots = slots.filter((s) => {
+          if (s.endsWith("9")) return false;
+          if (s.endsWith("0")) return false;
+          return new Set(s.split("")).size === 4;
+        });
+      } else if (instruction === "lowest_4_and_7") {
+        slots = slots.filter((s) => s.includes("4") && s.includes("7"));
+      } else if (instruction === "lowest_4_or_7") {
+        slots = slots.filter((s) => s.includes("4") || s.includes("7"));
+      } else if (instruction === "self_delete") {
+        slots = ["delete"];
       } else {
         invalidInstructions = true;
         invalid.push(line);
