@@ -1,5 +1,60 @@
 import { throttle } from "r628";
 import { getAllPagesMatching } from "../common/crom.js";
+import Picks from "./picks.txt?raw";
+import { range } from "../../r628/src/range.js";
+
+const FILTER_9KCON = `{ url: { startsWith: "http://scp-wiki.wikidot.com"}, wikidotInfo: { tags: { eq: "9000" } } }`;
+// @ts-expect-error
+window.getRatings = async () => {
+  const ratings = (
+    await getAllPagesMatching(FILTER_9KCON, `{ url, wikidotInfo { rating } }`)
+  ).filter((e) => !e.url.endsWith("scp9000contesthub"));
+  return ratings;
+};
+
+// @ts-expect-error
+window.calculatePicks = async (
+  rawArticles: { url: string; wikidotInfo: { rating: number } }[]
+) => {
+  const articles = rawArticles.sort(
+    (a, b) => b.wikidotInfo.rating - a.wikidotInfo.rating
+  );
+
+  const slotResults = new Map<string, string>();
+
+  const prefs = new Map<string, string[]>();
+
+  const parsedPicks = Picks.split("\n\n").map((e) => {
+    const lines = e.split("\n");
+    const url = lines[0];
+    const prefsRaw = lines.slice(1).join("\n");
+    const parsedPrefs = parsePrefs(prefsRaw);
+    if (parsedPrefs.invalid.length > 0) {
+      console.warn(url, "had invalid preferences: ", parsedPrefs.invalid);
+    }
+
+    prefs.set(url, parsedPrefs.prefs);
+  });
+
+  for (const a of articles) {
+    let preferences = prefs.get(a.url);
+    if (!preferences) {
+      console.warn(a.url, "has no slot preferences listed!");
+      preferences = range(998)
+        .map((e) => e + 9000)
+        .map((e) => e.toString());
+    }
+    const firstAvailableSlot = preferences.find((x) => !slotResults.has(x));
+    if (firstAvailableSlot === undefined) {
+      console.warn(a.url, ": no valid slot found!");
+    }
+    if (firstAvailableSlot !== "no_slot" && firstAvailableSlot) {
+      slotResults.set(firstAvailableSlot, a.url);
+    }
+  }
+
+  return Object.fromEntries(Array.from(slotResults.entries()));
+};
 
 async function getDiscussionLink(url: string) {
   const pageData = await (await fetch(url)).text();
@@ -86,8 +141,8 @@ function parsePrefs(str: string): {
         slots = slots.filter((s) => s.includes("4") && s.includes("7"));
       } else if (instruction === "lowest_4_or_7") {
         slots = slots.filter((s) => s.includes("4") || s.includes("7"));
-      } else if (instruction === "self_delete") {
-        slots = ["delete"];
+      } else if (instruction === "no_slot") {
+        slots = ["no_slot"];
       } else {
         invalidInstructions = true;
         invalid.push(line);
@@ -97,6 +152,10 @@ function parsePrefs(str: string): {
     if (invalidInstructions) continue;
 
     prefs.push(...slots);
+  }
+
+  for (let i = 9000; i <= 9998; i++) {
+    prefs.push(i.toString());
   }
 
   return {
@@ -144,7 +203,7 @@ window.copyURLToClipboard = (url) => (target: HTMLElement) => {
 // @ts-expect-error
 window.getAllAuthorComments = async () => {
   const pages = await getAllPagesMatching(
-    `{ url: { startsWith: "http://scp-wiki.wikidot.com"}, wikidotInfo: { tags: { eq: "9000" } } }`,
+    FILTER_9KCON,
     `{ url, attributions { user { name } } }`
   );
 

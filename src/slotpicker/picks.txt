@@ -68,7 +68,7 @@ http://scp-wiki.wikidot.com/9000contestanactualcrow
 9900
 
 http://scp-wiki.wikidot.com/9000contestanimalhospital
-9XYZZ
+9XYZ
 
 http://scp-wiki.wikidot.com/9000contestanorrack
 9016
@@ -115,7 +115,7 @@ http://scp-wiki.wikidot.com/9000contestastralnavigator
 9X00
 9090
 9X80
-8X30
+9X30
 9540
 9XYZ
 
@@ -139,7 +139,7 @@ http://scp-wiki.wikidot.com/9000contestbigslothonmyface
 9500
 9100
 9998
-9XYZ self_delete
+9XYZ no_slot 
 
 http://scp-wiki.wikidot.com/9000contestblackmonday
 9006
@@ -829,6 +829,7 @@ http://scp-wiki.wikidot.com/9000contestsevencix
 
 http://scp-wiki.wikidot.com/9000contestshariavanilla
 9529
+9XYZ no_slot
 
 http://scp-wiki.wikidot.com/9000contest-shirleysterling
 9300
@@ -881,7 +882,7 @@ http://scp-wiki.wikidot.com/9000contestspider-jaws
 http://scp-wiki.wikidot.com/9000contestsprawlingstar
 900X
 9X00 
-9XXXX 
+9XXX
 9876
 9929
 
@@ -1044,3 +1045,44 @@ http://scp-wiki.wikidot.com/9000katyastrangelove
 9980
 9400
 9014
+
+http://scp-wiki.wikidot.com/9000contestbattlecruiser12 
+9003
+9100
+9300
+9154
+9303
+
+http://scp-wiki.wikidot.com/9000contestpliltdrgrimoire
+9600
+9X00
+9663
+9333
+
+http://scp-wiki.wikidot.com/9000contestdoctorscrappy
+9876
+9001
+9666
+9900
+9696
+
+http://scp-wiki.wikidot.com/9000contestpuriora
+
+http://scp-wiki.wikidot.com/9000contestperdoh
+
+http://scp-wiki.wikidot.com/9000contestpinoccappuccino
+9931
+9317
+9901
+9311
+
+http://scp-wiki.wikidot.com/9000contestmrmcguffin
+9005
+9007
+9011
+9021
+9099
+
+http://scp-wiki.wikidot.com/9000contestjackike
+
+http://scp-wiki.wikidot.com/9000contestalexjohansson
