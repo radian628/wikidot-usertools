@@ -3,6 +3,7 @@ import { lessLoader } from "esbuild-plugin-less";
 import * as path from "node:path";
 import * as fs from "node:fs/promises";
 import { rawQueryParamPlugin } from "./r628/src-node/esbuild-raw-query-param.js";
+import { glob } from "glob";
 
 export const bundledPrecompiledTypescript: esbuild.Plugin = {
   name: "bpt",
@@ -47,9 +48,35 @@ const ctx = await esbuild.context({
   ],
   bundle: true,
   outdir: "build",
-  plugins: [lessLoader(), bundledPrecompiledTypescript, rawQueryParamPlugin],
+  plugins: [
+    lessLoader(),
+    bundledPrecompiledTypescript,
+    rawQueryParamPlugin,
+    {
+      name: "reorder-userscript-comments",
+      setup(build) {
+        build.onEnd(async () => {
+          const files = await glob("build/**/*.user.js");
+          await Promise.all([
+            files.map(async (f: string) => {
+              const file = (await fs.readFile(f)).toString();
+              const userscriptCommentRegex =
+                /\/\*![\s\S]*?\/\/\s*==UserScript==[\s\S]*?\/\/\s*==\/UserScript==[\s\S]*?\*\//g;
+              const matches = [...file.matchAll(userscriptCommentRegex)];
+              fs.writeFile(
+                f,
+                matches.map((m) => m[0]).join("\n") +
+                  file.replaceAll(userscriptCommentRegex, "")
+              );
+            }),
+          ]);
+        });
+      },
+    },
+  ],
   minify: true,
   sourcemap: true,
+  legalComments: "inline",
 });
 
 const tomlctx = await esbuild.context({

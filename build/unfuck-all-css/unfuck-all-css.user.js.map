@@ -2,6 +2,6 @@
   "version": 3,
   "sources": ["../../src/unfuck-all-css/unfuck-all-css.user.ts"],
   "sourcesContent": ["/*!\r\n// ==UserScript==\r\n// @name        Unfuck All CSS \r\n// @namespace   Violentmonkey Scripts\r\n// @grant       none\r\n// @match *://*.wikidot.com/*\r\n// @version     1.0\r\n// @author      radian628\r\n// @description 9/13/2025, 12:35:21 PM\r\n// ==/UserScript==\r\n*/\r\n\r\nwindow.addEventListener(\"load\", () => {\r\n  setTimeout(() => {\r\n    const styles = Array.from(document.querySelectorAll(\"style\"));\r\n    for (const s of styles) {\r\n      s.parentElement!.removeChild(s);\r\n    }\r\n\r\n    setTimeout(() => {\r\n      for (const s of styles) {\r\n        s.textContent += \"/*force refresh lol*/\";\r\n        document.head.appendChild(s);\r\n      }\r\n    }, 200);\r\n    console.log(\"hi\");\r\n  }, 100);\r\n});\r\n"],
-  "mappings": "mBAYA,OAAO,iBAAiB,OAAQ,IAAM,CACpC,WAAW,IAAM,CACf,IAAMA,EAAS,MAAM,KAAK,SAAS,iBAAiB,OAAO,CAAC,EAC5D,QAAWC,KAAKD,EACdC,EAAE,cAAe,YAAYA,CAAC,EAGhC,WAAW,IAAM,CACf,QAAWA,KAAKD,EACdC,EAAE,aAAe,wBACjB,SAAS,KAAK,YAAYA,CAAC,CAE/B,EAAG,GAAG,EACN,QAAQ,IAAI,IAAI,CAClB,EAAG,GAAG,CACR,CAAC",
+  "mappings": "mBAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA,EAYA,OAAO,iBAAiB,OAAQ,IAAM,CACpC,WAAW,IAAM,CACf,IAAMA,EAAS,MAAM,KAAK,SAAS,iBAAiB,OAAO,CAAC,EAC5D,QAAWC,KAAKD,EACdC,EAAE,cAAe,YAAYA,CAAC,EAGhC,WAAW,IAAM,CACf,QAAWA,KAAKD,EACdC,EAAE,aAAe,wBACjB,SAAS,KAAK,YAAYA,CAAC,CAE/B,EAAG,GAAG,EACN,QAAQ,IAAI,IAAI,CAClB,EAAG,GAAG,CACR,CAAC",
   "names": ["styles", "s"]
 }
