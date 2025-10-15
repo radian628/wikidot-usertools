@@ -10,7 +10,7 @@ import ExtensionJavascript from "./memfs-ext/extension.ts?bpt";
 // ==UserScript==
 // @name        Wikidot VSCode 
 // @match       *://*.wikidot.com/*
-// @match       https://radian628.github.io/dummy.html 
+// @match       https://radian628.github.io/wikidot-usertools/dummy.html* 
 // @grant       none
 // @version     1.0.1
 // @author      radian628
@@ -47,20 +47,37 @@ import ExtensionJavascript from "./memfs-ext/extension.ts?bpt";
 //   }
 // });
 
-const VSCODE_HOST_URL = `https://radian628.github.io/dummy.html?wikidot-vscode`;
+const VSCODE_HOST_URL = `https://radian628.github.io/wikidot-usertools/dummy.html?wikidot-vscode`;
 
 if (window.location.href === VSCODE_HOST_URL) {
-  const iframe = document.createElement("iframe");
-  iframe.style.width = "100vw";
-  iframe.style.height = "100vh";
-  iframe.style.position = "fixed";
-  iframe.style.top = "0";
-  iframe.style.left = "0";
-  iframe.style.zIndex = "100";
-  iframe.srcdoc = TestVscode.replace("{{{product.json}}}", ProductJson)
-    .replace("{{{memfs-package.json}}}", btoa(ExtensionPackageJson))
-    .replace("{{{memfs-extension.js}}}", btoa(ExtensionJavascript));
-  document.body.appendChild(iframe);
+  // document.addEventListener("load", () => {
+  (async () => {
+    await await fetch("/eval", {
+      method: "POST",
+      body: `self.customFetchHandler = req => {
+      console.log(req.url)
+      if (req.url.startstWith("https://unpkg.com/vscode-web@1.91.1/dist/out/vs/workbench/services/extensions/worker/webWorkerExtensionHostIframe.html")) {
+        return new Response("<script>console.log('sugma balls')</script>", {
+          headers: { "Content-Type": "text/html" }  
+        });
+      }
+      return fetch(req);
+    }`,
+    });
+
+    const iframe = document.createElement("iframe");
+    iframe.style.width = "100vw";
+    iframe.style.height = "100vh";
+    iframe.style.position = "fixed";
+    iframe.style.top = "0";
+    iframe.style.left = "0";
+    iframe.style.zIndex = "100";
+    iframe.srcdoc = TestVscode.replace("{{{product.json}}}", ProductJson)
+      .replace("{{{memfs-package.json}}}", btoa(ExtensionPackageJson))
+      .replace("{{{memfs-extension.js}}}", btoa(ExtensionJavascript));
+    document.body.appendChild(iframe);
+  })();
+  // });
 } else {
   // @ts-expect-error
   window.createVsCode = () => {

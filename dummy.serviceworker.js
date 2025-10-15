@@ -29,7 +29,7 @@ self.addEventListener("install", () => {
   console.log("installed");
 });
 
-self.addEventListener("activate", () => {
-  console.log("sw activate");
-  clients.claim();
-});
+// self.addEventListener("activate", () => {
+//   console.log("sw activate");
+//   clients.claim();
+// });

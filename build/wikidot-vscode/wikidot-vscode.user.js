@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name        Wikidot VSCode 
 // @match       *://*.wikidot.com/*
-// @match       https://radian628.github.io/dummy.html 
+// @match       https://radian628.github.io/wikidot-usertools/dummy.html* 
 // @grant       none
 // @version     1.0.1
 // @author      radian628
@@ -23110,5 +23110,13 @@
 @jspm/core/nodelibs/browser/chunk-CcCWfKp1.js:
   (*! safe-buffer. MIT License. Feross Aboukhadijeh <https://feross.org/opensource> *)
 */
-`;var i="https://radian628.github.io/dummy.html?wikidot-vscode";if(window.location.href===i){let e=document.createElement("iframe");e.style.width="100vw",e.style.height="100vh",e.style.position="fixed",e.style.top="0",e.style.left="0",e.style.zIndex="100",e.srcdoc=t.replace("{{{product.json}}}",r).replace("{{{memfs-package.json}}}",btoa(n)).replace("{{{memfs-extension.js}}}",btoa(o)),document.body.appendChild(e)}else window.createVsCode=()=>{let e=document.createElement("iframe");e.style.width="100vw",e.style.height="100vh",e.style.position="fixed",e.style.top="0",e.style.left="0",e.style.zIndex="100",e.src=i,document.body.appendChild(e)};})();
+`;var i="https://radian628.github.io/wikidot-usertools/dummy.html?wikidot-vscode";window.location.href===i?(async()=>{await await fetch("/eval",{method:"POST",body:`self.customFetchHandler = req => {
+      console.log(req.url)
+      if (req.url.startstWith("https://unpkg.com/vscode-web@1.91.1/dist/out/vs/workbench/services/extensions/worker/webWorkerExtensionHostIframe.html")) {
+        return new Response("<script>console.log('sugma balls')<\/script>", {
+          headers: { "Content-Type": "text/html" }  
+        });
+      }
+      return fetch(req);
+    }`});let e=document.createElement("iframe");e.style.width="100vw",e.style.height="100vh",e.style.position="fixed",e.style.top="0",e.style.left="0",e.style.zIndex="100",e.srcdoc=t.replace("{{{product.json}}}",r).replace("{{{memfs-package.json}}}",btoa(n)).replace("{{{memfs-extension.js}}}",btoa(o)),document.body.appendChild(e)})():window.createVsCode=()=>{let e=document.createElement("iframe");e.style.width="100vw",e.style.height="100vh",e.style.position="fixed",e.style.top="0",e.style.left="0",e.style.zIndex="100",e.src=i,document.body.appendChild(e)};})();
 //# sourceMappingURL=wikidot-vscode.user.js.map
