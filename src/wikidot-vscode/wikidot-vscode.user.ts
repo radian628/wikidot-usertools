@@ -10,6 +10,7 @@ import ExtensionJavascript from "./memfs-ext/extension.ts?bpt";
 // ==UserScript==
 // @name        Wikidot VSCode 
 // @match       *://*.wikidot.com/*
+// @match       https://radian628.github.io/dummy.html 
 // @grant       none
 // @version     1.0.1
 // @author      radian628
@@ -46,8 +47,9 @@ import ExtensionJavascript from "./memfs-ext/extension.ts?bpt";
 //   }
 // });
 
-// @ts-expect-error
-window.createVsCode = () => {
+const VSCODE_HOST_URL = `https://radian628.github.io/dummy.html?wikidot-vscode`;
+
+if (window.location.href === VSCODE_HOST_URL) {
   const iframe = document.createElement("iframe");
   iframe.style.width = "100vw";
   iframe.style.height = "100vh";
@@ -59,4 +61,20 @@ window.createVsCode = () => {
     .replace("{{{memfs-package.json}}}", btoa(ExtensionPackageJson))
     .replace("{{{memfs-extension.js}}}", btoa(ExtensionJavascript));
   document.body.appendChild(iframe);
-};
+} else {
+  // @ts-expect-error
+  window.createVsCode = () => {
+    const iframe = document.createElement("iframe");
+    iframe.style.width = "100vw";
+    iframe.style.height = "100vh";
+    iframe.style.position = "fixed";
+    iframe.style.top = "0";
+    iframe.style.left = "0";
+    iframe.style.zIndex = "100";
+    iframe.src = VSCODE_HOST_URL;
+    // iframe.srcdoc = TestVscode.replace("{{{product.json}}}", ProductJson)
+    //   .replace("{{{memfs-package.json}}}", btoa(ExtensionPackageJson))
+    //   .replace("{{{memfs-extension.js}}}", btoa(ExtensionJavascript));
+    document.body.appendChild(iframe);
+  };
+}

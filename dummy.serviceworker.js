@@ -18,8 +18,8 @@ self.addEventListener("fetch", (event) => {
     );
   } else {
     event.respondWith(
-      window.customFetchHandler
-        ? window.customFetchHandler(event.request)
+      self.customFetchHandler
+        ? self.customFetchHandler(event.request)
         : fetch(event.request)
     );
   }
