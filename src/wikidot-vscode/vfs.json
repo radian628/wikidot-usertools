@@ -1,0 +1,4 @@
+{
+  "root": "../../node_modules/vscode-web",
+  "exclude": ["**/dist/extensions/**"]
+}
