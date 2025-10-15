@@ -17,7 +17,11 @@ self.addEventListener("fetch", (event) => {
       })()
     );
   } else {
-    event.respondWith(fetch(event.request));
+    event.respondWith(
+      window.customFetchHandler
+        ? window.customFetchHandler(event.request)
+        : fetch(event.request)
+    );
   }
 });
 
