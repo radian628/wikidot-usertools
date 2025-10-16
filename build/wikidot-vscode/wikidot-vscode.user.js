@@ -8,145 +8,7 @@
 // @author      radian628
 // @description VSCode in Wikidot. This is the dumbest thing I've ever created. 
 // ==/UserScript==
-*/"use strict";(()=>{var t=`<!doctype html>\r
-<html>\r
-  <head>\r
-    <meta charset="utf-8" />\r
-\r
-    <!-- Mobile tweaks -->\r
-    <meta name="mobile-web-app-capable" content="yes" />\r
-    <meta name="apple-mobile-web-app-capable" content="yes" />\r
-    <meta name="apple-mobile-web-app-title" content="Code" />\r
-    <link rel="apple-touch-icon" href="/code-192.png" />\r
-\r
-    <!-- Disable pinch zooming -->\r
-    <meta\r
-      name="viewport"\r
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"\r
-    />\r
-\r
-    <!-- Workbench Icon/Manifest/CSS -->\r
-    <link rel="icon" href="/favicon.ico" type="image/x-icon" />\r
-    <link rel="manifest" href="/manifest.json" />\r
-    <link\r
-      data-name="vs/workbench/workbench.web.main"\r
-      rel="stylesheet"\r
-      href="https://unpkg.com/vscode-web@1.91.1/dist/out/vs/workbench/workbench.web.main.css"\r
-    />\r
-  </head>\r
-\r
-  <body aria-label=""></body>\r
-\r
-  <!-- Startup (do not modify order of script tags!) -->\r
-  <script>\r
-    const oldfetch = window.fetch;\r
-    window._oldfetch = oldfetch;\r
-    window.fetch = (...args) => {\r
-      const req = args[0];\r
-      // const url = URL.parse(req, window.location);\r
-      // if (url && url.pathname.endsWith("/browser/ui/codicons/codicon/codicon.ttf")) {\r
-      //   return Promise.resolve(\`{{{base64:}}}\`);\r
-      // }\r
-\r
-      // console.log(url, url.pathname);\r
-\r
-      console.log("FETCH WITH ARGS:", ...args);\r
-\r
-      if (req === "product.json") {\r
-        return new Response(\`{{{product.json}}}\`, {\r
-          headers: { "Content-Type": "application/json" },\r
-        });\r
-      } else if (req === "http:/MEMFS_EXTENSION/package.json") {\r
-        const res = atob(\`{{{memfs-package.json}}}\`);\r
-        console.log(res);\r
-        return new Response(res, {\r
-          headers: { "Content-Type": "application/json" },\r
-        });\r
-      } else if (req === "http:/MEMFS_EXTENSION/extension.js") {\r
-        const res = atob(\`{{{memfs-extension.js}}}\`);\r
-        console.log(res);\r
-        return new Response(res, {\r
-          headers: { "Content-Type": "application/javascript" },\r
-        });\r
-      } else if (req === "http:/MEMFS_EXTENSION/package.nls.json") {\r
-        return new Response("{}", {\r
-          headers: { "Content-Type": "application/json" },\r
-        });\r
-      }\r
-\r
-      return _oldfetch(...args);\r
-    };\r
-  <\/script>\r
-  <!-- <script src="../../node_modules/vscode-web/dist/out/vs/loader.js"><\/script>\r
-  <script src="../../node_modules/vscode-web/dist/out/vs/webPackagePaths.js"><\/script> -->\r
-  <script>\r
-    async function loadSync(path) {\r
-      const text = await (await fetch(path)).text();\r
-      eval(text);\r
-    }\r
-    (async () => {\r
-      await loadSync(\r
-        // "../../node_modules/vscode-web/dist/out/vs/loader.js"\r
-\r
-        "https://unpkg.com/vscode-web@1.91.1/dist/out/vs/loader.js"\r
-      );\r
-      await loadSync(\r
-        // "../../node_modules/vscode-web/dist/out/vs/webPackagePaths.js"\r
-        "https://unpkg.com/vscode-web@1.91.1/dist/out/vs/webPackagePaths.js"\r
-      );\r
-\r
-      const rootPath = \`https://unpkg.com/vscode-web@1.91.1/dist\`;\r
-      // const rootPath = \`memfs:/dist\`;\r
-\r
-      Object.keys(self.webPackagePaths).map(function (key, index) {\r
-        self.webPackagePaths[key] =\r
-          \`\${rootPath}/node_modules/\${key}/\${self.webPackagePaths[key]}\`;\r
-      });\r
-\r
-      console.log("web package paths", self.webPackagePaths);\r
-\r
-      require.config({\r
-        // paths: {\r
-        //   "vs/base/worker/workerMain.js":\r
-        //     "data:application/javascript,console.log('HELO WORLD!')",\r
-        // },\r
-        baseUrl: \`\${rootPath}/out\`,\r
-        recordStats: true,\r
-        trustedTypesPolicy: window.trustedTypes?.createPolicy("amdLoader", {\r
-          createScriptURL(value) {\r
-            console.log("CREATE SRIPT URL", value);\r
-            return value;\r
-          },\r
-        }),\r
-        paths: self.webPackagePaths,\r
-      });\r
-\r
-      const oldRequire = require;\r
-      window.require = function (...args) {\r
-        console.log("require with", ...args);\r
-        return oldRequire(...args);\r
-      };\r
-\r
-      await loadSync(\r
-        // "../../node_modules/vscode-web/dist/out/vs/workbench/workbench.web.main.nls.js"\r
-\r
-        "https://unpkg.com/vscode-web@1.91.1/dist/out/vs/workbench/workbench.web.main.nls.js"\r
-      );\r
-      await loadSync(\r
-        // "../../node_modules/vscode-web/dist/out/vs/workbench/workbench.web.main.js"\r
-        "https://unpkg.com/vscode-web@1.91.1/dist/out/vs/workbench/workbench.web.main.js"\r
-      );\r
-      await loadSync(\r
-        // "../../node_modules/vscode-web/dist/out/vs/code/browser/workbench/workbench.js"\r
-        "https://unpkg.com/vscode-web@1.91.1/dist/out/vs/code/browser/workbench/workbench.js"\r
-      );\r
-    })();\r
-  <\/script>\r
-  <!-- <script src="../../node_modules/vscode-web/dist/out/vs/workbench/workbench.web.main.nls.js"><\/script>\r
-  <script src="../../node_modules/vscode-web/dist/out/vs/workbench/workbench.web.main.js"><\/script>\r
-  <script src="../../node_modules/vscode-web/dist/out/vs/code/browser/workbench/workbench.js"><\/script>  -->\r
-</html>\r
-`;var r=`{\r
+*/"use strict";(()=>{var i=(t=>typeof require<"u"?require:typeof Proxy<"u"?new Proxy(t,{get:(o,r)=>(typeof require<"u"?require:o)[r]}):t)(function(t){if(typeof require<"u")return require.apply(this,arguments);throw Error('Dynamic require of "'+t+'" is not supported')});var s=`{\r
   "productConfiguration": {\r
     "nameShort": "VSCode Web Sample",\r
     "nameLong": "VSCode Web sample",\r
@@ -173,7 +35,7 @@
     }\r
   ]\r
 }\r
-`;var n=`{\r
+`;var a=`{\r
   "name": "memfs",\r
   "description": "Web playground for VS Code",\r
   "version": "0.0.13",\r
@@ -231,7 +93,7 @@
     "webpack-cli": "^3.3.12"\r
   }\r
 }\r
-`;var o=`"use strict";
+`;var l=`"use strict";
 (() => {
   var __create = Object.create;
   var __defProp = Object.defineProperty;
@@ -23110,7 +22972,7 @@
 @jspm/core/nodelibs/browser/chunk-CcCWfKp1.js:
   (*! safe-buffer. MIT License. Feross Aboukhadijeh <https://feross.org/opensource> *)
 */
-`;var i="https://radian628.github.io/wikidot-usertools/dummy.html?wikidot-vscode";window.location.href===i?(async()=>{await await fetch("/eval",{method:"POST",body:`self.customFetchHandler = req => {
+`;var f="https://radian628.github.io/wikidot-usertools/dummy.html?wikidot-vscode";window.location.href===f?(async()=>{await await fetch("/eval",{method:"POST",body:`self.customFetchHandler = req => {
       console.log(req.url)
       if (req.url.startstWith("https://unpkg.com/vscode-web@1.91.1/dist/out/vs/workbench/services/extensions/worker/webWorkerExtensionHostIframe.html")) {
         return new Response("<script>console.log('sugma balls')<\/script>", {
@@ -23118,5 +22980,28 @@
         });
       }
       return fetch(req);
-    }`});let e=document.createElement("iframe");e.style.width="100vw",e.style.height="100vh",e.style.position="fixed",e.style.top="0",e.style.left="0",e.style.zIndex="100",e.srcdoc=t.replace("{{{product.json}}}",r).replace("{{{memfs-package.json}}}",btoa(n)).replace("{{{memfs-extension.js}}}",btoa(o)),document.body.appendChild(e)})():window.createVsCode=()=>{let e=document.createElement("iframe");e.style.width="100vw",e.style.height="100vh",e.style.position="fixed",e.style.top="0",e.style.left="0",e.style.zIndex="100",e.src=i,document.body.appendChild(e)};})();
+    }`}),document.head.innerHTML=`
+    <meta charset="utf-8" />
+
+    <!-- Mobile tweaks -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Code" />
+    <link rel="apple-touch-icon" href="/code-192.png" />
+
+    <!-- Disable pinch zooming -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"
+    />
+
+    <!-- Workbench Icon/Manifest/CSS -->
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="manifest" href="/manifest.json" />
+    <link
+      data-name="vs/workbench/workbench.web.main"
+      rel="stylesheet"
+      href="https://unpkg.com/vscode-web@1.91.1/dist/out/vs/workbench/workbench.web.main.css"
+    />
+    `;let t=window.fetch;window._oldfetch=t,window.fetch=(...r)=>{let n=r[0];if(console.log("FETCH WITH ARGS:",...r),n==="product.json")return new Response(s,{headers:{"Content-Type":"application/json"}});if(n==="http:/MEMFS_EXTENSION/package.json"){let e=a;return console.log("successfully retrieved memfs package.json",e),new Response(e,{headers:{"Content-Type":"application/json"}})}else if(n==="http:/MEMFS_EXTENSION/extension.js"){let e=l;return new Response(e,{headers:{"Content-Type":"application/javascript"}})}else if(n==="http:/MEMFS_EXTENSION/package.nls.json")return new Response("{}",{headers:{"Content-Type":"application/json"}});return window._oldfetch(...r)};async function o(r){let n=document.createElement("script");return new Promise((e,u)=>{n.src=r,n.onload=e,document.body.appendChild(n)})}(async()=>{await o("https://unpkg.com/vscode-web@1.91.1/dist/out/vs/loader.js"),await o("https://unpkg.com/vscode-web@1.91.1/dist/out/vs/webPackagePaths.js");let r="https://unpkg.com/vscode-web@1.91.1/dist";Object.keys(self.webPackagePaths).map(function(e,u){self.webPackagePaths[e]=`${r}/node_modules/${e}/${self.webPackagePaths[e]}`}),console.log("web package paths",self.webPackagePaths),i.config({baseUrl:`${r}/out`,recordStats:!0,trustedTypesPolicy:window.trustedTypes?.createPolicy("amdLoader",{createScriptURL(e){return console.log("CREATE SRIPT URL",e),e}}),paths:self.webPackagePaths});let n=i;window.require=function(...e){return console.log("require with",...e),n(...e)},await o("https://unpkg.com/vscode-web@1.91.1/dist/out/vs/workbench/workbench.web.main.nls.js"),await o("https://unpkg.com/vscode-web@1.91.1/dist/out/vs/workbench/workbench.web.main.js"),await o("https://unpkg.com/vscode-web@1.91.1/dist/out/vs/code/browser/workbench/workbench.js")})()})():window.createVsCode=()=>{let t=document.createElement("iframe");t.style.width="100vw",t.style.height="100vh",t.style.position="fixed",t.style.top="0",t.style.left="0",t.style.zIndex="100",t.src=f,document.body.appendChild(t)};})();
 //# sourceMappingURL=wikidot-vscode.user.js.map

@@ -31,7 +31,11 @@ export const getPageId = defaultThrottle(async function (url: string) {
   }
 });
 
-export async function setPageSource(url: string, newSource: string) {
+export async function setPageSource(
+  url: string,
+  newSource: string,
+  newTitle?: string
+) {
   const id = await getPageId(url);
   const slug = new URL(url).pathname.slice(1);
   const lock = (await asyncRequestModule("edit/PageEditModule", {
@@ -58,6 +62,7 @@ export async function setPageSource(url: string, newSource: string) {
     revision_id: lock.page_revision_id,
     source: newSource,
     title:
+      newTitle ??
       (dom.getElementById("edit-page-title") as HTMLInputElement)?.value ??
       "No Title",
     wiki_page: slug,

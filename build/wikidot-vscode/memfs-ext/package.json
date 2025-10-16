@@ -4,10 +4,6 @@
   "version": "0.0.13",
   "publisher": "vscode",
   "license": "MIT",
-  "enabledApiProposals": [
-    "fileSearchProvider",
-    "textSearchProvider"
-  ],
   "private": true,
   "activationEvents": [
     "onFileSystem:memfs",

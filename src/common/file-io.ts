@@ -1,10 +1,15 @@
 import { requestModuleAsync } from "./request-module-async.js";
 
-export function uploadFile(name: string, file: Blob, comments: string) {
+export function uploadFile(
+  name: string,
+  file: Blob,
+  comments: string,
+  pageId: string
+) {
   const formdata = new FormData();
   formdata.append("action", "FileAction");
   formdata.append("event", "uploadFile");
-  formdata.append("page_id", WIKIREQUEST.info.pageId);
+  formdata.append("page_id", pageId);
   formdata.append("MAX_FILE_SIZE", "209715200");
   formdata.append("userfile", file);
   formdata.append("dfilename", name);
@@ -15,9 +20,9 @@ export function uploadFile(name: string, file: Blob, comments: string) {
   });
 }
 
-export async function getFileIds() {
+export async function getFileIds(pageId: string) {
   const table = await requestModuleAsync("files/PageFilesModule", {
-    page_id: WIKIREQUEST.info.pageId,
+    page_id: pageId,
   });
   const dom = new DOMParser().parseFromString(table.body, "text/html");
 
@@ -78,13 +83,13 @@ export async function deleteFile(id: string) {
   });
 }
 
-export async function replaceFile(name: string, file: Blob) {
-  const { ids } = await getFileIds();
+export async function replaceFile(name: string, file: Blob, pageId: string) {
+  const { ids } = await getFileIds(pageId);
   const id = ids.get(name);
   if (id) {
     await deleteFile(id);
   }
-  await uploadFile(name, file, "");
+  await uploadFile(name, file, "", pageId);
 }
 
 export async function renameFile(id: string, newname: string) {

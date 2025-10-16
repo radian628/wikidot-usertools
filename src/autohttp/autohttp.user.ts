@@ -12,6 +12,7 @@
 
 import { registerStorageItem, waitForCond } from "r628";
 import { getPageSource } from "../common/wikidot-api-utils.js";
+import { compareBytes, getFileLink, replaceFile } from "../common/file-io.js";
 
 const AUTOHTTP_DIRECTIVE = /\!\!\!AUTOHTTP (\S+) (\S+)\!\!\!/g;
 const BUILDPOLL_DIRECTIVE = /\!\!\!AUTOHTTP_BUILDPOLL (\S+)\!\!\!/g;
@@ -55,7 +56,7 @@ async function attemptFileRefetch(
       // reupload file + update cache
       await Promise.all([
         cache.put(req, new Response(localFile)),
-        replaceFile(filename, new Blob([localFile])),
+        replaceFile(filename, new Blob([localFile]), WIKIREQUEST.info.pageId),
       ]);
 
       console.log(`Reuploaded '${filename}' to Wikidot.`);
@@ -128,17 +129,3 @@ async function attemptFileRefetch(
 
   pollBuildVersions();
 })();
-function getFileLink(filename: string): URL | RequestInfo {
-  throw new Error("Function not implemented.");
-}
-
-function compareBytes(
-  localFile: Uint8Array<ArrayBuffer>,
-  wikidotFile: Uint8Array<ArrayBuffer>
-) {
-  throw new Error("Function not implemented.");
-}
-
-function replaceFile(filename: string, arg1: Blob): any {
-  throw new Error("Function not implemented.");
-}

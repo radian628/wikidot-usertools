@@ -252,7 +252,12 @@ export function MultisaveDialog(props: { exit: () => void }) {
                   totalFilesRenamed++;
                 } else if (!file.uploadedFileId && file.file) {
                   promises.push(
-                    uploadFile(file.name, file.file, "").then((e) => {
+                    uploadFile(
+                      file.name,
+                      file.file,
+                      "",
+                      WIKIREQUEST.info.pageId
+                    ).then((e) => {
                       currentFilesTransferred++;
                       updateUploadProgress();
                       currentBytes += file.size;
