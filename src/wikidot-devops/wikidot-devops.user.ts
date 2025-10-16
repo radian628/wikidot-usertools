@@ -23,7 +23,7 @@ import { compareBytes, replaceFile, uploadFile } from "../common/file-io.js";
 
 const DEVOPS_ENTRY_POINT_DIRECTIVE = /\[\!\-\-devops:(.*?)\-\-\]/;
 
-const HTTPUrl = z.url({ protocol: /^https?$/ });
+const HTTPUrl = z.url();
 const WebsocketUrl = z.url({ protocol: /^wss?$/ });
 
 const WikidotDevOpsManifest = z.array(
