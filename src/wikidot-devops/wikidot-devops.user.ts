@@ -82,7 +82,7 @@ async function fetchAndValidateJson<T>(endpoint: string, parser: z.ZodType<T>) {
       db.get("files", url),
       fetch(url).then((r) => r.blob()),
     ]);
-    await db.put("files", localFile, url);
+    await db.put("files", remoteFile, url);
     return {
       file: remoteFile,
       needsUpdating:
@@ -162,7 +162,8 @@ async function fetchAndValidateJson<T>(endpoint: string, parser: z.ZodType<T>) {
             await Promise.all(
               filesList.map(async (f) => {
                 const fileUrl = `${d.filesBaseUrl.replace(/\/*$/g, "")}/${f}`;
-                const { file, needsUpdating } = await fetchAndCompareFile(f);
+                const { file, needsUpdating } =
+                  await fetchAndCompareFile(fileUrl);
                 if (needsUpdating) {
                   changed = true;
                   filesChanged = true;
