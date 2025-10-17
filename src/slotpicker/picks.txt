@@ -216,11 +216,11 @@ http://scp-wiki.wikidot.com/9000contestcoccolithophor
 9XYZ
 
 http://scp-wiki.wikidot.com/9000contestdappleddaspletosaur
-9001
-9900
-9100
-9500
-9200
+9111
+9779
+9222
+9993
+9191
 
 http://scp-wiki.wikidot.com/9000contestdaveyoufool
 9002
@@ -305,11 +305,10 @@ http://scp-wiki.wikidot.com/9000contestdoctorzurvan
 
 http://scp-wiki.wikidot.com/9000contestdrbalthazaar
 9004
-900X
-9500
+9400
 9X00
+900X
 9444
-9876
 
 http://scp-wiki.wikidot.com/9000contestdreadnoughtgalaxy
 900X
@@ -318,10 +317,12 @@ http://scp-wiki.wikidot.com/9000contestdreadnoughtgalaxy
 9020
 9050
 9030
-9888
-9777
+9995
+999X highest
+9099
+9399
+9199
 9031
-9X99
 9233
 
 http://scp-wiki.wikidot.com/9000contestdr-lutwin
@@ -799,11 +800,11 @@ http://scp-wiki.wikidot.com/9000contestratseerofrattesse
 
 http://scp-wiki.wikidot.com/9000contestresolver
 900X
-9X00 
+9X00
 9033
-90X0 
+90X0
 9333
-9XXX 
+9XXX
 
 http://scp-wiki.wikidot.com/9000contestsailorenoch
 9991
@@ -854,11 +855,11 @@ http://scp-wiki.wikidot.com/9000contestsimpleruins
 9200
 
 http://scp-wiki.wikidot.com/9000contestsinkingotter
-9341
-9500
-9001
-9998
+9996
 9618
+9669
+9600
+9196
 
 http://scp-wiki.wikidot.com/9000contestsoftseal
 900X
