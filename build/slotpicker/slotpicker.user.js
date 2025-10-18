@@ -978,7 +978,7 @@ http://scp-wiki.wikidot.com/9000contestvilsotoast
 http://scp-wiki.wikidot.com/9000contestwackdog
 900X 
 9X00 
-999X 
+999X highest
 9750
 9577
 
