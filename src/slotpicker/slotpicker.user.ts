@@ -2,22 +2,73 @@ import { throttle } from "r628";
 import { getAllPagesMatching } from "../common/crom.js";
 import Picks from "./picks.txt?raw";
 import { range } from "../../r628/src/range.js";
+import { asyncRequestModule, getPageId } from "../common/wikidot-api-utils.js";
 
 const FILTER_9KCON = `{ url: { startsWith: "http://scp-wiki.wikidot.com"}, wikidotInfo: { tags: { eq: "9000" } } }`;
 // @ts-expect-error
 window.getRatings = async () => {
-  const ratings = (
-    await getAllPagesMatching(FILTER_9KCON, `{ url, wikidotInfo { rating } }`)
-  ).filter((e) => !e.url.endsWith("scp9000contesthub"));
-  return ratings;
+  const ratings = (await getAllPagesMatching(FILTER_9KCON, `{ url }`))
+    .filter((e) => !e.url.endsWith("scp9000contesthub"))
+    .map((e) => getRatingInfo(e.url));
+  return await Promise.all(ratings);
 };
+
+async function getRatingInfo(url: string) {
+  const id = await getPageId(url);
+  const e = (await asyncRequestModule("pagerate/WhoRatedPageModule", {
+    pageId: id,
+  })) as any;
+
+  const dom = new DOMParser().parseFromString(e.body, "text/html");
+  const raters = dom.querySelectorAll(".printuser");
+
+  let netRating = 0;
+  let upvoteTotal = 0;
+  let votes = [] as {
+    username: string | undefined;
+    direction: string | undefined;
+  }[];
+
+  for (const r of Array.from(raters)) {
+    const username = (r.children[1] as HTMLElement | null)?.innerText?.trim();
+    const rating = (
+      r.nextElementSibling as HTMLElement | null
+    )?.innerText?.trim();
+
+    votes.push({ username, direction: rating });
+
+    if (rating === "+") {
+      netRating++;
+      upvoteTotal++;
+    } else if (rating === "-") {
+      netRating--;
+    } else {
+      console.warn(
+        `Unrecognized vote type '${rating}' for user '${username}' and page '${url}'.`
+      );
+    }
+  }
+
+  return {
+    url,
+    netRating,
+    upvoteTotal,
+    votes,
+  };
+}
 
 // @ts-expect-error
 window.calculatePicks = async (
-  rawArticles: { url: string; wikidotInfo: { rating: number } }[]
+  rawArticles: {
+    url: string;
+    netRating: number;
+    upvoteTotal: number;
+    votes: string;
+  }[]
 ) => {
   const articles = rawArticles.sort(
-    (a, b) => b.wikidotInfo.rating - a.wikidotInfo.rating
+    (a, b) =>
+      b.netRating * 10000 + b.upvoteTotal - a.netRating * 10000 - a.upvoteTotal
   );
 
   const slotResults = new Map<string, string>();
@@ -44,6 +95,18 @@ window.calculatePicks = async (
         .map((e) => e + 9000)
         .map((e) => e.toString());
     }
+
+    preferences = (
+      await Promise.all(
+        preferences.map(async (p) => {
+          if (p.startsWith("9") && p.length === 4) return [p];
+          const status = (await fetch(`https://scp-wiki.wikidot.com/scp-${p}`))
+            .status;
+          return status === 404 ? [p] : [];
+        })
+      )
+    ).flat();
+
     const firstAvailableSlot = preferences.find((x) => !slotResults.has(x));
     if (firstAvailableSlot === undefined) {
       console.warn(a.url, ": no valid slot found!");
@@ -143,6 +206,8 @@ function parsePrefs(str: string): {
         slots = slots.filter((s) => s.includes("4") || s.includes("7"));
       } else if (instruction === "no_slot") {
         slots = ["no_slot"];
+      } else if (instruction.startsWith("custom")) {
+        slots = [instruction.slice(6)];
       } else {
         invalidInstructions = true;
         invalid.push(line);

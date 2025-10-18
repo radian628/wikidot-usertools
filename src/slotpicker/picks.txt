@@ -17,7 +17,7 @@ http://scp-wiki.wikidot.com/9000contest8bitbreadbox
 9555
 9005
 9375
-8336
+9336
 
 http://scp-wiki.wikidot.com/9000contestaftokrator
 9800
@@ -543,10 +543,10 @@ http://scp-wiki.wikidot.com/9000contestjezixo
 9985
 
 http://scp-wiki.wikidot.com/9000contestjtdn
-8542
+9000 custom8542
 9542
 9642
-8742
+9000 custom8742
 9742
 
 http://scp-wiki.wikidot.com/9000contestj-v-g
@@ -829,7 +829,7 @@ http://scp-wiki.wikidot.com/9000contestsevencix
 
 http://scp-wiki.wikidot.com/9000contestshariavanilla
 9529
-9XYZ no_slot
+9000 custom529-j
 
 http://scp-wiki.wikidot.com/9000contest-shirleysterling
 9300

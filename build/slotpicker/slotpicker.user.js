@@ -1,5 +1,5 @@
-"use strict";(()=>{function w(r,o){let t=[],n=o.limits.reduce((e,p)=>Math.max(e,p.duration),0),c=[],i=new Set;setInterval(()=>{for(;;){let e=t.at(0);if(!e)return;let p=Date.now();if(c=c.filter(a=>(p-a.time)/1e3<=n),i.size>=o.maxConcurrentRequests)return;for(let a of o.limits){let m=0;for(let g of c)(p-g.time)/1e3<=a.duration&&m++;if(m>=a.maxRequests)return}t.shift(),c.push({time:Date.now()});let d=r(...e.params);i.add(d),(async()=>{let a=await d;e.callback(a),i.delete(d)})()}});let s=(...e)=>new Promise((p,d)=>{t.push({params:e,callback:a=>{p(a)}})});return s._throttled=!0,s}async function X(r){return await(await fetch("https://apiv1.crom.avn.sh/graphql",{body:JSON.stringify({query:r}),method:"POST",mode:"cors",headers:{"Content-Type":"application/json"}})).json()}async function u(r,o){let t,n=[];for(;;){let c=`{
-  pages(filter: ${r}, first: 100${t?`, after: "${t}"`:""}) {
+"use strict";(()=>{function u(e,o){let i=[],c=o.limits.reduce((n,p)=>Math.max(n,p.duration),0),r=[],t=new Set;setInterval(()=>{for(;;){let n=i.at(0);if(!n)return;let p=Date.now();if(r=r.filter(a=>(p-a.time)/1e3<=c),t.size>=o.maxConcurrentRequests)return;for(let a of o.limits){let m=0;for(let T of r)(p-T.time)/1e3<=a.duration&&m++;if(m>=a.maxRequests)return}i.shift(),r.push({time:Date.now()});let d=e(...n.params);t.add(d),(async()=>{let a=await d;n.callback(a),t.delete(d)})()}});let s=(...n)=>new Promise((p,d)=>{i.push({params:n,callback:a=>{p(a)}})});return s._throttled=!0,s}async function x(e){return await(await fetch("https://apiv1.crom.avn.sh/graphql",{body:JSON.stringify({query:e}),method:"POST",mode:"cors",headers:{"Content-Type":"application/json"}})).json()}async function l(e,o){let i,c=[];for(;;){let r=`{
+  pages(filter: ${e}, first: 100${i?`, after: "${i}"`:""}) {
     edges {
       node ${o} 
     },
@@ -8,7 +8,7 @@
       endCursor
     }
   }
-}`,i=await X(c);if(n.push(...i.data.pages.edges.map(s=>s.node)),!i.data.pages.pageInfo.hasNextPage)break;t=i.data.pages.pageInfo.endCursor}return n}var k=`http://scp-wiki.wikidot.com/9000booblesnoot
+}`,t=await x(r);if(c.push(...t.data.pages.edges.map(s=>s.node)),!t.data.pages.pageInfo.hasNextPage)break;i=t.data.pages.pageInfo.endCursor}return c}var k=`http://scp-wiki.wikidot.com/9000booblesnoot
 9966
 9006
 9886
@@ -27,7 +27,7 @@ http://scp-wiki.wikidot.com/9000contest8bitbreadbox
 9555
 9005
 9375
-8336
+9336
 
 http://scp-wiki.wikidot.com/9000contestaftokrator
 9800
@@ -226,11 +226,11 @@ http://scp-wiki.wikidot.com/9000contestcoccolithophor
 9XYZ
 
 http://scp-wiki.wikidot.com/9000contestdappleddaspletosaur
-9001
-9900
-9100
-9500
-9200
+9111
+9779
+9222
+9993
+9191
 
 http://scp-wiki.wikidot.com/9000contestdaveyoufool
 9002
@@ -315,11 +315,10 @@ http://scp-wiki.wikidot.com/9000contestdoctorzurvan
 
 http://scp-wiki.wikidot.com/9000contestdrbalthazaar
 9004
-900X
-9500
+9400
 9X00
+900X
 9444
-9876
 
 http://scp-wiki.wikidot.com/9000contestdreadnoughtgalaxy
 900X
@@ -328,10 +327,12 @@ http://scp-wiki.wikidot.com/9000contestdreadnoughtgalaxy
 9020
 9050
 9030
-9888
-9777
+9995
+999X highest
+9099
+9399
+9199
 9031
-9X99
 9233
 
 http://scp-wiki.wikidot.com/9000contestdr-lutwin
@@ -552,10 +553,10 @@ http://scp-wiki.wikidot.com/9000contestjezixo
 9985
 
 http://scp-wiki.wikidot.com/9000contestjtdn
-8542
+9000 custom8542
 9542
 9642
-8742
+9000 custom8742
 9742
 
 http://scp-wiki.wikidot.com/9000contestj-v-g
@@ -809,11 +810,11 @@ http://scp-wiki.wikidot.com/9000contestratseerofrattesse
 
 http://scp-wiki.wikidot.com/9000contestresolver
 900X
-9X00 
+9X00
 9033
-90X0 
+90X0
 9333
-9XXX 
+9XXX
 
 http://scp-wiki.wikidot.com/9000contestsailorenoch
 9991
@@ -838,7 +839,7 @@ http://scp-wiki.wikidot.com/9000contestsevencix
 
 http://scp-wiki.wikidot.com/9000contestshariavanilla
 9529
-9XYZ no_slot
+9000 custom529-j
 
 http://scp-wiki.wikidot.com/9000contest-shirleysterling
 9300
@@ -864,11 +865,11 @@ http://scp-wiki.wikidot.com/9000contestsimpleruins
 9200
 
 http://scp-wiki.wikidot.com/9000contestsinkingotter
-9341
-9500
-9001
-9998
+9996
 9618
+9669
+9600
+9196
 
 http://scp-wiki.wikidot.com/9000contestsoftseal
 900X
@@ -1098,14 +1099,14 @@ http://scp-wiki.wikidot.com/9000contestalexjohansson
 
 http://scp-wiki.wikidot.com/9000contestmann
 
-http://scp-wiki.wikidot.com/9000contestuncannyon`;function l(r){let o=[];for(let t=0;t<r&&t<1e7;t++)o.push(t);return o}var h='{ url: { startsWith: "http://scp-wiki.wikidot.com"}, wikidotInfo: { tags: { eq: "9000" } } }';window.getRatings=async()=>(await u(h,"{ url, wikidotInfo { rating } }")).filter(o=>!o.url.endsWith("scp9000contesthub"));window.calculatePicks=async r=>{let o=r.sort((i,s)=>s.wikidotInfo.rating-i.wikidotInfo.rating),t=new Map,n=new Map,c=k.split(`
+http://scp-wiki.wikidot.com/9000contestuncannyon`;function h(e){let o=[];for(let i=0;i<e&&i<1e7;i++)o.push(i);return o}function f(e){return u(e,{maxConcurrentRequests:5,limits:[{duration:5,maxRequests:10}]})}function M(e,o){return new Promise((i,c)=>{window.OZONE.ajax.requestModule(e,o,r=>{i(r)})})}var w=new Map,g=f(M),y=f(async function(e){if(w.has(e))return w.get(e);let o=await(await fetch(e)).text(),c=new DOMParser().parseFromString(o,"text/html").querySelectorAll("head script");for(let r of Array.from(c)){let t=r.innerText.match(/WIKIREQUEST\.info\.pageId\s*\=\s*(\d+)/);if(t)return w.set(e,t[1]),t[1]}});var b='{ url: { startsWith: "http://scp-wiki.wikidot.com"}, wikidotInfo: { tags: { eq: "9000" } } }';window.getRatings=async()=>{let e=(await l(b,"{ url }")).filter(o=>!o.url.endsWith("scp9000contesthub")).map(o=>P(o.url));return await Promise.all(e)};async function P(e){let o=await y(e),i=await g("pagerate/WhoRatedPageModule",{pageId:o}),r=new DOMParser().parseFromString(i.body,"text/html").querySelectorAll(".printuser"),t=0,s=0,n=[];for(let p of Array.from(r)){let d=p.children[1]?.innerText?.trim(),a=p.nextElementSibling?.innerText?.trim();n.push({username:d,direction:a}),a==="+"?(t++,s++):a==="-"?t--:console.warn(`Unrecognized vote type '${a}' for user '${d}' and page '${e}'.`)}return{url:e,netRating:t,upvoteTotal:s,votes:n}}window.calculatePicks=async e=>{let o=e.sort((t,s)=>s.netRating*1e4+s.upvoteTotal-t.netRating*1e4-t.upvoteTotal),i=new Map,c=new Map,r=k.split(`
 
-`).map(i=>{let s=i.split(`
-`),e=s[0],p=s.slice(1).join(`
-`),d=f(p);d.invalid.length>0&&console.warn(e,"had invalid preferences: ",d.invalid),n.set(e,d.prefs)});for(let i of o){let s=n.get(i.url);s||(console.warn(i.url,"has no slot preferences listed!"),s=l(998).map(p=>p+9e3).map(p=>p.toString()));let e=s.find(p=>!t.has(p));e===void 0&&console.warn(i.url,": no valid slot found!"),e!=="no_slot"&&e&&t.set(e,i.url)}return Object.fromEntries(Array.from(t.entries()))};async function b(r){let o=await(await fetch(r)).text();return new DOMParser().parseFromString(o,"text/html").querySelector("#discuss-button").href}function T(r,o){let t=new Map;for(let n=1;n<4;n++){let c=r[n],i=o[n];if(c.match(/\d/g)){if(c!==i)return!1}else{let s=t.get(c.toUpperCase());if(s===void 0)t.set(c.toUpperCase(),i);else if(s!==i)return!1}}return!0}function x(r){let o=[];for(let t=9e3;t<=9998;t++){let n=t.toString();T(r,n)&&o.push(n)}return o}function f(r){let o=r.split(`
-`),t=["9000"],n=[];for(let c of o){if(c.trim().length===0)continue;let i=c.trim().split(/\s+/g),s=/^9[0-9xXyYzZ]{3}$/g;if(!i[0].match(s)){n.push(c);continue}let e=x(i[0]),p=!1;for(let d of i.slice(1))if(d==="highest")e.reverse();else if(d.startsWith("not")){let a=d.slice(3);e=e.filter(m=>m!==a)}else d==="palindrome"?e=e.filter(a=>a===a.split("").reverse().join("")):d==="no_same_digits_and_doesnt_end_with_9_or_0"?e=e.filter(a=>a.endsWith("9")||a.endsWith("0")?!1:new Set(a.split("")).size===4):d==="lowest_4_and_7"?e=e.filter(a=>a.includes("4")&&a.includes("7")):d==="lowest_4_or_7"?e=e.filter(a=>a.includes("4")||a.includes("7")):d==="no_slot"?e=["no_slot"]:(p=!0,n.push(c));p||t.push(...e)}for(let c=9e3;c<=9998;c++)t.push(c.toString());return{prefs:t,invalid:n}}window.parsePrefs=f;async function v(r,o){let t=await b(r);console.log("discussion link",t);let n=await(await fetch(t)).text(),c=new DOMParser().parseFromString(n,"text/html");return Array.from(c.querySelectorAll("#thread-container-posts .post")).filter(i=>{let s=i.querySelector(".printuser a:nth-child(2)");return console.log(s),s&&o.includes(s.innerText)})}window.copyURLToClipboard=r=>o=>{navigator.clipboard.writeText(r).then(()=>{o.style.backgroundColor="green"}).catch(()=>{o.style.backgroundColor="red"}).finally(()=>{setTimeout(()=>{o.style.backgroundColor="#eee"},1e3)})};window.getAllAuthorComments=async()=>{let r=await u(h,"{ url, attributions { user { name } } }"),o=w(v,{limits:[{duration:10,maxRequests:3}],maxConcurrentRequests:3});console.log(r),document.body.innerHTML="",document.body.style="display: flex; flex-wrap: wrap;";for(let t of r){let n=t.url,c=await o(n,t.attributions.map(i=>i.user.name));for(let i of c){let s=i.querySelector(".content");if(i.innerText.match("9")){for(let e of Array.from(s.querySelectorAll("img")))e.parentElement.removeChild(e);if(!s)break;document.body.innerHTML+=`<div style="padding: 10px; margin: 10px; border: 1px solid black; width: 250px; font-family: sans-serif;">
+`).map(t=>{let s=t.split(`
+`),n=s[0],p=s.slice(1).join(`
+`),d=X(p);d.invalid.length>0&&console.warn(n,"had invalid preferences: ",d.invalid),c.set(n,d.prefs)});for(let t of o){let s=c.get(t.url);s||(console.warn(t.url,"has no slot preferences listed!"),s=h(998).map(p=>p+9e3).map(p=>p.toString())),s=(await Promise.all(s.map(async p=>p.startsWith("9")&&p.length===4?[p]:(await fetch(`https://scp-wiki.wikidot.com/scp-${p}`)).status===404?[p]:[]))).flat();let n=s.find(p=>!i.has(p));n===void 0&&console.warn(t.url,": no valid slot found!"),n!=="no_slot"&&n&&i.set(n,t.url)}return Object.fromEntries(Array.from(i.entries()))};async function _(e){let o=await(await fetch(e)).text();return new DOMParser().parseFromString(o,"text/html").querySelector("#discuss-button").href}function R(e,o){let i=new Map;for(let c=1;c<4;c++){let r=e[c],t=o[c];if(r.match(/\d/g)){if(r!==t)return!1}else{let s=i.get(r.toUpperCase());if(s===void 0)i.set(r.toUpperCase(),t);else if(s!==t)return!1}}return!0}function S(e){let o=[];for(let i=9e3;i<=9998;i++){let c=i.toString();R(e,c)&&o.push(c)}return o}function X(e){let o=e.split(`
+`),i=["9000"],c=[];for(let r of o){if(r.trim().length===0)continue;let t=r.trim().split(/\s+/g),s=/^9[0-9xXyYzZ]{3}$/g;if(!t[0].match(s)){c.push(r);continue}let n=S(t[0]),p=!1;for(let d of t.slice(1))if(d==="highest")n.reverse();else if(d.startsWith("not")){let a=d.slice(3);n=n.filter(m=>m!==a)}else d==="palindrome"?n=n.filter(a=>a===a.split("").reverse().join("")):d==="no_same_digits_and_doesnt_end_with_9_or_0"?n=n.filter(a=>a.endsWith("9")||a.endsWith("0")?!1:new Set(a.split("")).size===4):d==="lowest_4_and_7"?n=n.filter(a=>a.includes("4")&&a.includes("7")):d==="lowest_4_or_7"?n=n.filter(a=>a.includes("4")||a.includes("7")):d==="no_slot"?n=["no_slot"]:d.startsWith("custom")?n=[d.slice(6)]:(p=!0,c.push(r));p||i.push(...n)}for(let r=9e3;r<=9998;r++)i.push(r.toString());return{prefs:i,invalid:c}}window.parsePrefs=X;async function I(e,o){let i=await _(e);console.log("discussion link",i);let c=await(await fetch(i)).text(),r=new DOMParser().parseFromString(c,"text/html");return Array.from(r.querySelectorAll("#thread-container-posts .post")).filter(t=>{let s=t.querySelector(".printuser a:nth-child(2)");return console.log(s),s&&o.includes(s.innerText)})}window.copyURLToClipboard=e=>o=>{navigator.clipboard.writeText(e).then(()=>{o.style.backgroundColor="green"}).catch(()=>{o.style.backgroundColor="red"}).finally(()=>{setTimeout(()=>{o.style.backgroundColor="#eee"},1e3)})};window.getAllAuthorComments=async()=>{let e=await l(b,"{ url, attributions { user { name } } }"),o=u(I,{limits:[{duration:10,maxRequests:3}],maxConcurrentRequests:3});console.log(e),document.body.innerHTML="",document.body.style="display: flex; flex-wrap: wrap;";for(let i of e){let c=i.url,r=await o(c,i.attributions.map(t=>t.user.name));for(let t of r){let s=t.querySelector(".content");if(t.innerText.match("9")){for(let n of Array.from(s.querySelectorAll("img")))n.parentElement.removeChild(n);if(!s)break;document.body.innerHTML+=`<div style="padding: 10px; margin: 10px; border: 1px solid black; width: 250px; font-family: sans-serif;">
       <p>
-      <button style="max-width: 100%; font-size: 125%; word-wrap: break-word" onclick="window.copyURLToClipboard('${n}')(this)">${n}</button> 
+      <button style="max-width: 100%; font-size: 125%; word-wrap: break-word" onclick="window.copyURLToClipboard('${c}')(this)">${c}</button> 
       </p>
       ${s.innerHTML}</div>`}}}};})();
 //# sourceMappingURL=slotpicker.user.js.map
