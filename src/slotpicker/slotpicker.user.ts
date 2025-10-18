@@ -71,7 +71,14 @@ window.calculatePicks = async (
       b.netRating * 10000 + b.upvoteTotal - a.netRating * 10000 - a.upvoteTotal
   );
 
-  const slotResults = new Map<string, string>();
+  const slotResults = new Map<
+    string,
+    {
+      url: string;
+      netRating: number;
+      upvoteTotal: number;
+    }
+  >();
 
   const prefs = new Map<string, string[]>();
 
@@ -112,11 +119,31 @@ window.calculatePicks = async (
       console.warn(a.url, ": no valid slot found!");
     }
     if (firstAvailableSlot !== "no_slot" && firstAvailableSlot) {
-      slotResults.set(firstAvailableSlot, a.url);
+      slotResults.set(firstAvailableSlot, {
+        url: a.url,
+        netRating: a.netRating,
+        upvoteTotal: a.upvoteTotal,
+      });
     }
   }
 
-  return Object.fromEntries(Array.from(slotResults.entries()));
+  return {
+    table: Object.fromEntries(Array.from(slotResults.entries())),
+    orderedResults: Array.from(slotResults.entries())
+      .map(([k, v]) => {
+        return {
+          ...v,
+          slot: k,
+        };
+      })
+      .sort(
+        (a, b) =>
+          b.netRating * 10000 +
+          b.upvoteTotal -
+          a.netRating * 10000 -
+          a.upvoteTotal
+      ),
+  };
 };
 
 async function getDiscussionLink(url: string) {
