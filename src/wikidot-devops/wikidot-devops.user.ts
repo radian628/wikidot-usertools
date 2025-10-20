@@ -243,7 +243,7 @@ async function fetchAndValidateJson<T>(endpoint: string, parser: z.ZodType<T>) {
         }
 
         for (const s of Array.from(document.querySelectorAll("head style"))) {
-          s.innerHTML = s.innerHTML + "/**/";
+          s.innerHTML = s.innerHTML + `/*${Math.random()}*/`;
         }
       } else {
         window.location.reload();

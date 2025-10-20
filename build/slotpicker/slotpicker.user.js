@@ -165,9 +165,9 @@ http://scp-wiki.wikidot.com/9000contestblankfellowplace
 9876
 
 http://scp-wiki.wikidot.com/9000contestblazingpie
-900X
-999X
-9X00
+900X highest
+999X highest
+9X00 highest
 9X9X
 9923
 
@@ -201,7 +201,7 @@ http://scp-wiki.wikidot.com/9000contestchoccoman
 900X
 9666
 9500
-9X99
+9X99 highest
 9404
 
 http://scp-wiki.wikidot.com/9000contestcircledot
@@ -263,7 +263,7 @@ http://scp-wiki.wikidot.com/9000contestdinotroutrosy
 http://scp-wiki.wikidot.com/9000contestdiogenes
 9X00
 900X
-999X
+999X highest
 9111
 9222
 9333
