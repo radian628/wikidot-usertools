@@ -1,6 +1,8 @@
-import { throttle } from "r628";
+import { throttle } from "../../r628/src/throttle.js";
 
-export function defaultThrottle(fn: Parameters<typeof throttle>[0]) {
+export function defaultThrottle<Params extends any[], Ret>(
+  fn: (...params: Params) => Promise<Ret>
+) {
   return throttle(fn, {
     maxConcurrentRequests: 5,
     limits: [{ duration: 5, maxRequests: 10 }],
