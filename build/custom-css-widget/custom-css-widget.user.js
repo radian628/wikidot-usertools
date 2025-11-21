@@ -4,6 +4,7 @@
 // @namespace   Violentmonkey Scripts
 // @grant       GM_getValue
 // @grant       GM_setValue
+// @match       *
 // @version     1.0
 // @author      radian628
 // @description 5/21/2025, 12:51:38 PM

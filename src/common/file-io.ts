@@ -1,3 +1,4 @@
+import { range } from "../../r628/src/range.js";
 import { requestModuleAsync } from "./request-module-async.js";
 
 export function uploadFile(
@@ -21,20 +22,11 @@ export function uploadFile(
 }
 
 export async function getFileIds(pageId: string) {
-  const table = await requestModuleAsync("files/PageFilesModule", {
-    page_id: pageId,
-  });
-  const dom = new DOMParser().parseFromString(table.body, "text/html");
-
-  let idmap = new Map();
-
-  for (const row of Array.from(dom.querySelectorAll("tbody tr"))) {
-    const filename = row.children[0].querySelector("a")!.innerText;
-    const id = row.id.match(/\d+$/g)![0];
-    idmap.set(filename, id);
-  }
-
-  return { ids: idmap };
+  return {
+    ids: new Map(
+      (await getAllFileInfo(pageId)).info.entries().map(([k, v]) => [k, v.id])
+    ),
+  };
 }
 
 export type FileInfo = {
@@ -43,9 +35,10 @@ export type FileInfo = {
   name: string;
 };
 
-export async function getFileInfo() {
+export async function getFileInfo(pageId: string, page?: number) {
   const table = await requestModuleAsync("files/PageFilesModule", {
-    page_id: WIKIREQUEST.info.pageId,
+    page_id: pageId,
+    page: page?.toString(),
   });
   const dom = new DOMParser().parseFromString(table.body, "text/html");
 
@@ -72,7 +65,32 @@ export async function getFileInfo() {
     });
   }
 
-  return { info: idmap };
+  return {
+    info: idmap,
+    fileCount: parseInt(
+      (dom.querySelector("h1 + p") as HTMLElement).innerText.match(
+        /\d+/g
+      )?.[0] ?? "0"
+    ),
+  };
+}
+
+export async function getAllFileInfo(pageId: string) {
+  const firstPage = await getFileInfo(pageId);
+  const pageCount = Math.ceil(firstPage.fileCount / 100);
+
+  return {
+    info: new Map(
+      [
+        firstPage,
+        ...(await Promise.all(
+          range(pageCount - 1).map(
+            async (i) => await getFileInfo(pageId, i + 2)
+          )
+        )),
+      ].flatMap((p) => [...p.info.entries()])
+    ),
+  };
 }
 
 export async function deleteFile(id: string) {

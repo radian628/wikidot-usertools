@@ -1,0 +1,29 @@
+.minimalist-editor-root {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  color: #333;
+  background-color: #eee;
+  padding-top: 25vh;
+  padding-bottom: 25vh;
+  box-sizing: border-box;
+  overflow: auto;
+  z-index: 9999999;
+}
+
+.minimalist-editor {
+  margin: auto;
+  font-family: serif;
+  font-size: 1.5em;
+  outline: none;
+  border: none;
+  background-color: transparent;
+  resize: none;
+  overflow: visible;
+  max-width: calc(100vw - 2em);
+  width: 40em;
+  display: block;
+  line-height: 1.5;
+}

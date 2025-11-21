@@ -19,7 +19,12 @@ import {
 } from "../common/wikidot-api-utils.js";
 import { z } from "zod";
 import * as idb from "idb";
-import { compareBytes, replaceFile, uploadFile } from "../common/file-io.js";
+import {
+  compareBytes,
+  getFileIds,
+  replaceFile,
+  uploadFile,
+} from "../common/file-io.js";
 
 const DEVOPS_ENTRY_POINT_DIRECTIVE = /\[\!\-\-devops:(.*?)\-\-\]/;
 
@@ -61,6 +66,8 @@ async function fetchAndValidateJson<T>(endpoint: string, parser: z.ZodType<T>) {
 }
 (async () => {
   await waitForCond(() => window.OZONE, 100);
+
+  console.log("file ids", await getFileIds(WIKIREQUEST.info.pageId));
 
   const db = await idb.openDB(
     `wikidot-devops-cache-${window.location.pathname}`,
