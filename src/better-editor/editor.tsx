@@ -124,7 +124,7 @@ export function Editor(props: {
                     window.location.href
                   );
                   console.log("revs", revnum, revnum2);
-                  if (revnum !== revnum2) {
+                  if (revnum !== revnum2 && false) {
                     window.alert(
                       "This revision is out of date. Please merge your changes before continuing."
                     );
