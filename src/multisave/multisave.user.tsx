@@ -8,7 +8,7 @@ import MultisaveCSS from "./multisave.css?raw";
 // @name        Wikidot File Multisave 
 // @match       *://*.wikidot.com/*
 // @grant       none
-// @version     1.0.1
+// @version     1.0.2
 // @author      radian628
 // @description Upload multiple files to wikidot at once. 
 // ==/UserScript==
