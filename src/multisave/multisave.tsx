@@ -173,7 +173,7 @@ export function MultisaveDialog(props: { exit: () => void }) {
     if (hasFetchedUploads) return;
 
     (async () => {
-      const fileInfo = await getFileInfo();
+      const fileInfo = await getFileInfo(window.WIKIREQUEST.info.pageId);
 
       const uploadedFiles: FileInfo[] = [...fileInfo.info.values()].map(
         (f) => ({
