@@ -1,5 +1,9 @@
 import * as d3 from "d3";
-import { crom } from "../common/crom.js";
+import {
+  crom,
+  getAllPagesMatching,
+  getAllPagesMatchingV2,
+} from "../common/crom.js";
 import * as graphology from "graphology";
 import { random } from "graphology-layout";
 import forceAtlas2 from "graphology-layout-forceatlas2";
@@ -80,7 +84,7 @@ for (let i = 0; i < 30000; i++) {
 
 function applyCircleIteration(
   graph: graphology.DirectedGraph,
-  influence: number
+  influence: number,
 ) {
   let neighborCountMap = new Map<string, number>();
 
@@ -121,7 +125,7 @@ function applyCircleIteration(
 }
 
 const worker = new Worker(
-  "../build/wiki-article-graph/wiki-article-graph-worker.js"
+  "../build/wiki-article-graph/wiki-article-graph-worker.js",
 );
 
 let positions: { id: string; x: number; y: number }[] = [];
@@ -137,17 +141,50 @@ const workerClient = workerifyClient<typeof wikiGraphWorkerInterface>(
   },
   (res) => {
     worker.postMessage(res);
-  }
+  },
 );
 
 void (async () => {
-  let graphRaw: WikiGraph = await (await fetch("../build/links.json")).json();
+  const search = new URLSearchParams(window.location.search);
 
-  graphRaw = Object.fromEntries(
-    Object.entries(graphRaw) //
-      .slice(0, 30000)
-    // .filter(([k, v]) => !!k.match(/\/scp-\d{1,4}$/g))
-  );
+  const matching = search.get("tag")
+    ? await getAllPagesMatchingV2(
+        `{ 
+    onWikidotPage: { tags: { eq: "${search.get("tag")}" }} 
+    url: { startsWith: "http://scp-wiki."} 
+    }`,
+        `{ url }`,
+      )
+    : undefined;
+
+  let graphJson = (await (
+    await fetch("../build/crosslinksv2.json")
+  ).json()) as {
+    url: string;
+    other: string[];
+  }[];
+
+  if (matching) {
+    const filter = new Set(matching.map((m) => m.url));
+    graphJson = graphJson.filter((e) => filter.has(e.url));
+  }
+
+  let graphRaw: WikiGraph = {};
+
+  console.log(graphJson);
+
+  for (const { url, other } of graphJson) {
+    graphRaw[url] = {
+      children: [],
+      links: other,
+    };
+  }
+
+  // graphRaw = Object.fromEntries(
+  //   Object.entries(graphRaw) //
+  //     .slice(0, 30000)
+  //   // .filter(([k, v]) => !!k.match(/\/scp-\d{1,4}$/g))
+  // );
 
   const graph = new graphology.DirectedGraph();
 
@@ -170,8 +207,8 @@ void (async () => {
   }
 
   for (const [url, article] of Object.entries(graphRaw)) {
-    for (const slug of new Set(article.links)) {
-      const targetUrl = `http://scp-wiki.wikidot.com${slug}`;
+    for (const targetUrl of new Set(article.links)) {
+      // const targetUrl = `http://scp-wiki.wikidot.com${slug}`;
       if (graphRaw[targetUrl]) {
         const color: [number, number, number] = nodeColors
           .get(url)!
@@ -181,17 +218,36 @@ void (async () => {
           size: 1,
           color: rgb2hex(hslToRgb(...color)),
         });
+
+        graph.setNodeAttribute(
+          url,
+          "size",
+          (graph.getNodeAttribute(url, "size") ?? 0) + 1,
+        );
+        graph.setNodeAttribute(
+          targetUrl,
+          "size",
+          (graph.getNodeAttribute(targetUrl, "size") ?? 0) + 1,
+        );
       }
     }
   }
 
-  for (const node of graph.nodes()) {
-    const degree = graph.degree(node);
-    graph.setNodeAttribute(node, "size", 1 + 2 * degree ** 0.3);
-    if (degree > 30) {
-      graph.dropNode(node);
-    }
+  for (const url of graph.nodes()) {
+    graph.setNodeAttribute(
+      url,
+      "size",
+      graph.getNodeAttribute(url, "size") ** 0.5 + 4,
+    );
   }
+
+  // for (const node of graph.nodes()) {
+  //   const degree = graph.degree(node);
+  //   graph.setNodeAttribute(node, "size", 1 + 2 * degree ** 0.3);
+  //   if (degree > 30) {
+  //     graph.dropNode(node);
+  //   }
+  // }
 
   random.assign(graph, {
     dimensions: ["x", "y"],
@@ -199,17 +255,17 @@ void (async () => {
   });
 
   // for (let i = 1; i < 10; i++) applyCircleIteration(graph, 1 / i);
-  const comps = getConnectedComponents(graph);
+  // const comps = getConnectedComponents(graph);
 
-  let largestComponent = [...new Set(comps.values())].reduce((prev, curr) =>
-    prev.size > curr.size ? prev : curr
-  );
+  // let largestComponent = [...new Set(comps.values())].reduce((prev, curr) =>
+  //   prev.size > curr.size ? prev : curr,
+  // );
 
-  for (const node of graph.nodes()) {
-    if (!largestComponent.has(node)) {
-      graph.dropNode(node);
-    }
-  }
+  // for (const node of graph.nodes()) {
+  //   if (!largestComponent.has(node)) {
+  //     graph.dropNode(node);
+  //   }
+  // }
 
   await workerClient.setGraph(graph.export());
 
@@ -220,7 +276,7 @@ void (async () => {
         // Math.min(iters * 0.01 + 1, 1),
         Math.min(3000, iters * 10) / Math.pow(iters, 0.5),
         // 0
-        (100 / Math.pow(iters, 0.5)) * (iters % 50 === 0 ? 10 : 1)
+        (100 / Math.pow(iters, 0.5)) * (iters % 50 === 0 ? 10 : 1),
         // (350 / Math.sqrt(iters)) * 0.1
       );
       iters++;
@@ -335,25 +391,25 @@ void (async () => {
     }
   }
 
-  sigma.on("enterNode", (e) => {
-    highlightNeighbors(e.node, 7);
-  });
+  // sigma.on("enterNode", (e) => {
+  //   highlightNeighbors(e.node, 7);
+  // });
 
-  sigma.on("leaveNode", (e) => {
-    for (const c of oldEdgeSettings) {
-      graph.setEdgeAttribute(c.id, "color", c.color);
-      graph.setEdgeAttribute(c.id, "size", c.size);
-      graph.setEdgeAttribute(c.id, "zIndex", c.zIndex);
-    }
-    oldEdgeSettings = [];
+  // sigma.on("leaveNode", (e) => {
+  //   for (const c of oldEdgeSettings) {
+  //     graph.setEdgeAttribute(c.id, "color", c.color);
+  //     graph.setEdgeAttribute(c.id, "size", c.size);
+  //     graph.setEdgeAttribute(c.id, "zIndex", c.zIndex);
+  //   }
+  //   oldEdgeSettings = [];
 
-    for (const c of oldNodeSettings) {
-      graph.setNodeAttribute(c.id, "hidden", c.hidden);
-      graph.setNodeAttribute(c.id, "zIndex", c.zIndex);
-      graph.setNodeAttribute(c.id, "color", c.color);
-    }
-    oldNodeSettings = [];
-  });
+  //   for (const c of oldNodeSettings) {
+  //     graph.setNodeAttribute(c.id, "hidden", c.hidden);
+  //     graph.setNodeAttribute(c.id, "zIndex", c.zIndex);
+  //     graph.setNodeAttribute(c.id, "color", c.color);
+  //   }
+  //   oldNodeSettings = [];
+  // });
 
   let lastClickedNode: string | undefined = undefined;
 

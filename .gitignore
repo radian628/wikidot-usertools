@@ -9,3 +9,7 @@ imgur-links.txt
 deviantart-links.txt
 src/see-no-evil
 build/see-no-evil
+output/*
+src/wiki-scraper/darken.ts
+src/wiki-scraper/filter-undefined-lines.ts
+src/wiki-scraper/get-edited-pages.ts

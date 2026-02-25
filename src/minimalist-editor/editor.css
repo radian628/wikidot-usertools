@@ -13,7 +13,8 @@
   z-index: 9999999;
 }
 
-.minimalist-editor {
+.minimalist-editor,
+.minimalist-editor-height-checker {
   margin: auto;
   font-family: serif;
   font-size: 1.5em;
@@ -26,4 +27,24 @@
   width: 40em;
   display: block;
   line-height: 1.5;
+}
+
+.minimalist-editor-height-checker {
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  z-index: -1;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.save-notif {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: black;
+  color: #0f0;
+  font-size: 150%;
+  padding: 20px;
+  z-index: 3;
 }
