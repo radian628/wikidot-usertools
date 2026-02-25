@@ -148,14 +148,26 @@ void (async () => {
   const search = new URLSearchParams(window.location.search);
 
   const matching = search.get("tag")
-    ? await getAllPagesMatchingV2(
-        `{ 
-    onWikidotPage: { tags: { eq: "${search.get("tag")}" }} 
+    ? (
+        await Promise.all(
+          search
+            .get("tag")!
+            .split(",")
+            .map(
+              async (tag) =>
+                await getAllPagesMatchingV2(
+                  `{ 
+    onWikidotPage: { tags: { eq: "${tag}" }} 
     url: { startsWith: "http://scp-wiki."} 
     }`,
-        `{ url }`,
-      )
+                  `{ url }`,
+                ),
+            ),
+        )
+      ).flat()
     : undefined;
+
+  console.log(matching);
 
   let graphJson = (await (
     await fetch("../build/crosslinksv2.json")
