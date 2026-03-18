@@ -8,7 +8,14 @@
 // @author      radian628
 // @description VSCode in Wikidot. This is the dumbest thing I've ever created. 
 // ==/UserScript==
-*/"use strict";(()=>{var i=(t=>typeof require<"u"?require:typeof Proxy<"u"?new Proxy(t,{get:(o,r)=>(typeof require<"u"?require:o)[r]}):t)(function(t){if(typeof require<"u")return require.apply(this,arguments);throw Error('Dynamic require of "'+t+'" is not supported')});var s=`{\r
+*/"use strict";
+import("https://cdn.jsdelivr.net/npm/ses@1.14.0/dist/lockdown.umd.min.js")
+.then(() => {
+  try {
+    lockdown();
+  }  catch (e) { console.warn(e); }
+  
+"use strict";(()=>{var i=(t=>typeof require<"u"?require:typeof Proxy<"u"?new Proxy(t,{get:(o,r)=>(typeof require<"u"?require:o)[r]}):t)(function(t){if(typeof require<"u")return require.apply(this,arguments);throw Error('Dynamic require of "'+t+'" is not supported')});var s=`{\r
   "productConfiguration": {\r
     "nameShort": "VSCode Web Sample",\r
     "nameLong": "VSCode Web sample",\r
@@ -23005,3 +23012,4 @@
     />
     `;let t=window.fetch;window._oldfetch=t,window.fetch=(...r)=>{let n=r[0];if(console.log("FETCH WITH ARGS:",...r),n==="product.json")return new Response(s,{headers:{"Content-Type":"application/json"}});if(n==="http:/MEMFS_EXTENSION/package.json"){let e=a;return console.log("successfully retrieved memfs package.json",e),new Response(e,{headers:{"Content-Type":"application/json"}})}else if(n==="http:/MEMFS_EXTENSION/extension.js"){let e=l;return new Response(e,{headers:{"Content-Type":"application/javascript"}})}else if(n==="http:/MEMFS_EXTENSION/package.nls.json")return new Response("{}",{headers:{"Content-Type":"application/json"}});return window._oldfetch(...r)};async function o(r){let n=document.createElement("script");return new Promise((e,u)=>{n.src=r,n.onload=e,document.body.appendChild(n)})}(async()=>{await o("https://unpkg.com/vscode-web@1.91.1/dist/out/vs/loader.js"),await o("https://unpkg.com/vscode-web@1.91.1/dist/out/vs/webPackagePaths.js");let r="https://unpkg.com/vscode-web@1.91.1/dist";Object.keys(self.webPackagePaths).map(function(e,u){self.webPackagePaths[e]=`${r}/node_modules/${e}/${self.webPackagePaths[e]}`}),console.log("web package paths",self.webPackagePaths),i.config({baseUrl:`${r}/out`,recordStats:!0,trustedTypesPolicy:window.trustedTypes?.createPolicy("amdLoader",{createScriptURL(e){return console.log("CREATE SRIPT URL",e),e}}),paths:self.webPackagePaths});let n=i;window.require=function(...e){return console.log("require with",...e),n(...e)},await o("https://unpkg.com/vscode-web@1.91.1/dist/out/vs/workbench/workbench.web.main.nls.js"),await o("https://unpkg.com/vscode-web@1.91.1/dist/out/vs/workbench/workbench.web.main.js"),await o("https://unpkg.com/vscode-web@1.91.1/dist/out/vs/code/browser/workbench/workbench.js")})()})():window.createVsCode=()=>{let t=document.createElement("iframe");t.style.width="100vw",t.style.height="100vh",t.style.position="fixed",t.style.top="0",t.style.left="0",t.style.zIndex="100",t.src=f,document.body.appendChild(t)};})();
 //# sourceMappingURL=wikidot-vscode.user.js.map
+ });

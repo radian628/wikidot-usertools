@@ -47,7 +47,7 @@ export function Editor(props: {
     (async () => {
       const worker = createWorkerWithInterface<typeof WorkerBridge>(
         "w1",
-        `data:application/javascript,${encodeURIComponent(WorkerSource)}`
+        `data:application/javascript,${encodeURIComponent(WorkerSource)}`,
       );
 
       console.log(worker);
@@ -116,22 +116,22 @@ export function Editor(props: {
                     currDoc.includes("=======")
                   ) {
                     window.alert(
-                      "Pending merge conflicts detected! Resolve them before merging!"
+                      "Pending merge conflicts detected! Resolve them before merging!",
                     );
                     return;
                   }
                   const revnum2 = await getLatestRevisionNumber(
-                    window.location.href
+                    window.location.href,
                   );
                   console.log("revs", revnum, revnum2);
                   if (revnum !== revnum2 && false) {
                     window.alert(
-                      "This revision is out of date. Please merge your changes before continuing."
+                      "This revision is out of date. Please merge your changes before continuing.",
                     );
 
                     const a = view.state.sliceDoc(0, view.state.doc.length);
                     const b = await getFormattedPageSource(
-                      window.location.href
+                      window.location.href,
                     );
 
                     const changes = diff(a, b);
@@ -150,7 +150,7 @@ export function Editor(props: {
                     });
                   } else {
                     await props.save(
-                      view.state.sliceDoc(0, view.state.doc.length)
+                      view.state.sliceDoc(0, view.state.doc.length),
                     );
                   }
 
@@ -169,7 +169,7 @@ export function Editor(props: {
             if (!e.docChanged) return;
             (async () => {
               const sheets = await worker.extractStylesheets(
-                e.state.sliceDoc(0, e.state.doc.length)
+                e.state.sliceDoc(0, e.state.doc.length),
               );
               props.replaceIframeStylesheets(sheets);
             })();
@@ -194,7 +194,7 @@ const getRevisions = defaultThrottle(async function (page_id, page, perpage) {
       },
       function (e) {
         resolve(e);
-      }
+      },
     );
   });
 });
@@ -202,7 +202,7 @@ const getRevisions = defaultThrottle(async function (page_id, page, perpage) {
 function formatRevisions(body: string) {
   const dom = new DOMParser().parseFromString(body, "text/html");
   return Array.from(
-    dom.querySelectorAll("table.page-history > tbody > tr:not(:nth-child(1))")
+    dom.querySelectorAll("table.page-history > tbody > tr:not(:nth-child(1))"),
   )
     .map((i) => {
       const number = (i.children?.[0] as HTMLElement)?.innerText;
@@ -232,8 +232,11 @@ export function App() {
 
   const [isResizing, setIsResizing] = useState(false);
 
+  const customCss = window.localStorage.getItem("better-editor-custom-css");
+
   return (
     <>
+      {customCss && <style>{customCss}</style>}
       <style>{`.cm-editor { height: 100vh; }`}</style>
       <div style={{ display: "flex", width: "100vw", height: "100vh" }}>
         <div style={{ height: "100vh", width: `${100 * fract}vw` }}>

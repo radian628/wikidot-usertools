@@ -20,6 +20,8 @@ import {
   listenForNoSelector,
 } from "r628";
 
+console.log("does it hide this msg");
+
 type GetUserPageResult = {
   status: "ok";
   jsInclude: unknown[];
@@ -39,7 +41,7 @@ function getUserCommentPageTextRaw(userId: string, page: number) {
       },
       (result) => {
         resolve(result);
-      }
+      },
     );
   });
 }
@@ -47,19 +49,19 @@ function getUserCommentPageTextRaw(userId: string, page: number) {
 async function getUserCommentPageElements(
   userId: string,
   page: number,
-  getUserCommentPageText: Throttled<typeof getUserCommentPageTextRaw>
+  getUserCommentPageText: Throttled<typeof getUserCommentPageTextRaw>,
 ) {
   const text = await getUserCommentPageText(userId, page);
   const threadContainer = extractElementFromString(
     text.body ?? "",
-    ".thread-container"
+    ".thread-container",
   );
   return threadContainer;
 }
 
 function extractElementFromString(
   src: string,
-  selector: string
+  selector: string,
 ): Element | null {
   const div = document.createElement("div");
   div.innerHTML = src;
@@ -68,7 +70,7 @@ function extractElementFromString(
 
 export async function getCommentCount(
   userId: string,
-  loadPageAt: (idx: number) => Promise<Element | null>
+  loadPageAt: (idx: number) => Promise<Element | null>,
 ) {
   const isPageEmpty = async (idx: number) => {
     const page = await loadPageAt(idx);
@@ -113,7 +115,7 @@ window.getUserCommentPageElements = getUserCommentPageElements;
 function recentPostsInfiniteScroll(
   recentPostsBox: HTMLDivElement,
   userId: string,
-  wikiFilter: PubSub<string>
+  wikiFilter: PubSub<string>,
 ): () => void {
   let loadedPages = new Map<number, Element | null>();
   let nextPageIndex = 1;
@@ -121,7 +123,7 @@ function recentPostsInfiniteScroll(
 
   async function loadNewPage(
     userId: string,
-    getUserCommentPageText: Throttled<typeof getUserCommentPageTextRaw>
+    getUserCommentPageText: Throttled<typeof getUserCommentPageTextRaw>,
   ) {
     let idx = nextPageIndex++;
     const page = await loadPageAt(userId, idx, getUserCommentPageText);
@@ -134,14 +136,14 @@ function recentPostsInfiniteScroll(
   async function loadPageAt(
     userId: string,
     idx: number,
-    getUserCommentPageText: Throttled<typeof getUserCommentPageTextRaw>
+    getUserCommentPageText: Throttled<typeof getUserCommentPageTextRaw>,
   ) {
     if (loadedPages.has(idx)) return loadedPages.get(idx)!;
     return getUserCommentPageElements(userId, idx, getUserCommentPageText).then(
       (page) => {
         loadedPages.set(idx, page);
         return page;
-      }
+      },
     );
   }
 
@@ -159,7 +161,7 @@ function recentPostsInfiniteScroll(
 
     for (const post of Array.from(posts)) {
       const linkToPost = post.querySelector(
-        ".info > a:nth-last-child(1)"
+        ".info > a:nth-last-child(1)",
       ) as HTMLAnchorElement | null;
 
       if (!linkToPost) {
@@ -198,8 +200,8 @@ function recentPostsInfiniteScroll(
         throttle(getUserCommentPageTextRaw, {
           maxConcurrentRequests: 5,
           limits: [{ duration: 2, maxRequests: 6 }],
-        })
-      )
+        }),
+      ),
     );
 
     commentCountStr = commentCount.toString();
@@ -219,7 +221,7 @@ function recentPostsInfiniteScroll(
         throttle(getUserCommentPageTextRaw, {
           maxConcurrentRequests: 3,
           limits: [{ duration: 1 / 3, maxRequests: 1 }],
-        })
+        }),
       );
       if (page) {
         recentPostsBox.insertBefore(page, sd.element);
@@ -240,14 +242,14 @@ function recentPostsInfiniteScroll(
   while (true) {
     // ensure we're on the right page
     const recentPostsBox = (await listenForSelector(
-      ".forum-recent-posts-box:has(#forum-recent-posts-list)"
+      ".forum-recent-posts-box:has(#forum-recent-posts-list)",
     )) as HTMLDivElement;
 
     // get user's id
     const userId =
       (
         recentPostsBox.querySelector(
-          "#recent-posts-user-id"
+          "#recent-posts-user-id",
         ) as HTMLInputElement | null
       )?.value ?? "";
 
@@ -267,7 +269,7 @@ function recentPostsInfiniteScroll(
     const stopInfiniteScroll = recentPostsInfiniteScroll(
       recentPostsBox,
       userId,
-      filter.wikiFilter
+      filter.wikiFilter,
     );
 
     await listenForNoSelector("#better-comments-view-indicator");

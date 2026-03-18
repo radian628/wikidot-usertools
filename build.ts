@@ -75,7 +75,17 @@ const ctx = await esbuild.context({
               fs.writeFile(
                 f,
                 matches.map((m) => m[0]).join("\n") +
-                  file.replaceAll(userscriptCommentRegex, "")
+                  `
+"use strict";
+import("https://cdn.jsdelivr.net/npm/ses@1.14.0/dist/lockdown.umd.min.js")
+.then(() => {
+  try {
+    lockdown();
+  }  catch (e) { console.warn(e); }
+  
+` +
+                  file.replaceAll(userscriptCommentRegex, "") +
+                  " });",
               );
             }),
           ]);

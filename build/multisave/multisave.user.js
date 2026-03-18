@@ -7,7 +7,14 @@
 // @author      radian628
 // @description Upload multiple files to wikidot at once. 
 // ==/UserScript==
-*/"use strict";(()=>{var Cy=Object.create;var Bc=Object.defineProperty;var qy=Object.getOwnPropertyDescriptor;var Yy=Object.getOwnPropertyNames;var Ry=Object.getPrototypeOf,Gy=Object.prototype.hasOwnProperty;var At=(l,t)=>()=>(t||l((t={exports:{}}).exports,t),t.exports);var Qy=(l,t,u,a)=>{if(t&&typeof t=="object"||typeof t=="function")for(let e of Yy(t))!Gy.call(l,e)&&e!==u&&Bc(l,e,{get:()=>t[e],enumerable:!(a=qy(t,e))||a.enumerable});return l};var Ln=(l,t,u)=>(u=l!=null?Cy(Ry(l)):{},Qy(t||!l||!l.__esModule?Bc(u,"default",{value:l,enumerable:!0}):u,l));var Zc=At(W=>{"use strict";/**
+*/"use strict";
+import("https://cdn.jsdelivr.net/npm/ses@1.14.0/dist/lockdown.umd.min.js")
+.then(() => {
+  try {
+    lockdown();
+  }  catch (e) { console.warn(e); }
+  
+"use strict";(()=>{var Cy=Object.create;var Bc=Object.defineProperty;var qy=Object.getOwnPropertyDescriptor;var Yy=Object.getOwnPropertyNames;var Ry=Object.getPrototypeOf,Gy=Object.prototype.hasOwnProperty;var At=(l,t)=>()=>(t||l((t={exports:{}}).exports,t),t.exports);var Qy=(l,t,u,a)=>{if(t&&typeof t=="object"||typeof t=="function")for(let e of Yy(t))!Gy.call(l,e)&&e!==u&&Bc(l,e,{get:()=>t[e],enumerable:!(a=qy(t,e))||a.enumerable});return l};var Ln=(l,t,u)=>(u=l!=null?Cy(Ry(l)):{},Qy(t||!l||!l.__esModule?Bc(u,"default",{value:l,enumerable:!0}):u,l));var Zc=At(W=>{"use strict";/**
  * @license React
  * scheduler.production.js
  *
@@ -144,3 +151,4 @@ Error generating stack: `+a.message+`
 }\r
 `;var th=setInterval(()=>{let l=document.getElementById("files-button");if(!l||l.dataset.isClone)return;let t=l.cloneNode(!0);t.dataset.isClone="true",l.parentElement?.insertBefore(t,l),l.parentElement?.removeChild(l),t.addEventListener("click",()=>{let u=document.createElement("div");document.body.appendChild(u),(0,Dy.createRoot)(u).render(Ny.default.createElement(Oy,{exit:()=>{document.body.removeChild(u)}}))})},0),Hy=document.createElement("style");Hy.innerHTML=Uy.replaceAll(";"," !important ;");document.head.appendChild(Hy);})();
 //# sourceMappingURL=multisave.user.js.map
+ });

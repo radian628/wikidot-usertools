@@ -1,4 +1,5 @@
 import htmlparse, { parse } from "node-html-parser";
+import { Database } from "bun:sqlite";
 
 export type PageData = { html: string; url: string }[];
 export type ParsedPageData = {
@@ -28,7 +29,7 @@ export function getParentRelationships(data: PageData): Map<string, string> {
 }
 
 export function getChildren(
-  parents: Map<string, string>
+  parents: Map<string, string>,
 ): Map<string, string[]> {
   const map = new Map<string, string[]>();
 
@@ -92,4 +93,41 @@ export function getPageCategory(url: string): string | undefined {
   if (!category) return;
 
   return category[0].slice(1, -1);
+}
+
+export const db = new Database("./build/wiki.db", {
+  strict: true,
+  readonly: true,
+});
+
+export const getAll = db.query(`
+SELECT * FROM articles 
+  LIMIT 100 OFFSET $offset
+  `);
+
+export const getCount = db.query(`
+SELECT COUNT(*) FROM articles  
+`);
+
+export function getPageCount() {
+  return (getCount.all()[0] as any)["COUNT(*)"] as number;
+}
+
+export async function streamFullDb(
+  atMost: number,
+  callback: (data: PageData[number]) => void,
+) {
+  let offset = 0;
+
+  while (true) {
+    console.log(`${((offset / atMost) * 100).toFixed(3)}% Done!`);
+    const entries = getAll.all({ offset }) as PageData;
+
+    for (const e of entries) callback(e);
+
+    if (entries.length < 100 || offset > (atMost ?? Infinity)) {
+      return;
+    }
+    offset += 100;
+  }
 }

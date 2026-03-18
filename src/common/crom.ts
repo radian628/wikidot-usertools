@@ -60,6 +60,7 @@ export async function getAllPagesMatching(
 export async function getAllPagesMatchingV2(
   filter: string,
   content: string,
+  limit?: number,
 ): Promise<any[]> {
   let cursor: string | undefined;
 
@@ -81,6 +82,7 @@ export async function getAllPagesMatchingV2(
     const data = await crom2(query);
     pages.push(...data.data.pages.edges.map((e: any) => e.node));
     if (!data.data.pages.pageInfo.hasNextPage) break;
+    if (pages.length >= (limit ?? Infinity)) break;
     cursor = data.data.pages.pageInfo.endCursor;
   }
 

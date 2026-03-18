@@ -1,3 +1,10 @@
+"use strict";
+import("https://cdn.jsdelivr.net/npm/ses@1.14.0/dist/lockdown.umd.min.js")
+.then(() => {
+  try {
+    lockdown();
+  }  catch (e) { console.warn(e); }
+  
 "use strict";(()=>{function h(o,n){let e=[],p=n.limits.reduce((i,a)=>Math.max(i,a.duration),0),c=[],t=new Set;setInterval(()=>{for(;;){let i=e.at(0);if(!i)return;let a=Date.now();if(c=c.filter(r=>(a-r.time)/1e3<=p),t.size>=n.maxConcurrentRequests)return;for(let r of n.limits){let u=0;for(let m of c)(a-m.time)/1e3<=r.duration&&u++;if(u>=r.maxRequests)return}e.shift(),c.push({time:Date.now()});let d=o(...i.params);t.add(d),(async()=>{let r=await d;i.callback(r),t.delete(d)})()}});let s=(...i)=>new Promise((a,d)=>{e.push({params:i,callback:r=>{a(r)}})});return s._throttled=!0,s}async function P(o){return await(await fetch("https://apiv1.crom.avn.sh/graphql",{body:JSON.stringify({query:o}),method:"POST",mode:"cors",headers:{"Content-Type":"application/json"}})).json()}async function l(o,n){let e,p=[];for(;;){let c=`{
   pages(filter: ${o}, first: 100${e?`, after: "${e}"`:""}) {
     edges {
@@ -1235,3 +1242,4 @@ http://scp-wiki.wikidot.com/9000contestuncannyon
       </p>
       ${s.innerHTML}</div>`}}}};})();
 //# sourceMappingURL=slotpicker.user.js.map
+ });
