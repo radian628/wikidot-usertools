@@ -7,7 +7,8 @@
 // @author      radian628
 // @description Upload multiple files to wikidot at once. 
 // ==/UserScript==
-*/"use strict";
+*/
+"use strict";
 import("https://cdn.jsdelivr.net/npm/ses@1.14.0/dist/lockdown.umd.min.js")
 .then(() => {
   try {

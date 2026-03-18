@@ -1,0 +1,40 @@
+.image-resize-widget {
+  position: fixed;
+  top: 20%;
+  left: 20%;
+  width: 60%;
+  height: 60%;
+  z-index: 9999;
+  background-color: white;
+  color: black;
+  border: 1px solid black;
+  box-shadow: 0 0 10px black;
+  display: grid;
+  grid-template-areas:
+    "top top"
+    "settings info"
+    "settings info"
+    "image image"
+    "actions actions";
+  padding: 20px;
+}
+
+.enum-ui button.selected {
+  outline: 3px solid orange;
+}
+
+.image-container {
+  overflow: auto;
+  border: 1px solid black;
+}
+
+.sliders-container {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+}
+
+.use-image-button {
+  margin-block: 0.5em;
+  font-size: 200%;
+  justify-self: center;
+}

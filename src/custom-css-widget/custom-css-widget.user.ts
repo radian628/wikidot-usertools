@@ -11,6 +11,8 @@
 // ==/UserScript==
 */
 
+/*!NO_SES*/
+
 import { parseMixed } from "@lezer/common";
 import { buildParser } from "@lezer/generator";
 import * as jsParser from "@lezer/javascript";
@@ -442,11 +444,11 @@ async function runAllJavascript(src: string, evalbox: Evalbox) {
       src
         .replaceAll(
           /\s*\/\*GENERATED START\*\/[\s\S]*?\/\*GENERATED END\*\//g,
-          ""
+          "",
         )
         .replaceAll(
           /\/\*js[\s\S]+?\*\//g,
-          (s: string | any[]) => `\0${s.slice(4, -2)}\0`
+          (s: string | any[]) => `\0${s.slice(4, -2)}\0`,
         )
         .split("\0")
         .map(async (e: any, i: number) => {
@@ -458,7 +460,7 @@ async function runAllJavascript(src: string, evalbox: Evalbox) {
           } else {
             return e;
           }
-        })
+        }),
     )
   ).join("");
 }
@@ -512,7 +514,7 @@ const init = async () => {
   async function updatecss() {
     widgetStylesheetRoot.innerText = await runAllJavascript(
       editor.doc(),
-      evalbox
+      evalbox,
     );
     localStorage.setItem("radian628-css-widget-text", editor.doc());
   }
@@ -525,11 +527,11 @@ const init = async () => {
     const withFormattedJS = await formatAllJavascript(
       editor.doc(),
       editor.cursor(),
-      evalbox
+      evalbox,
     );
     const css = await fmtcss(
       withFormattedJS.formatted,
-      withFormattedJS.cursorOffset
+      withFormattedJS.cursorOffset,
     );
     console.log(css.cursorOffset);
     editor.setDoc(css.formatted, css.cursorOffset);
@@ -537,7 +539,7 @@ const init = async () => {
 
   editor.onYoink(async () => {
     const styles = Array.from(
-      document.head.querySelectorAll("style")
+      document.head.querySelectorAll("style"),
     ).reverse();
     let style;
     for (const s of styles) {
@@ -599,6 +601,7 @@ const init = async () => {
 };
 
 const initListener = () => {
+  console.log("hello please work thank you");
   init();
   document.removeEventListener("click", initListener);
 };

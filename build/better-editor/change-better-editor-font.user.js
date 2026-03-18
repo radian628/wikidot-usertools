@@ -8,7 +8,8 @@
 // @author      radian628
 // @description 9/13/2025, 12:35:21 PM
 // ==/UserScript==
-*/"use strict";
+*/
+"use strict";
 import("https://cdn.jsdelivr.net/npm/ses@1.14.0/dist/lockdown.umd.min.js")
 .then(() => {
   try {

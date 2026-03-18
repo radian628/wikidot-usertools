@@ -9,12 +9,44 @@
 // ==/UserScript==
 */
 
-import { uploadFile } from "../common/file-io.js";
+import { getAllFileInfo, getFileInfo, uploadFile } from "../common/file-io.js";
 import {
   getPageId,
   getPageSource,
   setPageSource,
 } from "../common/wikidot-api-utils.js";
+import { imageResizePopup } from "./image-resize-widget.js";
+
+export type Action =
+  | {
+      id: number;
+      type: "find-replace";
+      find: string;
+      replace: string;
+      reasoning: string;
+    }
+  | {
+      id: number;
+      type: "upload-file";
+      oldUrl: string;
+      newName: string;
+      reasoning: string;
+    };
+function promiseQueue() {
+  let prev: Promise<any> = Promise.resolve();
+
+  return {
+    enqueue<T>(p: () => Promise<T>): Promise<T> {
+      const myPrev = prev;
+      const res = (async () => {
+        await myPrev;
+        return await p();
+      })();
+      prev = res;
+      return res;
+    },
+  };
+}
 
 (async () => {
   const HOSTNAMES = [
@@ -99,7 +131,11 @@ import {
 
   // filter out ones not in page source
   const pageId = await getPageId(window.location.href);
-  const pageSource = await getPageSource(window.location.href);
+  if (!pageId) return;
+  const pageSource = (await getPageSource(window.location.href)).replaceAll(
+    "\u00a0",
+    " ",
+  );
   urlInfo = urlInfo.filter((u) => pageSource.includes(u.url));
 
   const root = document.createElement("div");
@@ -177,21 +213,9 @@ transition: transform 0.25s;
   const ul2 = document.createElement("ul");
   root.appendChild(ul2);
 
-  type Action =
-    | {
-        type: "find-replace";
-        find: string;
-        replace: string;
-        reasoning: string;
-      }
-    | {
-        type: "upload-file";
-        oldUrl: string;
-        newName: string;
-        reasoning: string;
-      };
-
   const actions: Action[] = [];
+
+  let actionid = 0;
 
   if (
     urlInfo.some(
@@ -205,7 +229,31 @@ transition: transform 0.25s;
       find: "fonts.googleapis.com",
       replace: "fonts.bunny.net",
       reasoning: `Switch use of Google Fonts to privacy-preserving mirror Bunny Fonts.`,
+      id: actionid++,
     });
+  }
+
+  const fileInfo = await getAllFileInfo(pageId);
+
+  const usedFilenames = new Set<string>(
+    [...fileInfo.info.values()].map((f) => f.name),
+  );
+
+  const extRegex = /\.[a-zA-Z-_]+$/g;
+
+  function pickUniqueFilename(name: string) {
+    let candidate = name;
+    let i = 2;
+    while (true) {
+      if (!usedFilenames.has(candidate)) {
+        usedFilenames.add(candidate);
+        return candidate;
+      }
+      let ext = name.match(extRegex)?.[0] ?? "";
+
+      candidate = name.replace(extRegex, "") + i + ext;
+      i++;
+    }
   }
 
   for (const { url, hostType } of urlInfo) {
@@ -213,7 +261,9 @@ transition: transform 0.25s;
       const parsedUrl = new URL(url, window.location.href);
 
       if (parsedUrl.hostname !== "fonts.googleapis.com") {
-        const newFilename = url.replace(/\/+$/g, "").split("/").at(-1)!;
+        const newFilename = pickUniqueFilename(
+          url.replace(/\/+$/g, "").split("/").at(-1)!,
+        );
 
         const slug = window.location.pathname.split("/")[1];
 
@@ -222,12 +272,14 @@ transition: transform 0.25s;
           oldUrl: url,
           newName: newFilename,
           reasoning: `Upload non-local file.`,
+          id: actionid++,
         });
         actions.push({
           type: "find-replace",
           find: url,
           replace: `https://${window.location.hostname}/local--files/${slug}/${newFilename}`,
           reasoning: `Upload non-local file.`,
+          id: actionid++,
         });
       }
     }
@@ -257,6 +309,8 @@ transition: transform 0.25s;
     ),
   );
 
+  const popupQueue = promiseQueue();
+
   const br = document.createElement("br");
   root.appendChild(br);
 
@@ -280,18 +334,10 @@ transition: transform 0.25s;
     (async () => {
       let allgood = true;
       await Promise.all([
-        setPageSource(window.location.href, src)
-          .then(() => {
-            msg("Page Source successfully updated!", "good");
-          })
-          .catch(() => {
-            msg("Failed to update text in Page Source.", "bad");
-            allgood = false;
-          }),
         ...actions.flatMap((a) => {
           if (a.type === "upload-file") {
             let corsUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(a.oldUrl)}`;
-            if (new URL(a.oldUrl).hostname === "commons.wikimedia.org")
+            if (new URL(a.oldUrl).hostname.endsWith("wikimedia.org"))
               corsUrl = a.oldUrl;
             msg(`Fetching '${a.oldUrl}' via CORS proxy...`, "info");
             return fetch(corsUrl)
@@ -303,12 +349,24 @@ transition: transform 0.25s;
                 msg(`Failed to fetch '${a.oldUrl}'.`, "bad");
                 allgood = false;
               })
-              .then((blob) => {
+              .then(async (blob) => {
                 msg(`Uploading '${a.oldUrl}' to Wikidot...`, "info");
                 if (!blob || !pageId) throw new Error();
+
+                let resizedBlob = blob;
+                if (
+                  resizedBlob.size > 800_000 &&
+                  resizedBlob.type.startsWith("image") &&
+                  resizedBlob.type != "image/svg+xml"
+                ) {
+                  resizedBlob = await popupQueue.enqueue(() =>
+                    imageResizePopup(blob),
+                  );
+                }
+
                 return uploadFile(
                   a.newName,
-                  blob,
+                  resizedBlob,
                   `Uploaded via auto-localizer script.`,
                   pageId,
                 );
@@ -335,6 +393,14 @@ transition: transform 0.25s;
           }
         }),
       ]);
+      await setPageSource(window.location.href, src)
+        .then(() => {
+          msg("Page Source successfully updated!", "good");
+        })
+        .catch(() => {
+          msg("Failed to update text in Page Source.", "bad");
+          allgood = false;
+        });
 
       if (allgood) {
         msg(

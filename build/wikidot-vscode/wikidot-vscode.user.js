@@ -8,7 +8,8 @@
 // @author      radian628
 // @description VSCode in Wikidot. This is the dumbest thing I've ever created. 
 // ==/UserScript==
-*/"use strict";
+*/
+"use strict";
 import("https://cdn.jsdelivr.net/npm/ses@1.14.0/dist/lockdown.umd.min.js")
 .then(() => {
   try {

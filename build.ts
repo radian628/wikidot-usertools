@@ -69,6 +69,7 @@ const ctx = await esbuild.context({
           await Promise.all([
             files.map(async (f: string) => {
               const file = (await fs.readFile(f)).toString();
+              const noSES = file.includes("/*!NO_SES*/");
               const userscriptCommentRegex =
                 /\/\*!\s*?\/\/\s*==UserScript==[\s\S]*?\/\/\s*==\/UserScript==[\s\S]*?\*\//g;
               const matches = [...file.matchAll(userscriptCommentRegex)];
@@ -77,10 +78,10 @@ const ctx = await esbuild.context({
                 matches.map((m) => m[0]).join("\n") +
                   `
 "use strict";
-import("https://cdn.jsdelivr.net/npm/ses@1.14.0/dist/lockdown.umd.min.js")
+${noSES ? "Promise.resolve()" : `import("https://cdn.jsdelivr.net/npm/ses@1.14.0/dist/lockdown.umd.min.js")`}
 .then(() => {
   try {
-    lockdown();
+    ${noSES ? "" : `lockdown();`}
   }  catch (e) { console.warn(e); }
   
 ` +
