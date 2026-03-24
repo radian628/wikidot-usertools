@@ -12,7 +12,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { injectFunction } from "../../r628/src/inject.js";
+import { injectFunction } from "r628";
 import EditorCSS from "./editor.css?raw";
 import { getPageSource, setPageSource } from "../common/wikidot-api-utils.js";
 

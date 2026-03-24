@@ -1,11 +1,11 @@
-import { range } from "../../r628/src/range.js";
+import { range } from "r628";
 import { requestModuleAsync } from "./request-module-async.js";
 
 export function uploadFile(
   name: string,
   file: Blob,
   comments: string,
-  pageId: string
+  pageId: string,
 ) {
   const formdata = new FormData();
   formdata.append("action", "FileAction");
@@ -24,7 +24,7 @@ export function uploadFile(
 export async function getFileIds(pageId: string) {
   return {
     ids: new Map(
-      (await getAllFileInfo(pageId)).info.entries().map(([k, v]) => [k, v.id])
+      (await getAllFileInfo(pageId)).info.entries().map(([k, v]) => [k, v.id]),
     ),
   };
 }
@@ -69,8 +69,8 @@ export async function getFileInfo(pageId: string, page?: number) {
     info: idmap,
     fileCount: parseInt(
       (dom.querySelector("h1 + p") as HTMLElement).innerText.match(
-        /\d+/g
-      )?.[0] ?? "0"
+        /\d+/g,
+      )?.[0] ?? "0",
     ),
   };
 }
@@ -85,10 +85,10 @@ export async function getAllFileInfo(pageId: string) {
         firstPage,
         ...(await Promise.all(
           range(pageCount - 1).map(
-            async (i) => await getFileInfo(pageId, i + 2)
-          )
+            async (i) => await getFileInfo(pageId, i + 2),
+          ),
         )),
-      ].flatMap((p) => [...p.info.entries()])
+      ].flatMap((p) => [...p.info.entries()]),
     ),
   };
 }

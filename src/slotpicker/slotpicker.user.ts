@@ -1,7 +1,7 @@
 import { throttle } from "r628";
 import { getAllPagesMatching } from "../common/crom.js";
 import Picks from "./picks.txt?raw";
-import { range } from "../../r628/src/range.js";
+import { range } from "r628";
 import { asyncRequestModule, getPageId } from "../common/wikidot-api-utils.js";
 
 const FILTER_9KCON = `{ url: { startsWith: "http://scp-wiki.wikidot.com"}, wikidotInfo: { tags: { eq: "9000" } } }`;
@@ -44,7 +44,7 @@ async function getRatingInfo(url: string) {
       netRating--;
     } else {
       console.warn(
-        `Unrecognized vote type '${rating}' for user '${username}' and page '${url}'.`
+        `Unrecognized vote type '${rating}' for user '${username}' and page '${url}'.`,
       );
     }
   }
@@ -64,11 +64,11 @@ window.calculatePicks = async (
     netRating: number;
     upvoteTotal: number;
     votes: string;
-  }[]
+  }[],
 ) => {
   const articles = rawArticles.sort(
     (a, b) =>
-      b.netRating * 10000 + b.upvoteTotal - a.netRating * 10000 - a.upvoteTotal
+      b.netRating * 10000 + b.upvoteTotal - a.netRating * 10000 - a.upvoteTotal,
   );
 
   const slotResults = new Map<
@@ -110,7 +110,7 @@ window.calculatePicks = async (
           const status = (await fetch(`https://scp-wiki.wikidot.com/scp-${p}`))
             .status;
           return status === 404 ? [p] : [];
-        })
+        }),
       )
     ).flat();
 
@@ -141,7 +141,7 @@ window.calculatePicks = async (
           b.netRating * 10000 +
           b.upvoteTotal -
           a.netRating * 10000 -
-          a.upvoteTotal
+          a.upvoteTotal,
       ),
   };
 };
@@ -150,7 +150,7 @@ async function getDiscussionLink(url: string) {
   const pageData = await (await fetch(url)).text();
   const dom = new DOMParser().parseFromString(pageData, "text/html");
   const discussButton = dom.querySelector(
-    "#discuss-button"
+    "#discuss-button",
   ) as HTMLAnchorElement;
   return discussButton.href;
 }
@@ -265,10 +265,10 @@ async function getAuthorPosts(url: string, authors: string[]) {
   const discussionPage = await (await fetch(dlink)).text();
   const dom = new DOMParser().parseFromString(discussionPage, "text/html");
   return Array.from(
-    dom.querySelectorAll("#thread-container-posts .post")
+    dom.querySelectorAll("#thread-container-posts .post"),
   ).filter((p) => {
     const usernameContainer = p.querySelector(
-      ".printuser a:nth-child(2)"
+      ".printuser a:nth-child(2)",
     ) as HTMLElement;
     console.log(usernameContainer);
     return usernameContainer && authors.includes(usernameContainer.innerText);
@@ -296,7 +296,7 @@ window.copyURLToClipboard = (url) => (target: HTMLElement) => {
 window.getAllAuthorComments = async () => {
   const pages = await getAllPagesMatching(
     FILTER_9KCON,
-    `{ url, attributions { user { name } } }`
+    `{ url, attributions { user { name } } }`,
   );
 
   const authorPostsThrottled = throttle(getAuthorPosts, {
@@ -317,7 +317,7 @@ window.getAllAuthorComments = async () => {
     const url = page.url;
     const authorPosts = await authorPostsThrottled(
       url,
-      page.attributions.map((e: any) => e.user.name)
+      page.attributions.map((e: any) => e.user.name),
     );
     for (const ap of authorPosts) {
       const apcontent = ap.querySelector(".content");

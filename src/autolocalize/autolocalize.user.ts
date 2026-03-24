@@ -9,6 +9,7 @@
 // ==/UserScript==
 */
 
+import { createRoot } from "react-dom/client";
 import { getAllFileInfo, getFileInfo, uploadFile } from "../common/file-io.js";
 import {
   getPageId,
@@ -16,22 +17,9 @@ import {
   setPageSource,
 } from "../common/wikidot-api-utils.js";
 import { imageResizePopup } from "./image-resize-widget.js";
+import { initAutolocalizeUI } from "./autolocalize-ui.js";
+import { Action } from "./autolocalize-actions.js";
 
-export type Action =
-  | {
-      id: number;
-      type: "find-replace";
-      find: string;
-      replace: string;
-      reasoning: string;
-    }
-  | {
-      id: number;
-      type: "upload-file";
-      oldUrl: string;
-      newName: string;
-      reasoning: string;
-    };
 function promiseQueue() {
   let prev: Promise<any> = Promise.resolve();
 
@@ -138,81 +126,6 @@ function promiseQueue() {
   );
   urlInfo = urlInfo.filter((u) => pageSource.includes(u.url));
 
-  const root = document.createElement("div");
-  document.body.appendChild(root);
-  root.style = `
-position: fixed;
-z-index: 999;
-bottom: 0;
-right: 0;
-color: black;
-background-color: white;
-box-shadow: 0 0 10px black;
-border-top: 1px solid black;
-border-left: 1px solid black;
-padding: 10px;
-font-family: sans-serif;
-max-width: 50%;
-max-height: 50%;
-overflow: auto;
-transition: transform 0.25s;
-`;
-
-  const showHide = document.createElement("button");
-  root.appendChild(showHide);
-  showHide.innerText = "Show/Hide";
-  let show = true;
-  showHide.onclick = () => {
-    show = !show;
-    if (show) {
-      root.style.transform = "";
-      root.style.overflow = "";
-    } else {
-      root.style.transform = "translateY(calc(100% - 40px))";
-      root.scrollTop = 0;
-      root.style.overflow = "hidden";
-    }
-  };
-
-  {
-    const br = document.createElement("br");
-    root.appendChild(br);
-  }
-
-  if (!urlInfo.some((a) => a.hostType !== "local")) {
-    root.parentElement?.removeChild(root);
-    return;
-  }
-
-  root.appendChild(
-    new Text(
-      `Some images on this page are not localized. Here is a list of all improperly-localized URLs:`,
-    ),
-  );
-
-  const ul = document.createElement("ul");
-  root.appendChild(ul);
-
-  for (const { url, hostType } of urlInfo) {
-    if (hostType !== "local") {
-      const li = document.createElement("li");
-      ul.appendChild(li);
-
-      const a = document.createElement("a");
-      li.appendChild(a);
-      a.href = url;
-      a.target = "_blank";
-      a.innerText = url;
-    }
-  }
-
-  root.appendChild(
-    new Text("To fix this, the following actions are suggested:"),
-  );
-
-  const ul2 = document.createElement("ul");
-  root.appendChild(ul2);
-
   const actions: Action[] = [];
 
   let actionid = 0;
@@ -271,54 +184,25 @@ transition: transform 0.25s;
           type: "upload-file",
           oldUrl: url,
           newName: newFilename,
-          reasoning: `Upload non-local file.`,
+          reasoning: `Upload non-local file to Wikidot.`,
           id: actionid++,
         });
         actions.push({
           type: "find-replace",
           find: url,
           replace: `https://${window.location.hostname}/local--files/${slug}/${newFilename}`,
-          reasoning: `Upload non-local file.`,
+          reasoning: `Update URL to use newly-uploaded local file.`,
           id: actionid++,
         });
       }
     }
   }
 
-  for (const ac of actions) {
-    const li = document.createElement("li");
-    ul2.appendChild(li);
-    if (ac.type === "find-replace") {
-      li.appendChild(
-        new Text(
-          `Page Source: Replace '${ac.find}' with '${ac.replace}' (${ac.reasoning})`,
-        ),
-      );
-    } else {
-      li.appendChild(
-        new Text(
-          `Files: Upload file with name '${ac.newName}' from '${ac.oldUrl}' (${ac.reasoning})`,
-        ),
-      );
-    }
-  }
-
-  root.appendChild(
-    new Text(
-      "Press the button to below to perform all actions listed above automatically:",
-    ),
-  );
+  initAutolocalizeUI({ actions, urls: urlInfo.map((u) => u.url) });
 
   const popupQueue = promiseQueue();
 
-  const br = document.createElement("br");
-  root.appendChild(br);
-
-  const applyButton = document.createElement("button");
-  root.appendChild(applyButton);
-  applyButton.innerText = "Perform Listed Actions";
-
-  applyButton.onclick = () => {
+  const a = () => {
     let src = pageSource;
 
     msg("Replacing text in Page Source...", "info");
@@ -418,7 +302,7 @@ transition: transform 0.25s;
 
   const actionLog = document.createElement("div");
   actionLog.style = `border: 1px solid black;`;
-  root.appendChild(actionLog);
+  // root.appendChild(actionLog);
 
   const msg = (m: string, type: "good" | "bad" | "info") => {
     const div = document.createElement("div");

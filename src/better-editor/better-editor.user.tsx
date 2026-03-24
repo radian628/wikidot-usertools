@@ -10,8 +10,7 @@
 // ==/UserScript==
 */
 
-import { throttle, workerifyServerIframe } from "r628";
-import { injectFunction } from "../../r628/src/inject.js";
+import { injectFunction, throttle, workerifyServerIframe } from "r628";
 import { createRoot } from "react-dom/client";
 import React from "react";
 import { App } from "./editor.js";
@@ -39,7 +38,7 @@ function initializeEditor() {
     (fn) => (WIKIDOT.page.listeners.editClick = fn),
     (fn) => (fn) => {
       initializeEditor();
-    }
+    },
   );
 })();
 

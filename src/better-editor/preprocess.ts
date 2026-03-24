@@ -1,5 +1,4 @@
-import { createEvalbox } from "../../r628/src/evalbox.js";
-import { smartAsyncReplaceAll } from "../../r628/src/stringutils.js";
+import { createEvalbox, smartAsyncReplaceAll } from "r628";
 
 export async function preprocess(str: string, cursor: number, doEval: boolean) {
   const evalbox = await createEvalbox();
@@ -36,7 +35,7 @@ export async function preprocess(str: string, cursor: number, doEval: boolean) {
         cursorPos: cursor,
       };
     },
-    { cursor }
+    { cursor },
   );
   evalbox.kill();
   return res;

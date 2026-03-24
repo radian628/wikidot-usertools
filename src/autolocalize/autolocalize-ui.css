@@ -1,0 +1,111 @@
+.autolocalize-ui {
+  position: fixed;
+  z-index: 9999;
+  top: 0;
+  left: 0;
+  max-width: 70%;
+  max-height: 100%;
+  background-color: #222;
+  color: #eee;
+  padding: 20px;
+  border-right: 1px solid white;
+  border-bottom: 1px solid white;
+  overflow: auto;
+  padding-bottom: 200px;
+  box-sizing: border-box;
+}
+
+.autolocalize-ui a {
+  color: #9cf;
+  text-decoration: underline;
+}
+
+.autolocalize-ui > ul {
+  background-color: #161616;
+  border-radius: 10px;
+  border: 1px solid #666;
+  list-style: none;
+  padding: 0;
+}
+
+.autolocalize-ui > ul > li:not(:nth-last-child(1)) {
+  border-bottom: 1px solid #666;
+}
+
+.autolocalize-ui > ul > li {
+  padding: 10px;
+}
+
+.autolocalize-ui > ul > li::marker {
+  display: none;
+}
+
+.action.find-replace {
+  display: grid;
+  grid-template-areas:
+    "category category"
+    "reasoning reasoning"
+    "find replace"
+    "find replace";
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.action.upload-file {
+  display: grid;
+  grid-template-areas:
+    "category category"
+    "reasoning reasoning"
+    "url name"
+    "url name";
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.category {
+  grid-area: category;
+  font-weight: bold;
+  font-size: 110%;
+}
+.reasoning {
+  grid-area: reasoning;
+  font-size: 90%;
+  font-style: italic;
+  color: #ccc;
+}
+.find {
+  grid-area: find;
+  color: #fcc;
+}
+.replace {
+  grid-area: replace;
+  color: #cfc;
+}
+.url {
+  grid-area: url;
+}
+.name {
+  grid-area: name;
+}
+
+.reasoning {
+  margin-bottom: 10px;
+}
+
+.context {
+  font-size: 90%;
+  color: #bbb;
+  text-decoration: none;
+}
+
+.rm {
+  text-decoration: line-through;
+}
+
+.autolocalize-ui button {
+  font-size: 150%;
+  background-color: #3a3a3a;
+  color: white;
+  border: 1px solid #666;
+  cursor: pointer;
+  border-radius: 10px;
+  padding: 15px;
+}

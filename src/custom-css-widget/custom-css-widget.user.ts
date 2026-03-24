@@ -11,8 +11,6 @@
 // ==/UserScript==
 */
 
-/*!NO_SES*/
-
 import { parseMixed } from "@lezer/common";
 import { buildParser } from "@lezer/generator";
 import * as jsParser from "@lezer/javascript";
@@ -30,7 +28,7 @@ import { EditorView, keymap, lineNumbers } from "@codemirror/view";
 import { defaultKeymap, history, indentWithTab } from "@codemirror/commands";
 import { search, searchKeymap } from "@codemirror/search";
 import { oneDark } from "@codemirror/theme-one-dark";
-import { createEvalbox, Evalbox } from "../../r628/src/evalbox.js";
+import { createEvalbox, Evalbox } from "r628";
 import * as prettier from "prettier";
 import * as prettierPostcss from "prettier/plugins/postcss.js";
 import * as prettierBabel from "prettier/plugins/babel.js";

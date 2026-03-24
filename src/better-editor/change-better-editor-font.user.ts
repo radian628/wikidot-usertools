@@ -10,7 +10,7 @@
 // ==/UserScript==
 */
 
-import { injectFunction } from "../../r628/src/inject.js";
+import { injectFunction } from "r628";
 
 (async () => {
   if (window.parent !== window) return;

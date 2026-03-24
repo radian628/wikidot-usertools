@@ -12,10 +12,9 @@ import {
   cssModuleParser,
   embeddedJSInCssFinderParser,
 } from "./css-module-parser.js";
-import { createWorkerWithInterface } from "../../r628/src/workerify.js";
 import WorkerSource from "./better-editor-worker.ts?bpt";
 import { WorkerBridge } from "./better-editor-worker-bridge.js";
-import { workerifyClientIframe } from "r628";
+import { createWorkerWithInterface, workerifyClientIframe } from "r628";
 import { IframeBridge } from "./better-editor-iframe-bridge.js";
 import { preprocess } from "./preprocess.js";
 import { diff } from "@codemirror/merge";

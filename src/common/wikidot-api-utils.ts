@@ -1,7 +1,7 @@
-import { throttle } from "../../r628/src/throttle.js";
+import { throttle } from "r628";
 
 export function defaultThrottle<Params extends any[], Ret>(
-  fn: (...params: Params) => Promise<Ret>
+  fn: (...params: Params) => Promise<Ret>,
 ) {
   return throttle(fn, {
     maxConcurrentRequests: 5,
@@ -36,7 +36,7 @@ export const getPageId = defaultThrottle(async function (url: string) {
 export async function setPageSource(
   url: string,
   newSource: string,
-  newTitle?: string
+  newTitle?: string,
 ) {
   const id = await getPageId(url);
   const slug = new URL(url).pathname.slice(1);
@@ -47,11 +47,11 @@ export async function setPageSource(
   })) as any;
   if (lock.locked) {
     window.alert(
-      "Could not save the page, as it is currently locked and being edited by another user."
+      "Could not save the page, as it is currently locked and being edited by another user.",
     );
   }
   const dom = new DOMParser().parseFromString(lock.body, "text/html");
-  await asyncRequestModule("Empty", {
+  return await asyncRequestModule("Empty", {
     action: "WikiPageAction",
     comments: "Saved page.",
     event: "savePage",

@@ -1,5 +1,7 @@
 import React, { Fragment, useEffect, useState } from "react";
-import { Action } from "../../src/autolocalize/autolocalize.user.js";
+import { createRoot } from "react-dom/client";
+import CSS from "./autolocalize-ui.css?raw";
+import { RunningAction, Status } from "./autolocalize-actions.js";
 
 function pubsub<T>() {
   const handlers = new Set<(t: T) => void>();
@@ -16,15 +18,6 @@ function pubsub<T>() {
   };
 }
 
-type Emitter<T> = {
-  subscribe(cb: (t: T) => void): () => void;
-};
-type Status = { type: "success" | "fail" | "info"; data: string };
-
-type RunningAction = Action & {
-  events?: Emitter<Status>;
-};
-
 function StatusView(params: { status: Status }) {
   return (
     <div className={`status-${params.status.type}`}>{params.status.data}</div>
@@ -34,16 +27,6 @@ function StatusView(params: { status: Status }) {
 function ActionView(params: { action: RunningAction }) {
   const a = params.action;
 
-  useEffect(() => {
-    if (!a.events) {
-      return;
-    }
-    const unsub = a.events.subscribe((evt) => {
-      setStatus(evt);
-    });
-    return unsub;
-  }, [a]);
-
   const [status, setStatus] = useState<Status | undefined>();
 
   if (a.type === "find-replace") {
@@ -52,8 +35,14 @@ function ActionView(params: { action: RunningAction }) {
         <div className="action find-replace">
           <div className="category">Find/Replace Page Source</div>
           <div className="reasoning">{a.reasoning}</div>
-          <div className="find">{a.find}</div>
-          <div className="replace">{a.replace}</div>
+          <div className="find">
+            <div className="context">Find & Remove:</div>
+            <span className="rm">{a.find}</span>
+          </div>
+          <div className="replace">
+            <div className="context">Replace With:</div>
+            {a.replace}
+          </div>
         </div>
         {status && <StatusView status={status}></StatusView>}
       </li>
@@ -64,8 +53,14 @@ function ActionView(params: { action: RunningAction }) {
         <div className="action upload-file">
           <div className="category">Upload File</div>
           <div className="reasoning">{a.reasoning}</div>
-          <div className="url">{a.oldUrl}</div>
-          <div className="name">{a.newName}</div>
+          <div className="url">
+            <div className="context">Fetch From:</div>
+            {a.oldUrl}
+          </div>
+          <div className="name">
+            <div className="context">Upload w/ Filename:</div>
+            {a.newName}
+          </div>
         </div>
         {status && <StatusView status={status}></StatusView>}
       </li>
@@ -82,8 +77,11 @@ export function AutolocalizeUI(params: { urls: string[]; actions: Action[] }) {
 
   return (
     <div className="autolocalize-ui">
-      Some files on this page are not properly localized to the SCP Wiki. The
-      URLs of these files are listed below:
+      <style>{CSS}</style>
+      <p>
+        Some files on this page are not properly localized to the SCP Wiki. The
+        URLs of these files are listed below:
+      </p>
       <ul>
         {urls.map((u) => (
           <Fragment key={u}>
@@ -95,14 +93,21 @@ export function AutolocalizeUI(params: { urls: string[]; actions: Action[] }) {
           </Fragment>
         ))}
       </ul>
-      <br></br>
-      This script may be able to fix these files automatically by performing the
-      following actions:
+      <p>
+        This script may be able to fix these files automatically by performing
+        the following actions:
+      </p>
       <ul className="actions-list">
         {(runningActions ?? params.actions).map((act) => {
           return <ActionView action={act} key={act.id}></ActionView>;
         })}
       </ul>
+      <p>
+        Press the button below for this script to run the actions above on your
+        behalf. Remember to always manually check the page afterwards for
+        breakage!
+      </p>
+      <button>Run Actions</button>
     </div>
   );
 }
@@ -113,6 +118,8 @@ export function initAutolocalizeUI(params: {
 }) {
   const root2 = document.createElement("div");
   document.body.appendChild(root2);
-  // createRoot(root2).rendedr()
+  createRoot(root2).render(
+    <AutolocalizeUI {...{ ...params }}></AutolocalizeUI>,
+  );
   return root2;
 }
