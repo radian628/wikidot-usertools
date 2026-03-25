@@ -1,7 +1,7 @@
 import { range } from "r628";
 import { requestModuleAsync } from "./request-module-async.js";
 
-export function uploadFile(
+export async function uploadFile(
   name: string,
   file: Blob,
   comments: string,
@@ -15,10 +15,12 @@ export function uploadFile(
   formdata.append("userfile", file);
   formdata.append("dfilename", name);
   formdata.append("comments", comments);
-  return fetch(window.location.origin + "/default--flow/files__UploadTarget", {
-    method: "post",
-    body: formdata,
-  });
+  return (
+    await fetch(window.location.origin + "/default--flow/files__UploadTarget", {
+      method: "post",
+      body: formdata,
+    })
+  ).ok;
 }
 
 export async function getFileIds(pageId: string) {

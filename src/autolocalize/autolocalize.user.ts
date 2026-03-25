@@ -17,24 +17,7 @@ import {
   setPageSource,
 } from "../common/wikidot-api-utils.js";
 import { imageResizePopup } from "./image-resize-widget.js";
-import { initAutolocalizeUI } from "./autolocalize-ui.js";
-import { Action } from "./autolocalize-actions.js";
-
-function promiseQueue() {
-  let prev: Promise<any> = Promise.resolve();
-
-  return {
-    enqueue<T>(p: () => Promise<T>): Promise<T> {
-      const myPrev = prev;
-      const res = (async () => {
-        await myPrev;
-        return await p();
-      })();
-      prev = res;
-      return res;
-    },
-  };
-}
+import { Action, autolocalizePopup } from "./autolocalize-widget.js";
 
 (async () => {
   const HOSTNAMES = [
@@ -139,34 +122,11 @@ function promiseQueue() {
   ) {
     actions.push({
       type: "find-replace",
-      find: "fonts.googleapis.com",
-      replace: "fonts.bunny.net",
-      reasoning: `Switch use of Google Fonts to privacy-preserving mirror Bunny Fonts.`,
+      findInSource: "fonts.googleapis.com",
+      replaceInSource: "fonts.bunny.net",
+      info: `Switch use of Google Fonts to privacy-preserving mirror Bunny Fonts.`,
       id: actionid++,
     });
-  }
-
-  const fileInfo = await getAllFileInfo(pageId);
-
-  const usedFilenames = new Set<string>(
-    [...fileInfo.info.values()].map((f) => f.name),
-  );
-
-  const extRegex = /\.[a-zA-Z-_]+$/g;
-
-  function pickUniqueFilename(name: string) {
-    let candidate = name;
-    let i = 2;
-    while (true) {
-      if (!usedFilenames.has(candidate)) {
-        usedFilenames.add(candidate);
-        return candidate;
-      }
-      let ext = name.match(extRegex)?.[0] ?? "";
-
-      candidate = name.replace(extRegex, "") + i + ext;
-      i++;
-    }
   }
 
   for (const { url, hostType } of urlInfo) {
@@ -174,143 +134,26 @@ function promiseQueue() {
       const parsedUrl = new URL(url, window.location.href);
 
       if (parsedUrl.hostname !== "fonts.googleapis.com") {
-        const newFilename = pickUniqueFilename(
-          url.replace(/\/+$/g, "").split("/").at(-1)!,
-        );
-
+        const newFilename = parsedUrl.pathname
+          .replace(/\/+$/g, "")
+          .split("/")
+          .at(-1)!;
         const slug = window.location.pathname.split("/")[1];
 
         actions.push({
-          type: "upload-file",
-          oldUrl: url,
+          type: "localize",
+          url: url,
           newName: newFilename,
-          reasoning: `Upload non-local file to Wikidot.`,
-          id: actionid++,
-        });
-        actions.push({
-          type: "find-replace",
-          find: url,
-          replace: `https://${window.location.hostname}/local--files/${slug}/${newFilename}`,
-          reasoning: `Update URL to use newly-uploaded local file.`,
+          info: `Upload non-local file to Wikidot and change URLs in Page Source.`,
+          findInSource: url,
+          replaceInSourceBase: `https://${window.location.hostname}/local--files/${slug}/`,
           id: actionid++,
         });
       }
     }
   }
 
-  initAutolocalizeUI({ actions, urls: urlInfo.map((u) => u.url) });
-
-  const popupQueue = promiseQueue();
-
-  const a = () => {
-    let src = pageSource;
-
-    msg("Replacing text in Page Source...", "info");
-
-    for (const a of actions) {
-      if (a.type === "find-replace") {
-        src = src.replaceAll(a.find, a.replace);
-      }
-    }
-
-    msg("Uploading updated Page Source...", "info");
-
-    (async () => {
-      let allgood = true;
-      await Promise.all([
-        ...actions.flatMap((a) => {
-          if (a.type === "upload-file") {
-            let corsUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(a.oldUrl)}`;
-            if (new URL(a.oldUrl).hostname.endsWith("wikimedia.org"))
-              corsUrl = a.oldUrl;
-            msg(`Fetching '${a.oldUrl}' via CORS proxy...`, "info");
-            return fetch(corsUrl)
-              .then((res) => {
-                return res.blob();
-              })
-              .catch((err) => {
-                console.error(err);
-                msg(`Failed to fetch '${a.oldUrl}'.`, "bad");
-                allgood = false;
-              })
-              .then(async (blob) => {
-                msg(`Uploading '${a.oldUrl}' to Wikidot...`, "info");
-                if (!blob || !pageId) throw new Error();
-
-                let resizedBlob = blob;
-                if (
-                  resizedBlob.size > 800_000 &&
-                  resizedBlob.type.startsWith("image") &&
-                  resizedBlob.type != "image/svg+xml"
-                ) {
-                  resizedBlob = await popupQueue.enqueue(() =>
-                    imageResizePopup(blob),
-                  );
-                }
-
-                return uploadFile(
-                  a.newName,
-                  resizedBlob,
-                  `Uploaded via auto-localizer script.`,
-                  pageId,
-                );
-              })
-              .catch((err) => {
-                console.error(err);
-                msg(
-                  `Failed to upload '${a.oldUrl}' to Wikidot as '${a.newName}'.`,
-                  "bad",
-                );
-                allgood = false;
-              })
-              .then((res) => {
-                if (!res) {
-                  return;
-                }
-                msg(
-                  `Successfully uploaded '${a.oldUrl}' to Wikidot as '${a.newName}'`,
-                  "good",
-                );
-              });
-          } else {
-            return [];
-          }
-        }),
-      ]);
-      await setPageSource(window.location.href, src)
-        .then(() => {
-          msg("Page Source successfully updated!", "good");
-        })
-        .catch(() => {
-          msg("Failed to update text in Page Source.", "bad");
-          allgood = false;
-        });
-
-      if (allgood) {
-        msg(
-          `All actions have succeeded! Try force-refreshing the page with Ctrl-Shift-R to see if the new images work.`,
-          "good",
-        );
-      } else {
-        msg(
-          `Failed to run some actions. Manual uploads and revisions are likely necessary.`,
-          "bad",
-        );
-      }
-    })();
-  };
-
-  const actionLog = document.createElement("div");
-  actionLog.style = `border: 1px solid black;`;
-  // root.appendChild(actionLog);
-
-  const msg = (m: string, type: "good" | "bad" | "info") => {
-    const div = document.createElement("div");
-    actionLog.appendChild(div);
-    div.innerText = m;
-    div.style.color =
-      type === "info" ? "#666" : type === "good" ? "#0b0" : "#b00";
-  };
-
-  console.log("actions", actions);
+  if (actions.length > 0) {
+    autolocalizePopup(actions, pageId);
+  }
 })();

@@ -45,7 +45,7 @@ export function EnumField<T>(props: {
   );
 }
 
-async function getResized(
+export async function getResized(
   img: ImageBitmap,
   width: number,
   height: number,

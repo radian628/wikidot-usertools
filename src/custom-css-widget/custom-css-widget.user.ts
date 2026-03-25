@@ -28,11 +28,11 @@ import { EditorView, keymap, lineNumbers } from "@codemirror/view";
 import { defaultKeymap, history, indentWithTab } from "@codemirror/commands";
 import { search, searchKeymap } from "@codemirror/search";
 import { oneDark } from "@codemirror/theme-one-dark";
-import { createEvalbox, Evalbox } from "r628";
 import * as prettier from "prettier";
 import * as prettierPostcss from "prettier/plugins/postcss.js";
 import * as prettierBabel from "prettier/plugins/babel.js";
 import * as prettierEstree from "prettier/plugins/estree.js";
+import { createEvalbox, Evalbox } from "r628";
 
 async function makeCodemirrorEditor(container: HTMLElement) {
   const embeddedJSFinderParser = buildParser(`

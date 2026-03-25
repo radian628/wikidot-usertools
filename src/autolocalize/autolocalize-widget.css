@@ -1,0 +1,107 @@
+.autolocalize-widget {
+  top: 0;
+  left: 0;
+  width: 50vw;
+  max-height: 100vh;
+  overflow: auto;
+  scrollbar-width: thin;
+  position: fixed;
+  background-color: white;
+  color: #222;
+  padding: 10px;
+  z-index: 999;
+  border-right: 1px solid black;
+  border-bottom: 1px solid black;
+  box-shadow: 0 0 20px black;
+  font-family: "Inter", sans-serif;
+}
+
+.autolocalize-action-list {
+  padding-inline-start: 0;
+  list-style: none;
+}
+
+.autolocalize-action-list li {
+  display: grid;
+  grid-template-areas:
+    "toggle info"
+    "toggle reasoning"
+    "toggle status";
+  grid-template-columns: 0fr 1fr;
+  margin-bottom: 20px;
+}
+
+.enable-disable-toggle {
+  grid-area: toggle;
+  align-self: center;
+  width: 30px;
+  height: 30px;
+  margin-right: 20px;
+}
+
+.action-info {
+  grid-area: "info";
+}
+
+.reasoning {
+  grid-area: "reasoning";
+  font-size: 80%;
+  font-style: italic;
+}
+
+.status {
+  grid-area: "status";
+  border: 1px solid #999;
+  padding: 2px 5px;
+  font-size: 90%;
+  margin-top: 5px;
+  font-family: monospace;
+}
+
+.status-not-started {
+  color: black;
+}
+
+.status-in-progress {
+  color: #880;
+}
+
+.status-fail {
+  color: #b00;
+}
+
+.status-success {
+  color: #0b0;
+}
+
+.run-button {
+  font-size: 200%;
+  margin: auto;
+  display: block;
+}
+
+.status-text {
+  font-size: 150%;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.autolocalize-widget h1 {
+  font-size: 130%;
+  border-bottom: 1px solid black;
+  font-family: "Inter", sans-serif;
+  font-weight: bold;
+  color: black;
+}
+.autolocalize-widget h2 {
+  font-size: 120%;
+  border-bottom: 1px solid black;
+  margin-top: 20px;
+  font-family: "Inter", sans-serif;
+  font-weight: bold;
+  color: black;
+}
+
+h2 + p {
+  margin-top: 0;
+}

@@ -5,7 +5,6 @@ import { XMLHttpRequestInterceptor } from "@mswjs/interceptors/XMLHttpRequest";
 import { FetchInterceptor } from "@mswjs/interceptors/fetch";
 import { ArrayMap, workerifyClientIframe, workerifyServerIframe } from "r628";
 import SerializerRuntime from "./serializer-runtime.ts?bpt";
-import { networkInterfaces } from "os";
 import {
   defaultCacheHttpRequest,
   SerializedResponse,
@@ -32,7 +31,7 @@ function tryJsonParse(str: string) {
 // @ts-expect-error
 window.makeFileBundleHTML = async function (
   corsify: (str: string) => string,
-  files: string[]
+  files: string[],
 ) {
   let fileCache = new Map<string, string>();
   let linksToCache = new Map<string, Set<string>>();
@@ -70,9 +69,9 @@ window.makeFileBundleHTML = async function (
           cacheHttpRequest: defaultCacheHttpRequest,
         },
         5,
-        "text/html"
+        "text/html",
       );
-    })
+    }),
   );
 
   const json = JSON.stringify(Object.fromEntries(fileCache.entries()));
@@ -86,14 +85,14 @@ window.makeFileBundleHTML = async function (
     const ENTRYPOINT = ${JSON.stringify(files[0])}
     const FILES = ${json};
     const LOADABLE_FILES = ${JSON.stringify(
-      files.map((f) => ({ title: f, url: f }))
+      files.map((f) => ({ title: f, url: f })),
     )}
     const DELIMSTART = ${JSON.stringify(linkDelimStart)};
     const DELIMEND = ${JSON.stringify(linkDelimEnd)};
     const LINKS_TO = ${JSON.stringify(
       Object.fromEntries(
-        linksToCache.entries().map(([k, v]) => [k, Array.from(v)] as const)
-      )
+        linksToCache.entries().map(([k, v]) => [k, Array.from(v)] as const),
+      ),
     )}
     const NETWORK_REQUESTS_CACHE = ${JSON.stringify(netReqCache.serialize())}
   </script>
@@ -137,7 +136,7 @@ async function makeFileBundle(
   prevurl: string | undefined,
   ctx: BundleContext,
   depthRemaining: number,
-  overrideContentType?: string
+  overrideContentType?: string,
 ) {
   if (depthRemaining === 0) return;
   originalurl = ctx.normalizeUrl(originalurl, prevurl);
@@ -239,7 +238,7 @@ async function makeFileBundle(
 
           await Promise.all([
             ...links.map((l) =>
-              makeFileBundle(l, originalurl, ctx, depthRemaining - 1)
+              makeFileBundle(l, originalurl, ctx, depthRemaining - 1),
             ),
           ]);
 
@@ -251,7 +250,7 @@ async function makeFileBundle(
             });
             ctx.networkRequestsCache.set(
               await ctx.cacheHttpRequest(r),
-              req.response
+              req.response,
             );
           }
 
@@ -259,21 +258,21 @@ async function makeFileBundle(
             (dom.doctype
               ? new XMLSerializer().serializeToString(dom.doctype)
               : "") + dom.documentElement.outerHTML,
-            contentType
+            contentType,
           );
         } else if (contentType === "text/css") {
           const css = handleCSS(await blob.text(), links);
           await Promise.all(
             links.map((l) =>
-              makeFileBundle(l, originalurl, ctx, depthRemaining - 1)
-            )
+              makeFileBundle(l, originalurl, ctx, depthRemaining - 1),
+            ),
           );
           return textToBase64(css, "text/css");
         } else {
           const b64 = await blobToBase64Url(blob);
           return b64;
         }
-      })()
+      })(),
     );
   } catch (e) {
     console.error("caught", e);
@@ -301,7 +300,7 @@ interceptor.on("response", async ({ request, response }) => {
       "interceptor received request",
       request,
       "title",
-      document.title
+      document.title,
     );
 
   const responseBody = await blobToBase64Url(await response.blob());
@@ -336,7 +335,7 @@ window.addEventListener("load", () => {
     const server = workerifyServerIframe(
       "sniffer",
       networkSnifferInterface,
-      window.parent
+      window.parent,
     );
   } else {
   }
@@ -360,7 +359,7 @@ function sniffRequests(url: string) {
         console.log("b");
         const sniffer = workerifyClientIframe<typeof networkSnifferInterface>(
           "sniffer",
-          snifftest.contentWindow
+          snifftest.contentWindow,
         );
         const requests = await sniffer.getRequests();
         resolve(requests);

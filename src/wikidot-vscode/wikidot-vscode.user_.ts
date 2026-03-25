@@ -3,6 +3,7 @@ import ProductJson from "./product.json?raw";
 import ExtensionPackageJson from "./memfs-ext/package.json?raw";
 import ExtensionJavascript from "./memfs-ext/extension.ts?bpt";
 // import VFS from "./vfs.json?vfs";
+// TODO: fix this stupid thing
 
 // console.log("big ass VFS", VFS);
 
@@ -136,11 +137,11 @@ if (window.location.href === VSCODE_HOST_URL) {
       await loadSync(
         // "../../node_modules/vscode-web/dist/out/vs/loader.js"
 
-        "https://unpkg.com/vscode-web@1.91.1/dist/out/vs/loader.js"
+        "https://unpkg.com/vscode-web@1.91.1/dist/out/vs/loader.js",
       );
       await loadSync(
         // "../../node_modules/vscode-web/dist/out/vs/webPackagePaths.js"
-        "https://unpkg.com/vscode-web@1.91.1/dist/out/vs/webPackagePaths.js"
+        "https://unpkg.com/vscode-web@1.91.1/dist/out/vs/webPackagePaths.js",
       );
 
       const rootPath = `https://unpkg.com/vscode-web@1.91.1/dist`;
@@ -187,15 +188,15 @@ if (window.location.href === VSCODE_HOST_URL) {
       await loadSync(
         // "../../node_modules/vscode-web/dist/out/vs/workbench/workbench.web.main.nls.js"
 
-        "https://unpkg.com/vscode-web@1.91.1/dist/out/vs/workbench/workbench.web.main.nls.js"
+        "https://unpkg.com/vscode-web@1.91.1/dist/out/vs/workbench/workbench.web.main.nls.js",
       );
       await loadSync(
         // "../../node_modules/vscode-web/dist/out/vs/workbench/workbench.web.main.js"
-        "https://unpkg.com/vscode-web@1.91.1/dist/out/vs/workbench/workbench.web.main.js"
+        "https://unpkg.com/vscode-web@1.91.1/dist/out/vs/workbench/workbench.web.main.js",
       );
       await loadSync(
         // "../../node_modules/vscode-web/dist/out/vs/code/browser/workbench/workbench.js"
-        "https://unpkg.com/vscode-web@1.91.1/dist/out/vs/code/browser/workbench/workbench.js"
+        "https://unpkg.com/vscode-web@1.91.1/dist/out/vs/code/browser/workbench/workbench.js",
       );
     })();
 

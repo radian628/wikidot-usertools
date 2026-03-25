@@ -76,6 +76,7 @@ export async function getPageSource(url: string): Promise<string> {
   const res = (await asyncRequestModule("viewsource/ViewSourceModule", {
     page_id: id,
   })) as any;
+
   return (
     (
       new DOMParser()

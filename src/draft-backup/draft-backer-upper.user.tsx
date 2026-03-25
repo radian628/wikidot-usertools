@@ -10,14 +10,16 @@
 */
 
 import React, { memo, useEffect, useMemo, useState } from "react";
-import { injectElementsAt } from "../../r628/src/listen-for-element.js";
 import { createRoot } from "react-dom/client";
 import { openDB, deleteDB, wrap, unwrap, DBSchema } from "idb";
 import { Duration } from "luxon";
-import { injectFunction } from "../../r628/src/inject.js";
 import { ChangeObject, diffChars } from "diff";
-import { getLinesAndCols } from "../../r628/src/stringutils.js";
-import { interleave } from "../../r628/src/array-utils.js";
+import {
+  getLinesAndCols,
+  interleave,
+  injectElementsAt,
+  injectFunction,
+} from "r628";
 
 interface BackupsDB extends DBSchema {
   backups: {
@@ -49,7 +51,7 @@ type ChangeRange = {
 
 function splitByLine(
   diff: ChangeObject<string>[],
-  lac: [number, number][]
+  lac: [number, number][],
 ): (ChangeObject<string> & { line: number })[] {
   let i = 0;
   return diff.flatMap((d) => {
@@ -72,7 +74,7 @@ function getDiffChangeRanges(
   options: {
     // number of surrounding lines to show
     context: number;
-  }
+  },
 ): ChangeRange[][] {
   const str = diff.map((d) => d.value).join("");
   const lac = getLinesAndCols(str);
@@ -121,7 +123,7 @@ function DiffDisplay(props: { oldstr: string; newstr: string }) {
       getDiffChangeRanges(diffChars(props.oldstr, props.newstr), {
         context: 2,
       }),
-    [props.oldstr, props.newstr]
+    [props.oldstr, props.newstr],
   );
 
   const [expanded, setExpanded] = useState(false);
@@ -174,7 +176,7 @@ function DiffDisplay(props: { oldstr: string; newstr: string }) {
             >
               ...
             </span>
-          )
+          ),
         ).map((e, i) => (
           <React.Fragment key="i">{e}</React.Fragment>
         ))}
@@ -253,7 +255,7 @@ function DiffDisplay(props: { oldstr: string; newstr: string }) {
         const b = await db.getAllFromIndex(
           "backups",
           "byUrl",
-          normalizeURL(window.location.href)
+          normalizeURL(window.location.href),
         );
         setBackups(b.sort((a, b) => b.timestamp - a.timestamp));
       })();
@@ -304,7 +306,7 @@ function DiffDisplay(props: { oldstr: string; newstr: string }) {
                       type="button"
                       onClick={() => {
                         const editor = document.getElementById(
-                          "edit-page-textarea"
+                          "edit-page-textarea",
                         ) as HTMLTextAreaElement | null;
                         if (!editor) return;
                         editor.value = b.content;
@@ -349,7 +351,7 @@ function DiffDisplay(props: { oldstr: string; newstr: string }) {
 
   async function makeBackup(beforeUnload: boolean) {
     const edit = document.getElementById(
-      "edit-page-textarea"
+      "edit-page-textarea",
     ) as HTMLTextAreaElement;
     if (!edit) return;
     if (edit.value === lastBackupContent) return;
@@ -379,7 +381,7 @@ function DiffDisplay(props: { oldstr: string; newstr: string }) {
     await db.getAllFromIndex(
       "backups",
       "byUrl",
-      normalizeURL(window.location.href)
+      normalizeURL(window.location.href),
     )
   ).sort((a, b) => b.timestamp - a.timestamp);
 
@@ -394,25 +396,25 @@ let noConfirmationDialog = false;
 injectFunction<any[], any>(
   () =>
     window?.WIKIDOT?.modules?.PageEditModule?.listeners?.save?.bind(
-      window?.WIKIDOT.modules.PageEditModule.listeners
+      window?.WIKIDOT.modules.PageEditModule.listeners,
     ),
   (fn) => (window.WIKIDOT.modules.PageEditModule.listeners.save = fn),
   (f) =>
     (...args) => {
       noConfirmationDialog = true;
       return f(...args);
-    }
+    },
 );
 
 injectFunction<any[], any>(
   () =>
     window.WIKIDOT?.modules?.PageEditModule?.listeners?.cancel?.bind(
-      window?.WIKIDOT.modules.PageEditModule.listeners
+      window?.WIKIDOT.modules.PageEditModule.listeners,
     ),
   (fn) => (window.WIKIDOT.modules.PageEditModule.listeners.cancel = fn),
   (f) =>
     (...args) => {
       noConfirmationDialog = true;
       return f(...args);
-    }
+    },
 );
