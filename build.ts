@@ -7,6 +7,7 @@ import { glob } from "glob";
 import { copy } from "esbuild-plugin-copy";
 import { vfsBuilderPlugin } from "./vfsplugin.js";
 import { bundledPrecompiledTypescript } from "r628/src-node/esbuild-precompiled-ts.js";
+import { buildNotifyPlugin } from "r628/src-node/esbuild-build-notify.js";
 
 // export const bundledPrecompiledTypescript: esbuild.Plugin = {
 //   name: "bpt",
@@ -62,6 +63,7 @@ const ctx = await esbuild.context({
   plugins: [
     bpt,
     lessLoader(),
+    buildNotifyPlugin("BUILD"),
     rawQueryParamPlugin,
     vfsBuilderPlugin,
     {
@@ -97,7 +99,7 @@ ${noSES ? "Promise.resolve()" : `import("https://cdn.jsdelivr.net/npm/ses@1.14.0
       },
     },
   ],
-  minify: true,
+  minify: false,
   sourcemap: true,
   legalComments: "inline",
 });

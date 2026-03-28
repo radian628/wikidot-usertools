@@ -37,6 +37,7 @@ export async function setPageSource(
   url: string,
   newSource: string,
   newTitle?: string,
+  comment?: string,
 ) {
   const id = await getPageId(url);
   const slug = new URL(url).pathname.slice(1);
@@ -53,7 +54,7 @@ export async function setPageSource(
   const dom = new DOMParser().parseFromString(lock.body, "text/html");
   return await asyncRequestModule("Empty", {
     action: "WikiPageAction",
-    comments: "Saved page.",
+    comments: comment ?? "Saved page.",
     event: "savePage",
     lock_id: lock.lock_id,
     lock_secret: lock.lock_secret,

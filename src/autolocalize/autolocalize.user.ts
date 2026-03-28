@@ -1,41 +1,60 @@
 /*!
 // ==UserScript==
 // @name        SCP Wiki AutoLocalize 
-// @match       *://*.wikidot.com/user:info/*
+// @match       *://*.wikidot.com/*
 // @grant       none
-// @version     1.0
+// @version     1.8
 // @author      radian628
 // @description Automatically localize SCP Wiki images. 
 // ==/UserScript==
 */
 
-import { createRoot } from "react-dom/client";
-import { getAllFileInfo, getFileInfo, uploadFile } from "../common/file-io.js";
 import {
   getPageId,
   getPageSource,
   setPageSource,
 } from "../common/wikidot-api-utils.js";
-import { imageResizePopup } from "./image-resize-widget.js";
 import { Action, autolocalizePopup } from "./autolocalize-widget.js";
+import { getOffsetSources } from "./find-offsets.js";
+
+export const HOSTNAMES = [
+  window.location.hostname,
+  "scpwiki.com",
+  "scp-wiki.net",
+  "scp-wiki.wikidot.com",
+  "www.scpwiki.com",
+  "www.scp-wiki.net",
+  "www.scp-wiki.wikidot.com",
+  "www.wikidot.com",
+  "cdn.scpwiki.com",
+  "fonts.bunny.net",
+  "d3g0gp89917ko0.cloudfront.net",
+  "scp-wiki-cdn.nyc3.cdn.digitaloceanspaces.com",
+];
+HOSTNAMES.push(...HOSTNAMES.map((o) => o.replaceAll("wikidot", "wdfiles")));
+
+const infobox = document.createElement("div");
+document.body.appendChild(infobox);
+infobox.style = `
+  z-index: 99;
+  color: black;
+  font-family: monospace;
+  background-color: white;
+  border: 1px solid black;
+  position: fixed;
+  top: 0;
+  left: 0;
+`;
+
+function pushInfoLine(line: string) {
+  const text = new Text(line);
+  infobox.appendChild(text);
+  infobox.appendChild(document.createElement("br"));
+}
 
 (async () => {
-  const HOSTNAMES = [
-    window.location.hostname,
-    "scpwiki.com",
-    "scp-wiki.net",
-    "scp-wiki.wikidot.com",
-    "www.scpwiki.com",
-    "www.scp-wiki.net",
-    "www.scp-wiki.wikidot.com",
-    "www.wikidot.com",
-    "cdn.scpwiki.com",
-    "fonts.bunny.net",
-    "d3g0gp89917ko0.cloudfront.net",
-    "scp-wiki-cdn.nyc3.cdn.digitaloceanspaces.com",
-  ];
-
-  HOSTNAMES.push(...HOSTNAMES.map((o) => o.replaceAll("wikidot", "wdfiles")));
+  const parentPageId = await getPageId(window.location.href);
+  if (!parentPageId) return;
 
   const MANUAL_EXCLUSION_PREFIXES = [
     "https://api.crom.avn.sh/pixel",
@@ -63,51 +82,78 @@ import { Action, autolocalizePopup } from "./autolocalize-widget.js";
     }
   }
 
+  async function loadUrlsFrom(dom: Document, pageUrl: string) {
+    let urlInfo: {
+      url: string;
+      hostType: HostType;
+    }[] = [];
+
+    const imgs = dom.querySelectorAll("#page-content img");
+    for (const img of Array.from(imgs)) {
+      const src = img.getAttribute("src");
+      if (src) {
+        urlInfo.push({
+          hostType: testUrl(src, pageUrl),
+          url: src,
+        });
+      }
+    }
+    for (const style of Array.from(dom.querySelectorAll("style"))) {
+      const urls = [...(style.innerText.match(/url\(\S*\)/g) ?? [])].map((u) =>
+        u
+          .slice(4, -1)
+          .replace(/^("|')/g, "")
+          .replace(/("|')$/g, "")
+          .replace("&amp;", "&"),
+      );
+
+      urlInfo.push(
+        ...urls.map((u) => ({
+          url: u,
+          hostType: testUrl(u, pageUrl),
+        })),
+      );
+    }
+
+    // make urls unique
+    urlInfo = [...new Map(urlInfo.map((u) => [u.url, u])).values()];
+
+    // filter out ones not in page source
+    const pageSource = (await getPageSource(pageUrl)).replaceAll("\u00a0", " ");
+
+    urlInfo = urlInfo.filter((u) => pageSource.includes(u.url));
+
+    return urlInfo;
+  }
+
+  pushInfoLine("Fetching page source...");
+
+  const parentPageSource = await getPageSource(window.location.href);
+
+  pushInfoLine("Fetching offsets (if any exist)...");
+
+  const offsetSources = await getOffsetSources(
+    parentPageSource,
+    window.location.href,
+  );
+
+  pushInfoLine("Finding hotlinked image URLs in all pages...");
+
+  const offsetUrls = (
+    await Promise.all(
+      offsetSources.map(async (o) => await loadUrlsFrom(o.dom, o.url)),
+    )
+  ).flat(1);
+
   let urlInfo: {
     url: string;
     hostType: HostType;
-  }[] = [];
+  }[] = [
+    ...(await loadUrlsFrom(document, window.location.href)),
+    ...offsetUrls,
+  ];
 
-  const imgs = document.querySelectorAll("#page-content img");
-  for (const img of Array.from(imgs)) {
-    const src = img.getAttribute("src");
-    if (src) {
-      urlInfo.push({
-        hostType: testUrl(src, window.location.href),
-        url: src,
-      });
-    }
-  }
-  for (const style of Array.from(document.querySelectorAll("style"))) {
-    const urls = [...(style.innerText.match(/url\(\S*\)/g) ?? [])].map((u) =>
-      u
-        .slice(4, -1)
-        .replace(/^("|')/g, "")
-        .replace(/("|')$/g, "")
-        .replace("&amp;", "&"),
-    );
-
-    console.log("urls", urls);
-
-    urlInfo.push(
-      ...urls.map((u) => ({
-        url: u,
-        hostType: testUrl(u, window.location.href),
-      })),
-    );
-  }
-
-  // make urls unique
-  urlInfo = [...new Map(urlInfo.map((u) => [u.url, u])).values()];
-
-  // filter out ones not in page source
-  const pageId = await getPageId(window.location.href);
-  if (!pageId) return;
-  const pageSource = (await getPageSource(window.location.href)).replaceAll(
-    "\u00a0",
-    " ",
-  );
-  urlInfo = urlInfo.filter((u) => pageSource.includes(u.url));
+  infobox.remove();
 
   const actions: Action[] = [];
 
@@ -154,6 +200,6 @@ import { Action, autolocalizePopup } from "./autolocalize-widget.js";
   }
 
   if (actions.length > 0) {
-    autolocalizePopup(actions, pageId);
+    autolocalizePopup(actions, parentPageId, offsetSources);
   }
 })();
