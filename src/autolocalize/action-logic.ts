@@ -135,12 +135,27 @@ export async function performActionsLogic(params: {
           ]);
         } else {
           updateStatusText("Fetching file...", "in-progress");
-          let corsProxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(action.url)}`;
-          let fetchUrl = action.url;
+
+          let url = action.url;
+          const purl = new URL(url, window.location.href);
+          if (
+            purl.hostname === "upload.wikimedia.org" &&
+            purl.pathname.startsWith("/wikipedia/commons/thumb")
+          ) {
+            const filename = purl.pathname.split("/").at(-2)!;
+            updateStatusText(
+              "Fixing broken Wikimedia thumbnail URL...",
+              "in-progress",
+            );
+            url = `https://upload.wikimedia.org/wikipedia/commons/${purl.pathname.split("/").slice(4, 6).join("/")}/${filename}`;
+          }
+
+          let corsProxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`;
+          let fetchUrl = url;
 
           if (
-            new URL(action.url).hostname.endsWith("wikidot.com") ||
-            new URL(action.url).hostname.endsWith("wdfiles.com")
+            new URL(url).hostname.endsWith("wikidot.com") ||
+            new URL(url).hostname.endsWith("wdfiles.com")
           )
             fetchUrl = corsProxyUrl;
 
@@ -282,7 +297,7 @@ export async function performActionsLogic(params: {
           licenseboxEntries.push({
             oldFilename: action.newName,
             filename: newFileName,
-            sourceLink: action.url,
+            sourceLink: url,
           });
 
           updateStatusText(
@@ -296,7 +311,7 @@ export async function performActionsLogic(params: {
               licensebox: false,
             },
             {
-              find: `ADD FILENAME FOR ${action.url} HERE ONCE UPLOADED`,
+              find: `ADD FILENAME FOR ${url} HERE ONCE UPLOADED`,
               replace: "> **Filename: **" + decodeURIComponent(newFileName),
               licensebox: true,
             },
