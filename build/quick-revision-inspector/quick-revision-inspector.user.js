@@ -1,4 +1,13 @@
-
+/*!
+  // ==UserScript==
+  // @name        Quick Revision Inspector BETA 
+  // @match       *://*.wikidot.com/*
+  // @grant       none
+  // @version     0.1.0
+  // @author      radian628
+  // @description Inspect wikidot page revisions quickly.
+  // ==/UserScript==
+  */
 "use strict";
 import("https://cdn.jsdelivr.net/npm/ses@1.14.0/dist/lockdown.umd.min.js")
 .then(() => {
@@ -35975,6 +35984,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
   }
 
   // src/quick-revision-inspector/quick-revision-inspector.user.ts
+  
   var ui = quickRevisionInspectorUI();
   document.body.appendChild(ui.elem);
 })();
