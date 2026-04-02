@@ -334,7 +334,11 @@ export async function performActionsLogic(params: {
   }
 
   async function updatePageSource(url: string) {
-    const updates = (await Promise.all(updatePageSourcePromises)).flat(1);
+    const updates = (await Promise.all(updatePageSourcePromises))
+      .flat(1)
+      .flatMap((u) => (u ? [u] : []))
+      .sort((a, b) => b.find.length - a.find.length);
+
     let src = await getPageSource(url)
       .then((s) => s.replaceAll("\u00A0", " "))
       .catch();
@@ -354,7 +358,6 @@ export async function performActionsLogic(params: {
     );
 
     for (const u of updates) {
-      if (!u) continue;
       if (u.licensebox) {
         licensebox = licensebox.replaceAll(u.find, u.replace);
       } else {

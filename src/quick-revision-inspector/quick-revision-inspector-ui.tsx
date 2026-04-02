@@ -2,12 +2,8 @@ import { StringField } from "r628";
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
 import CSS from "./quick-revision-inspector.css?raw";
-import {
-  compareVersions,
-  getPageRevisions,
-  revisionNumberToId,
-} from "../see-no-evil/wikidot-api.js";
 import { getPageId } from "../common/wikidot-api-utils.js";
+import { compareVersions, revisionNumberToId } from "../common/history.js";
 
 export function quickRevisionInspectorUI() {
   const elem = document.createElement("div");

@@ -1,0 +1,52 @@
+.smart-history-table {
+  border-collapse: collapse;
+  color: black;
+  background-color: white;
+}
+
+.smart-history-table th {
+  font-weight: bold;
+  text-align: left;
+}
+
+.smart-history-table .sh-comments {
+  text-align: right;
+  font-size: 85%;
+  max-width: 40%;
+}
+
+.smart-history-table th:nth-child(6) {
+  text-align: right;
+}
+
+.smart-history-table tr:nth-child(2n) {
+  background-color: #f1f1f1;
+}
+
+.smart-history-table .sh-date {
+  white-space: nowrap;
+}
+
+.smart-history-table td:not(:nth-child(6)) {
+  padding-right: 2px;
+}
+
+.smart-history-table tr.selected {
+  background-color: #ff5;
+}
+
+.sh-note {
+  color: #444;
+  font-size: 90%;
+  font-style: italic;
+  margin: 0;
+}
+
+.sh-truncated {
+  color: #666;
+  font-style: italic;
+}
+
+.sh-cmp input {
+  width: 5em;
+}
