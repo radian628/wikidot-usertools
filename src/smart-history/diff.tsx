@@ -72,7 +72,7 @@ export function DiffSection(props: { section: DiffSection }) {
 
   if (!show)
     return (
-      <>
+      <div className="collapsed-diff-section">
         <br></br>
         {showButton}
         <span className="sh-truncated">
@@ -81,11 +81,17 @@ export function DiffSection(props: { section: DiffSection }) {
         </span>
         <br></br>
         <br></br>
-      </>
+      </div>
     );
 
   return (
-    <>
+    <div
+      className={
+        props.section.collapsible
+          ? "collapsed-diff-section"
+          : "active-diff-section"
+      }
+    >
       {showButton}
       {props.section.lines.map((l, i) => (
         <Fragment key={i}>
@@ -103,7 +109,7 @@ export function DiffSection(props: { section: DiffSection }) {
           <br />
         </Fragment>
       ))}
-    </>
+    </div>
   );
 }
 

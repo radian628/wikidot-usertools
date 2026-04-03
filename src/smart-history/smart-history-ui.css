@@ -1,7 +1,10 @@
-.smart-history-table {
-  border-collapse: collapse;
+#smart-history-root {
   color: black;
   background-color: white;
+}
+
+.smart-history-table {
+  border-collapse: collapse;
 }
 
 .smart-history-table th {
@@ -35,6 +38,35 @@
   background-color: #ff5;
 }
 
+.smart-history-table tr {
+  position: relative;
+}
+
+.smart-history-table .options {
+  display: none;
+}
+
+.smart-history-table tr:hover .options {
+  display: block;
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: fit-content;
+  padding-left: 30px;
+  background-image: linear-gradient(
+    to left,
+    white 0%,
+    white calc(100% - 30px),
+    transparent 100%
+  );
+  z-index: 2;
+}
+
+.smart-history-table .options button {
+  margin-left: 5px;
+}
+
 .sh-note {
   color: #444;
   font-size: 90%;
@@ -43,10 +75,51 @@
 }
 
 .sh-truncated {
-  color: #666;
+  color: #777;
   font-style: italic;
 }
 
 .sh-cmp input {
   width: 5em;
+}
+
+.inline-diff {
+  font-family: monospace;
+}
+
+ins {
+  background-color: rgb(154, 235, 154);
+}
+
+del {
+  background-color: rgb(250, 170, 156);
+}
+
+.collapsed-diff-section {
+  background-color: white;
+}
+.active-diff-section {
+  background-color: #f2f2f2;
+}
+
+.page-source {
+  font-family: monospace;
+  border: 1px dashed #777;
+  padding: 10px;
+  margin-bottom: 10px;
+  white-space: pre;
+}
+
+.page-source-area-header {
+  display: grid;
+  grid-template-columns: auto auto;
+}
+
+.page-source-area-header h2 {
+  justify-self: left;
+}
+.page-source-area-header button {
+  justify-self: right;
+  height: fit-content;
+  align-self: center;
 }

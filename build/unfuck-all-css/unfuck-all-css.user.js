@@ -16,5 +16,5 @@
         lockdown();
       }  catch (e) { console.warn(e); }
 
-    "use strict";(()=>{window.addEventListener("load",()=>{setTimeout(()=>{let o=Array.from(document.querySelectorAll("style"));for(let e of o)e.parentElement.removeChild(e);setTimeout(()=>{for(let e of o)e.textContent+="/*force refresh lol*/",document.head.appendChild(e)},200),console.log("hi")},100)});})();
+    "use strict";(()=>{window.addEventListener("load",()=>{let o=Array.from(document.querySelectorAll("style"));for(let e of o)e.parentElement.removeChild(e);for(let e of o)e.textContent+="/*force refresh lol*/",document.head.appendChild(e)});})();
  });

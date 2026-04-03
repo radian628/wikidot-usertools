@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { getPageRevisionRange, RevisionRow } from "../common/history.js";
 import { format, getYear } from "date-fns";
 import CSS from "./smart-history-ui.css?raw";
-import { mutatify, NumberField } from "r628";
+import { eventEmitter, mutatify, NumberField, StringField } from "r628";
 import { Diff } from "./diff.js";
+import { asyncRequestModule } from "../common/wikidot-api-utils.js";
 
 type SmartHistoryProps = {
   pageId: string;
@@ -13,7 +14,11 @@ type SmartHistoryProps = {
 
 export function smartHistoryUI(props: SmartHistoryProps) {
   const elem = document.createElement("div");
-  const root = createRoot(elem);
+  const shadow = elem.attachShadow({ mode: "open" });
+  const stylesheet = new CSSStyleSheet();
+  stylesheet.replaceSync(CSS);
+  shadow.adoptedStyleSheets = [stylesheet];
+  const root = createRoot(shadow);
   root.render(<SmartHistoryUI {...props}></SmartHistoryUI>);
   return elem;
 }
@@ -72,9 +77,43 @@ export function SmartHistoryUI(props: SmartHistoryProps) {
 
   const [cmp, setCmp] = useState<{ from: number; to: number } | undefined>();
 
+  const [authorFilter, setAuthorFilter] = useState("");
+
+  const [shownSource, setShownSource] = useState("");
+
+  const [shownSourceIndex, setShownSourceIndex] = useState<number>();
+
+  const shownSourceText = useMemo(() => {
+    const dom = new DOMParser().parseFromString(shownSource, "text/html");
+
+    const src =
+      (dom.querySelector(".page-source") as HTMLElement)?.innerText ?? "";
+    return src.slice(1);
+  }, [shownSource]);
+
+  const pageSourceAreaRef = useRef<HTMLDivElement | null>(null);
+
   return (
-    <>
+    <div id="smart-history-root">
+      <div className="page-source-area" ref={pageSourceAreaRef}>
+        {shownSourceIndex !== undefined && (
+          <>
+            <div className="page-source-area-header">
+              <h2>Source of Rev. {shownSourceIndex}</h2>
+              <button
+                onClick={() => {
+                  setShownSourceIndex(undefined);
+                }}
+              >
+                Close
+              </button>
+            </div>
+            <div className="page-source">{shownSourceText}</div>
+          </>
+        )}
+      </div>
       <style>{CSS}</style>
+      <h2>Page History</h2>
       {cmp && <Diff from={cmp.from} to={cmp.to} pageId={props.pageId}></Diff>}
       <div>
         <label>Jump To </label>
@@ -121,14 +160,13 @@ export function SmartHistoryUI(props: SmartHistoryProps) {
       ) : (
         <></>
       )}
-      <br />
       <div className="sh-cmp">
         <label>Compare </label>
         <NumberFieldM
           value={cmpMin}
           setValue={setCmpMin}
         ></NumberFieldM> -&gt;{" "}
-        <NumberFieldM value={cmpMax} setValue={setCmpMax}></NumberFieldM>
+        <NumberFieldM value={cmpMax} setValue={setCmpMax}></NumberFieldM>{" "}
         <button
           onClick={() => {
             setCmp({
@@ -140,6 +178,13 @@ export function SmartHistoryUI(props: SmartHistoryProps) {
           Compare Revisions
         </button>
       </div>
+      <div className="sh-author-filter">
+        <label>Filter Author</label>{" "}
+        <StringField
+          value={authorFilter}
+          setValue={setAuthorFilter}
+        ></StringField>
+      </div>
       <table className="smart-history-table">
         <tbody>
           <tr>
@@ -150,13 +195,31 @@ export function SmartHistoryUI(props: SmartHistoryProps) {
             <th>Time</th>
             <th>Comments</th>
           </tr>
-          {revs.rows.map((r) => (
-            <RevisionTableRow
-              key={r.revno}
-              rev={r}
-              selectedNumber={revs.jumpTo}
-            ></RevisionTableRow>
-          ))}
+          {revs.rows
+            .filter(
+              (r) =>
+                r.byUsername
+                  .toLowerCase()
+                  .includes(authorFilter.toLowerCase()) ||
+                r.byUserId?.includes(authorFilter),
+            )
+            .map((r) => (
+              <RevisionTableRow
+                showSource={(src) => {
+                  setShownSource(src);
+                  setShownSourceIndex(r.revno);
+                  setTimeout(() => {
+                    pageSourceAreaRef?.current?.scrollIntoView({
+                      behavior: "smooth",
+                    });
+                  });
+                }}
+                revcount={props.revcount}
+                key={r.revno}
+                rev={r}
+                selectedNumber={revs.jumpTo}
+              ></RevisionTableRow>
+            ))}
         </tbody>
       </table>
       <div
@@ -186,21 +249,79 @@ export function SmartHistoryUI(props: SmartHistoryProps) {
           };
         }}
       ></div>
-    </>
+    </div>
   );
 }
 
 export function RevisionTableRow(props: {
   rev: RevisionRow;
   selectedNumber: number;
+  revcount: number;
+  showSource: (src: string) => void;
 }) {
   const rev = props.rev;
   return (
     <tr className={props.selectedNumber === rev.revno ? "selected" : ""}>
-      <td>{rev.revno}</td>
+      <td>
+        {rev.revno}
+        <div className="options">
+          <button
+            onClick={() => {
+              // @ts-expect-error
+              window.showVersion(Number(rev.revid));
+            }}
+          >
+            View
+          </button>
+          <button
+            onClick={async () => {
+              const res = await asyncRequestModule("history/PageSourceModule", {
+                revision_id: rev.revid,
+              });
+
+              if (res.status !== "ok") {
+                alert("Failed to fetch revision.");
+              }
+
+              props.showSource(res.body);
+            }}
+          >
+            Source
+          </button>
+          {props.rev.flags.includes("source") &&
+            rev.revno !== props.revcount && (
+              <button
+                onClick={(event) => {
+                  // wikidot has to check the HTML to generate the revert confirmation dialog
+                  // this HTML doesn't exist so we have to recreate it
+                  const dummyid = `revision-row-${rev.revid}`;
+                  if (!document.getElementById(dummyid)) {
+                    const dummy = document.createElement("div");
+                    dummy.style.display = "none";
+                    const dummy2 = document.createElement("td");
+                    dummy.appendChild(dummy2);
+                    dummy2.innerText = rev.revno?.toString() ?? "";
+                    dummy.id = dummyid;
+                    document.body.appendChild(dummy);
+                  }
+
+                  // @ts-expect-error
+                  WIKIDOT.modules.PageHistoryModule.listeners.revert(
+                    event.nativeEvent,
+                    Number(rev.revid),
+                  );
+                }}
+              >
+                Revert
+              </button>
+            )}
+        </div>
+      </td>
       <td>
         {rev.byUserLink ? (
-          <a href={rev.byUserLink}>{rev.byUsername}</a>
+          <a href={rev.byUserLink}>
+            {rev.byUsername === "AdminBright" ? "TheDuckMan" : rev.byUsername}
+          </a>
         ) : (
           <span>{rev.byUserId} (deleted)</span>
         )}

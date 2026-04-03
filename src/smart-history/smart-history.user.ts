@@ -10,7 +10,7 @@
 */
 
 import { getPageRevisionRange } from "../common/history.js";
-import { getPageId } from "../common/wikidot-api-utils.js";
+import { asyncRequestModule, getPageId } from "../common/wikidot-api-utils.js";
 import { smartHistoryUI } from "./smart-history-ui.js";
 
 (async () => {
@@ -24,14 +24,17 @@ import { smartHistoryUI } from "./smart-history-ui.js";
   newHistoryButton.className = "btn btn-default";
   newHistoryButton.href = "javascript:;";
   newHistoryButton.id = "history-button";
-  console.log("hello?");
 
   newHistoryButton.addEventListener("click", async () => {
-    console.log("hi");
     const pageId = await getPageId(window.location.href);
     if (!pageId) return;
     const latestRev = await getPageRevisionRange(pageId, 0, 1);
     if (!latestRev) return;
+
+    // needed to add the PageHistoryModule script
+    await asyncRequestModule("history/PageHistoryModule", {
+      page_id: pageId,
+    });
 
     const actionArea = document.getElementById("action-area");
     if (!actionArea) return;

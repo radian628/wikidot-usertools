@@ -23,6 +23,7 @@ export function parseRevisionRow(row: HTMLTableRowElement) {
           S: "source",
           T: "title",
           N: "newpage",
+          F: "file",
         })[s] ?? "unknown",
     );
 
