@@ -4,7 +4,7 @@
 // @namespace   Violentmonkey Scripts
 // @grant       none
 // @match       *://*.wikidot.com/*
-// @version     1.0
+// @version     1.1
 // @author      radian628
 // @description 9/13/2025, 12:35:21 PM
 // ==/UserScript==
@@ -52,6 +52,7 @@ window.addEventListener("load", () => {
     }
   }
 
+  if (window.parent === window) return;
   setTimeout(() => {
     forceRefreshAllCSS();
   }, 2000);
