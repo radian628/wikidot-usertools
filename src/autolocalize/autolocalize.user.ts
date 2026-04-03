@@ -3,7 +3,7 @@
 // @name        SCP Wiki AutoLocalize 
 // @match       *://*.wikidot.com/*
 // @grant       none
-// @version     1.10
+// @version     1.11
 // @author      radian628
 // @description Automatically localize SCP Wiki images. 
 // ==/UserScript==
