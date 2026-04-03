@@ -18,7 +18,7 @@ import { Action, autolocalizePopup } from "./autolocalize-widget.js";
 import { getOffsetSources } from "./find-offsets.js";
 
 export const HOSTNAMES = [
-  // window.location.hostname,
+  window.location.hostname,
   "scpwiki.com",
   "scp-wiki.net",
   "scp-wiki.wikidot.com",
@@ -88,6 +88,8 @@ function pushInfoLine(line: string) {
       hostType: HostType;
     }[] = [];
 
+    const pageSource = (await getPageSource(pageUrl)).replaceAll("\u00a0", " ");
+
     const imgs = dom.querySelectorAll("#page-content img");
     for (const img of Array.from(imgs)) {
       const src = img.getAttribute("src");
@@ -98,14 +100,17 @@ function pushInfoLine(line: string) {
         });
       }
     }
-    for (const style of Array.from(dom.querySelectorAll("style"))) {
-      const urls = [...(style.innerText.match(/url\(\S*\)/g) ?? [])].map((u) =>
+
+    function findUrlsInCSS(css: string) {
+      const urls = [...(css.match(/url\(\S*\)/g) ?? [])].map((u) =>
         u
           .slice(4, -1)
           .replace(/^("|')/g, "")
           .replace(/("|')$/g, "")
           .replace("&amp;", "&"),
       );
+
+      console.log("AAAA", urls);
 
       urlInfo.push(
         ...urls.map((u) => ({
@@ -115,12 +120,20 @@ function pushInfoLine(line: string) {
       );
     }
 
+    for (const style of Array.from(dom.querySelectorAll("style"))) {
+      findUrlsInCSS(style.innerText);
+    }
+
+    for (const css of pageSource.match(
+      /\[\[code.*?\]\][\s\S]*?\[\[\/code\]\]/g,
+    ) ?? []) {
+      findUrlsInCSS(css);
+    }
+
     // make urls unique
     urlInfo = [...new Map(urlInfo.map((u) => [u.url, u])).values()];
 
     // filter out ones not in page source
-    const pageSource = (await getPageSource(pageUrl)).replaceAll("\u00a0", " ");
-
     urlInfo = urlInfo.filter((u) => pageSource.includes(u.url));
 
     return urlInfo;
