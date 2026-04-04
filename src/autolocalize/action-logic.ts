@@ -177,7 +177,10 @@ export async function performActionsLogic(params: {
 
           let file: Blob | null = res;
 
-          if (!file.type.startsWith("image")) {
+          if (
+            !file.type.startsWith("image") &&
+            !action.newName.endsWith(".svg")
+          ) {
             updateStatusText(
               "Error: File is not an image. Alternatively, fetching it may have failed, causing it to return non-image data.",
               "fail",
@@ -252,7 +255,11 @@ export async function performActionsLogic(params: {
             }
           }
 
-          if (file && file.type === "image/svg+xml") {
+          if (
+            file &&
+            (file.type.startsWith("image/svg+xml") ||
+              action.newName.endsWith(".svg"))
+          ) {
             updateStatusText(
               "Image identified as SVG; skipping resize...",
               "in-progress",

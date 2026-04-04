@@ -3,7 +3,7 @@
 // @name        SCP Wiki AutoLocalize 
 // @match       *://*.wikidot.com/*
 // @grant       none
-// @version     1.11
+// @version     1.12
 // @author      radian628
 // @description Automatically localize SCP Wiki images. 
 // ==/UserScript==
@@ -18,7 +18,7 @@ import { Action, autolocalizePopup } from "./autolocalize-widget.js";
 import { getOffsetSources } from "./find-offsets.js";
 
 export const HOSTNAMES = [
-  window.location.hostname,
+  // window.location.hostname,
   "scpwiki.com",
   "scp-wiki.net",
   "scp-wiki.wikidot.com",
