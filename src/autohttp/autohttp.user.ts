@@ -10,7 +10,7 @@
 // ==/UserScript==
 */
 
-import { registerStorageItem, waitForCond } from "r628";
+import { registerStorageItem, waitFor } from "r628";
 import { getPageSource } from "../common/wikidot-api-utils.js";
 import { compareBytes, getFileLink, replaceFile } from "../common/file-io.js";
 
@@ -19,13 +19,13 @@ const BUILDPOLL_DIRECTIVE = /\!\!\!AUTOHTTP_BUILDPOLL (\S+)\!\!\!/g;
 
 const autohttpLocalStorage = registerStorageItem<Record<string, boolean>>(
   "autohttp-enabled",
-  {}
+  {},
 );
 
 async function attemptFileRefetch(
   cache: Cache,
   source: string,
-  directives: RegExpMatchArray[]
+  directives: RegExpMatchArray[],
 ) {
   const results = await Promise.all(
     Array.from(directives).map(async ([_, link, filename]) => {
@@ -44,13 +44,13 @@ async function attemptFileRefetch(
       // file is already up-to-date; nothing is to be done
       if (wikidotFile && compareBytes(localFile, wikidotFile)) {
         console.log(
-          `Current version of '${filename}' is up-to-date; no update needed.`
+          `Current version of '${filename}' is up-to-date; no update needed.`,
         );
         return false;
       }
 
       console.log(
-        `Current version of '${filename}' is outdated! Reuploading...`
+        `Current version of '${filename}' is outdated! Reuploading...`,
       );
 
       // reupload file + update cache
@@ -62,7 +62,7 @@ async function attemptFileRefetch(
       console.log(`Reuploaded '${filename}' to Wikidot.`);
 
       return true;
-    })
+    }),
   );
 
   if (results.some((e) => e)) {
@@ -72,7 +72,7 @@ async function attemptFileRefetch(
 }
 
 (async () => {
-  await waitForCond(() => window.OZONE, 100);
+  await waitFor(() => window.OZONE, 100);
 
   const [cache, source] = [
     await caches.open("wikidot-autohttp"),

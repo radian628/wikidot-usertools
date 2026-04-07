@@ -15,7 +15,7 @@ import {
   listenForSelector,
   memo,
   throttle,
-  waitForCond,
+  waitFor,
   waitUntil,
 } from "r628";
 import { scrollDetector } from "../better-comments-view/scroll-detector.js";
@@ -39,7 +39,7 @@ function getForumPageRaw(threadId: string, page: number) {
       },
       (result) => {
         resolve(result);
-      }
+      },
     );
   });
 }
@@ -104,7 +104,7 @@ alterElements("#new-post-form-container", (formContainer) => {
   while (true) {
     // wait for forum to be ready
     const forumRoot = await listenForSelector(".forum-thread-box");
-    const threadId = await waitForCond(() => WIKIDOT.forumThreadId);
+    const threadId = await waitFor(() => WIKIDOT.forumThreadId);
 
     // get rid of old forum content
     const forumPosts = forumRoot.querySelector("#thread-container-posts");
@@ -124,7 +124,7 @@ alterElements("#new-post-form-container", (formContainer) => {
 
     const unsub = forumInfiniteScroll(
       threadId.toString(),
-      forumPosts as HTMLElement
+      forumPosts as HTMLElement,
     );
 
     await listenForNoSelector("#thread-container");

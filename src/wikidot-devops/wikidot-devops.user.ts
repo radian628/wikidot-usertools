@@ -10,7 +10,7 @@
 // ==/UserScript==
 */
 
-import { waitForCond } from "r628";
+import { waitFor } from "r628";
 import {
   asyncRequestModule,
   getPageId,
@@ -39,7 +39,7 @@ const WikidotDevOpsManifest = z.array(
     filesBaseUrl: HTTPUrl,
     metadataUrl: HTTPUrl,
     changesUrl: WebsocketUrl,
-  })
+  }),
 );
 
 const WikidotDevOpsMetadata = z.object({
@@ -65,7 +65,7 @@ async function fetchAndValidateJson<T>(endpoint: string, parser: z.ZodType<T>) {
   return parser.parse(jsonData);
 }
 (async () => {
-  await waitForCond(() => window.OZONE, 100);
+  await waitFor(() => window.OZONE, 100);
 
   console.log("file ids", await getFileIds(WIKIREQUEST.info.pageId));
 
@@ -77,7 +77,7 @@ async function fetchAndValidateJson<T>(endpoint: string, parser: z.ZodType<T>) {
         db.createObjectStore("files");
         db.createObjectStore("strings");
       },
-    }
+    },
   );
   const source = await getPageSource(window.location.href);
 
@@ -96,7 +96,7 @@ async function fetchAndValidateJson<T>(endpoint: string, parser: z.ZodType<T>) {
         !(localFile instanceof Blob) ||
         !compareBytes(
           new Uint8Array(await localFile.arrayBuffer()),
-          new Uint8Array(await remoteFile.arrayBuffer())
+          new Uint8Array(await remoteFile.arrayBuffer()),
         ),
     };
   }
@@ -115,7 +115,7 @@ async function fetchAndValidateJson<T>(endpoint: string, parser: z.ZodType<T>) {
 
   async function fetchAndCompareJsonString<T>(
     url: string,
-    parser: z.ZodType<T>
+    parser: z.ZodType<T>,
   ) {
     const [localString, remoteString] = await Promise.all([
       db.get("strings", url),
@@ -137,7 +137,7 @@ async function fetchAndValidateJson<T>(endpoint: string, parser: z.ZodType<T>) {
 
   if (!localStorage.getItem(DEVOPS_STORAGE_ITEM)) {
     console.warn(
-      `DevOps directive present but ignored, as DevOps has not explicitly been enabled on this page. To enable it for this page, define the "${DEVOPS_STORAGE_ITEM}" localStorage item.`
+      `DevOps directive present but ignored, as DevOps has not explicitly been enabled on this page. To enable it for this page, define the "${DEVOPS_STORAGE_ITEM}" localStorage item.`,
     );
     return;
   }
@@ -146,7 +146,7 @@ async function fetchAndValidateJson<T>(endpoint: string, parser: z.ZodType<T>) {
 
   const devOpsManifest = await fetchAndValidateJson(
     devopsUrl,
-    WikidotDevOpsManifest
+    WikidotDevOpsManifest,
   );
 
   async function onTryChange() {
@@ -164,7 +164,7 @@ async function fetchAndValidateJson<T>(endpoint: string, parser: z.ZodType<T>) {
           (async () => {
             const filesList = await fetchAndValidateJson(
               d.fileAttachmentNamesUrl,
-              WikidotFileAttachmentNames
+              WikidotFileAttachmentNames,
             );
             await Promise.all(
               filesList.map(async (f) => {
@@ -177,14 +177,14 @@ async function fetchAndValidateJson<T>(endpoint: string, parser: z.ZodType<T>) {
                   console.log("Updating file", f);
                   await replaceFile(f, file, pageid);
                 }
-              })
+              }),
             );
           })(),
           (async () => {
             const sourceText = await fetchAndCompareString(d.sourceTextUrl);
             const metadata = await fetchAndCompareJsonString(
               d.metadataUrl,
-              WikidotDevOpsMetadata
+              WikidotDevOpsMetadata,
             );
 
             if (metadata.needsUpdating) metadataChanged = true;
@@ -196,7 +196,7 @@ async function fetchAndValidateJson<T>(endpoint: string, parser: z.ZodType<T>) {
               await setPageSource(
                 pageUrl,
                 sourceText.string,
-                metadata.json.title
+                metadata.json.title,
               );
             }
 
@@ -222,7 +222,7 @@ async function fetchAndValidateJson<T>(endpoint: string, parser: z.ZodType<T>) {
             }
           })(),
         ]);
-      })
+      }),
     );
 
     if (changed) {
@@ -237,7 +237,7 @@ async function fetchAndValidateJson<T>(endpoint: string, parser: z.ZodType<T>) {
           if (replacementPageContent) {
             pageContent?.parentElement?.replaceChild(
               replacementPageContent,
-              pageContent
+              pageContent,
             );
           }
         }
