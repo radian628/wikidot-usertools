@@ -1,19 +1,9 @@
-/*!
-// ==UserScript==
-// @name        Wikidot Smart History 
-// @match       *://*.wikidot.com/*
-// @grant       none
-// @version     0.1.0
-// @author      radian628
-// @description Make Wikidot's revision history easier to use. 
-// ==/UserScript==
-*/
-
+import { UsertoolPlugin } from "../combined/plugin.js";
 import { getPageRevisionRange } from "../common/history.js";
 import { asyncRequestModule, getPageId } from "../common/wikidot-api-utils.js";
 import { smartHistoryUI } from "./smart-history-ui.js";
 
-(async () => {
+async function main() {
   const historyButton = document.querySelector("#history-button");
   if (!historyButton) return;
   historyButton.id = "";
@@ -47,4 +37,12 @@ import { smartHistoryUI } from "./smart-history-ui.js";
       }),
     );
   });
-})();
+}
+export const SmartHistoryPlugin: UsertoolPlugin<{}> = {
+  name: "Smart History",
+  defaultSettings: {},
+  shouldRun: () => true,
+  async onPageLoad() {
+    await main();
+  },
+};

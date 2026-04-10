@@ -1,14 +1,5 @@
-/*!
-// ==UserScript==
-// @name        SCP Wiki AutoLocalize 
-// @match       *://*.wikidot.com/*
-// @grant       none
-// @version     1.12
-// @author      radian628
-// @description Automatically localize SCP Wiki images. 
-// ==/UserScript==
-*/
-
+import React from "react";
+import { UsertoolPlugin } from "../combined/plugin.js";
 import {
   getPageId,
   getPageSource,
@@ -33,9 +24,10 @@ export const HOSTNAMES = [
 ];
 HOSTNAMES.push(...HOSTNAMES.map((o) => o.replaceAll("wikidot", "wdfiles")));
 
-const infobox = document.createElement("div");
-document.body.appendChild(infobox);
-infobox.style = `
+const main = async () => {
+  const infobox = document.createElement("div");
+  document.body.appendChild(infobox);
+  infobox.style = `
   z-index: 99;
   color: black;
   font-family: monospace;
@@ -45,14 +37,11 @@ infobox.style = `
   top: 0;
   left: 0;
 `;
-
-function pushInfoLine(line: string) {
-  const text = new Text(line);
-  infobox.appendChild(text);
-  infobox.appendChild(document.createElement("br"));
-}
-
-(async () => {
+  function pushInfoLine(line: string) {
+    const text = new Text(line);
+    infobox.appendChild(text);
+    infobox.appendChild(document.createElement("br"));
+  }
   const parentPageId = await getPageId(window.location.href);
   if (!parentPageId) return;
 
@@ -215,4 +204,14 @@ function pushInfoLine(line: string) {
   if (actions.length > 0) {
     autolocalizePopup(actions, parentPageId, offsetSources);
   }
-})();
+};
+
+export const AutoLocalizePlugin: UsertoolPlugin<{}> = {
+  name: "AutoLocalize",
+  defaultSettings: {},
+  shouldRun: () => true,
+  async onPageLoad(hooks, settings) {
+    main();
+  },
+  settingsMenu: (props) => <div>(no settings available for this plugin)</div>,
+};

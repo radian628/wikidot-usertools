@@ -10,7 +10,7 @@ export type PluginHooks = {
 export type UsertoolPlugin<Settings> = {
   name: string;
   defaultSettings: Settings;
-  settingsMenu: React.FC<SmartGetSet<Settings>>;
+  settingsMenu?: React.FC<SmartGetSet<Settings>>;
   shouldRun: (url: URL) => boolean;
   onPageLoad(hooks: PluginHooks, settings: Settings): Promise<void>;
   customEditor?: React.FC<{ hooks: PluginHooks; settings: Settings }>;

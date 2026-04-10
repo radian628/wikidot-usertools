@@ -1,14 +1,4 @@
-/*!
-// ==UserScript==
-// @name        UserInfo Better Comments View 
-// @match       *://*.wikidot.com/user:info/*
-// @grant       none
-// @version     1.0
-// @author      radian628
-// @description A nicer way to view Wikidot comments. 
-// ==/UserScript==
-*/
-
+import { UsertoolPlugin } from "../combined/plugin.js";
 import { createWikiFilterField } from "./filter-by-wiki.js";
 import { scrollDetector } from "./scroll-detector.js";
 import {
@@ -238,7 +228,7 @@ function recentPostsInfiniteScroll(
   };
 }
 
-(async () => {
+async function main() {
   while (true) {
     // ensure we're on the right page
     const recentPostsBox = (await listenForSelector(
@@ -276,4 +266,11 @@ function recentPostsInfiniteScroll(
     stopInfiniteScroll();
     filter.unmount();
   }
-})();
+}
+
+export const BetterCommentsViewPlugin: UsertoolPlugin<{}> = {
+  name: "Better Comments View",
+  defaultSettings: {},
+  shouldRun: (url) => url.pathname.startsWith("/user:info"),
+  onPageLoad: main,
+};

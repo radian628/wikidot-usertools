@@ -224,19 +224,19 @@ export async function getLatestRevisionNumber(url: string) {
   return fmted[0]?.number ?? "0";
 }
 
-export function App() {
+export function App(props: { customCss: string }) {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
   const [fract, setFract] = useState(0.5);
 
   const [isResizing, setIsResizing] = useState(false);
 
-  const customCss = window.localStorage.getItem("better-editor-custom-css");
+  const customCss = props.customCss;
 
   return (
     <>
-      {customCss && <style>{customCss}</style>}
-      <style>{`.cm-editor { height: 100vh; }`}</style>
+      <style>{customCss}</style>
+      <style>{`.cm-editor { height: 100vh; } body { margin: 0; padding: 0; overflow: hidden; } `}</style>
       <div style={{ display: "flex", width: "100vw", height: "100vh" }}>
         <div style={{ height: "100vh", width: `${100 * fract}vw` }}>
           <Editor
@@ -289,6 +289,7 @@ export function App() {
               width: "100%",
               height: "100%",
               pointerEvents: isResizing ? "none" : "all",
+              border: "none",
             }}
             src={window.location.href}
             ref={iframeRef}

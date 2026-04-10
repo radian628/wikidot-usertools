@@ -23,8 +23,6 @@ export function smartHistoryUI(props: SmartHistoryProps) {
   return elem;
 }
 
-const NumberFieldM = mutatify(NumberField);
-
 const PAGESIZE = 50;
 const SHOW_ABOVE_JUMPTO = 10;
 
@@ -117,7 +115,7 @@ export function SmartHistoryUI(props: SmartHistoryProps) {
       {cmp && <Diff from={cmp.from} to={cmp.to} pageId={props.pageId}></Diff>}
       <div>
         <label>Jump To </label>
-        <NumberFieldM
+        <NumberField
           min={0}
           max={props.revcount}
           value={revs.jumpTo}
@@ -134,7 +132,7 @@ export function SmartHistoryUI(props: SmartHistoryProps) {
             );
           }}
           step={1}
-        ></NumberFieldM>
+        ></NumberField>
         {revs.jumpTo !== props.revcount ? (
           <button
             onClick={() => {
@@ -162,11 +160,11 @@ export function SmartHistoryUI(props: SmartHistoryProps) {
       )}
       <div className="sh-cmp">
         <label>Compare </label>
-        <NumberFieldM
+        <NumberField
           value={cmpMin}
           setValue={setCmpMin}
-        ></NumberFieldM> -&gt;{" "}
-        <NumberFieldM value={cmpMax} setValue={setCmpMax}></NumberFieldM>{" "}
+        ></NumberField> -&gt;{" "}
+        <NumberField value={cmpMax} setValue={setCmpMax}></NumberField>{" "}
         <button
           onClick={() => {
             setCmp({

@@ -1,4 +1,4 @@
-import { HOSTNAMES } from "./autolocalize.user.js";
+import { HOSTNAMES } from "./autolocalize.js";
 
 export function findPotentialOffsetURLs(src: string) {
   const comments = src.match(/\[!--[\s\S]*?--\]/g) ?? [];

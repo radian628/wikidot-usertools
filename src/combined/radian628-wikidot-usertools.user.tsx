@@ -1,12 +1,12 @@
 /*!
 // ==UserScript==
-// @name        Radian628 Wikidot Usertools 
+// @name        (BETA WIP UNFINISHED) Radian628 Wikidot Usertools
 // @match       *://*.wikidot.com/*
 // @grant       GM.getValue 
 // @grant       GM.setValue 
-// @version     1.0
+// @version     0.1.0
 // @author      radian628
-// @description  
+// @description all the usertools in one!
 // ==/UserScript==
 */
 
@@ -16,6 +16,15 @@ import React, { useEffect, useState } from "react";
 import { BooleanField, createEvalbox, NumberField, useGetSet } from "r628";
 import { initCustomCssWidget } from "../custom-css-widget/widget.js";
 import { getIsEnabled, getSettings, SettingsMenu } from "./settings-menu.js";
+import { CustomCSSWidgetPlugin } from "../custom-css-widget/custom-css-widget.jsx";
+import { BetterEditorPlugin } from "../better-editor/better-editor.js";
+import { AutoLocalizePlugin } from "../autolocalize/autolocalize.js";
+import { UnfuckAllCSSPlugin } from "../unfuck-all-css/unfuck-all-css.user.js";
+import { BetterCommentsViewPlugin } from "../better-comments-view/better-comments-view.user.js";
+import { MinimalistEditorPlugin } from "../minimalist-editor/minimalist-editor.js";
+import { MultisavePlugin } from "../multisave/multisave.user.js";
+import { SmartHistoryPlugin } from "../smart-history/smart-history.js";
+import { BetterForumViewPlugin } from "../better-forum/better-forum-view.js";
 
 const appendedContentContainer = document.createElement("div");
 document.body.appendChild(appendedContentContainer);
@@ -66,6 +75,7 @@ document.body.appendChild(appendedContentContainer);
   async function registerPlugin<T>(plugin: UsertoolPlugin<T>) {
     if (
       !isSettingsPage &&
+      !window.location.pathname.endsWith("resize-iframe.html") &&
       plugin.shouldRun(new URL(window.location.href)) &&
       (await getIsEnabled(plugin))
     ) {
@@ -74,34 +84,15 @@ document.body.appendChild(appendedContentContainer);
     plugins.push(plugin);
   }
 
-  registerPlugin({
-    name: "Custom CSS Widget",
-    defaultSettings: {
-      height: 300,
-    },
-    settingsMenu: (props) => (
-      <div>
-        <NumberField {...props.prop("height")}></NumberField>
-      </div>
-    ),
-    shouldRun: () => true,
-    async onPageLoad(hooks, settings) {
-      const initListener = () => {
-        initCustomCssWidget();
-        document.removeEventListener("click", initListener);
-      };
-
-      document.addEventListener("click", initListener);
-    },
-  });
-
-  registerPlugin({
-    name: "Sample Plugin",
-    defaultSettings: {},
-    settingsMenu: () => <div>sdfsdfdsf</div>,
-    shouldRun: () => true,
-    async onPageLoad() {},
-  });
+  registerPlugin(CustomCSSWidgetPlugin);
+  registerPlugin(BetterEditorPlugin);
+  registerPlugin(AutoLocalizePlugin);
+  registerPlugin(UnfuckAllCSSPlugin);
+  registerPlugin(BetterCommentsViewPlugin);
+  registerPlugin(MinimalistEditorPlugin);
+  registerPlugin(MultisavePlugin);
+  registerPlugin(SmartHistoryPlugin);
+  registerPlugin(BetterForumViewPlugin);
 
   if (isSettingsPage) {
     hooks.replacePageWith(() => (

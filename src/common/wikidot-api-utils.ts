@@ -10,7 +10,7 @@ export function defaultThrottle<Params extends any[], Ret>(
 }
 function _asyncRequestModule(module: string, params: any) {
   return new Promise<any>((resolve, reject) => {
-    window.OZONE.ajax.requestModule(module, params, (e) => {
+    OZONE.ajax.requestModule(module, params, (e) => {
       resolve(e);
     });
   });

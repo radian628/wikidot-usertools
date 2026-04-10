@@ -1,34 +1,23 @@
-/*!
-// ==UserScript==
-// @name        Minimalist Wikidot Editor
-// @namespace   Violentmonkey Scripts
-// @grant       none
-// @match *://*.wikidot.com/*
-// @version     1.0
-// @author      radian628
-// @description 9/13/2025, 12:35:21 PM
-// ==/UserScript==
-*/
-
 import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { injectFunction } from "r628";
 import EditorCSS from "./editor.css?raw";
 import { getPageSource, setPageSource } from "../common/wikidot-api-utils.js";
+import { UsertoolPlugin } from "../combined/plugin.js";
 
-function initializeEditor() {
-  document.body.innerHTML = "";
-  document.head.innerHTML = "";
-  document.body.style.margin = "0";
-  document.body.style.padding = "0";
-  document.body.style.overflow = "hidden";
-  // @ts-expect-error
-  OZONE.utils.addJavascriptUrl = () => {};
-  const domRoot = document.createElement("div");
-  document.body.appendChild(domRoot);
-  const reactRoot = createRoot(domRoot);
-  reactRoot.render(<App></App>);
-}
+// function initializeEditor() {
+//   document.body.innerHTML = "";
+//   document.head.innerHTML = "";
+//   document.body.style.margin = "0";
+//   document.body.style.padding = "0";
+//   document.body.style.overflow = "hidden";
+//   // @ts-expect-error
+//   OZONE.utils.addJavascriptUrl = () => {};
+//   const domRoot = document.createElement("div");
+//   document.body.appendChild(domRoot);
+//   const reactRoot = createRoot(domRoot);
+//   reactRoot.render(<App></App>);
+// }
 
 let lastSaved: string | undefined = undefined;
 
@@ -211,13 +200,17 @@ function App() {
   );
 }
 
-(async () => {
-  if (window.parent !== window) return;
-  await injectFunction(
-    () => window?.WIKIDOT?.page?.listeners?.editClick,
-    (fn) => (WIKIDOT.page.listeners.editClick = fn),
-    (fn) => (fn) => {
-      initializeEditor();
-    },
-  );
-})();
+export const MinimalistEditorPlugin: UsertoolPlugin<{}> = {
+  name: "Minimalist Editor",
+  defaultSettings: {},
+  shouldRun: () => true,
+  async onPageLoad(hooks, settings) {
+    await injectFunction(
+      () => WIKIDOT?.page?.listeners?.editClick,
+      (fn) => (WIKIDOT.page.listeners.editClick = fn),
+      (fn) => (fn) => {
+        hooks.replacePageWith(App);
+      },
+    );
+  },
+};

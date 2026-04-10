@@ -124,8 +124,12 @@ export function PluginSettings<T>(props: { plugin: UsertoolPlugin<T> }) {
   return (
     <div className="plugin-settings">
       <h2>{p.name}</h2>
-      {/* @ts-expect-error */}
-      {<SettingsMenuFunction {...settingsLocal}></SettingsMenuFunction>}
+      {SettingsMenuFunction ? (
+        // @ts-expect-error
+        <SettingsMenuFunction {...settingsLocal}></SettingsMenuFunction>
+      ) : (
+        <div>(no settings for this plugin)</div>
+      )}
     </div>
   );
 }
