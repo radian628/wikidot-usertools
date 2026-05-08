@@ -1,15 +1,12 @@
 {
   "name": "wikidot-devops-server",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "author": "radian628",
   "main": "build/index.js",
   "description": "Automate deployment of Wikidot pages.",
   "license": "WTFPL2",
   "scripts": {
     "build": "tsc -p ."
-  },
-  "bin": {
-    "wds": "./build/index.js"
   },
   "dependencies": {
     "chokidar": "^4.0.3",
@@ -23,5 +20,13 @@
     "@types/express": "^5.0.3",
     "@types/express-ws": "^3.0.5",
     "typescript": "^5.9.3"
+  },
+  "peerDependencies": {
+    "esbuild": "^0.28.0"
+  },
+  "peerDependenciesMeta": {
+    "esbuild": {
+      "optional": true
+    }
   }
 }

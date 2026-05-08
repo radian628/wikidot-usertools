@@ -6,6 +6,7 @@ export async function uploadFile(
   file: Blob,
   comments: string,
   pageId: string,
+  force?: boolean,
 ) {
   const formdata = new FormData();
   formdata.append("action", "FileAction");
@@ -15,6 +16,7 @@ export async function uploadFile(
   formdata.append("userfile", file);
   formdata.append("dfilename", name);
   formdata.append("comments", comments);
+  formdata.append("force", (force ?? false).toString());
   return (
     await fetch(window.location.origin + "/default--flow/files__UploadTarget", {
       method: "post",

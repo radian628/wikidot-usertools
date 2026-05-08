@@ -1,0 +1,38 @@
+.toggle-devops-ui {
+  top: 0;
+  left: 0;
+  position: fixed;
+}
+
+.devops-ui {
+  top: 20px;
+  left: 0;
+  position: fixed;
+  background-color: #333;
+  color: white;
+  max-width: 30vw;
+  max-height: calc(100vh - 20px);
+  overflow: auto;
+}
+
+.devops-log {
+  border: 1px solid #444;
+  background-color: #121212;
+}
+
+.devops-log .info {
+  color: #ccc;
+}
+.devops-log .warning {
+  color: #f94;
+}
+.devops-log .error {
+  color: #f33;
+}
+.devops-log .success {
+  color: #3f3;
+}
+
+body {
+  margin: 0;
+}

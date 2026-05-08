@@ -13,3 +13,5 @@ output/*
 src/wiki-scraper/darken.ts
 src/wiki-scraper/filter-undefined-lines.ts
 src/wiki-scraper/get-edited-pages.ts
+src/o5
+build/o5

@@ -10,6 +10,8 @@ import { App } from "./editor.js";
 import { IframeBridge } from "./better-editor-iframe-bridge.js";
 import { asyncRequestModule, getPageId } from "../common/wikidot-api-utils.js";
 import { UsertoolPlugin } from "../combined/plugin.js";
+import { mdiPencilPlus } from "@mdi/js";
+import { Icon } from "@mdi/react";
 
 // function initializeEditor() {
 //   document.body.innerHTML = "";
@@ -39,16 +41,27 @@ export const BetterEditorPlugin: UsertoolPlugin<{ customCss: string }> = {
   async onPageLoad(hooks, settings) {
     // if not in an iframe
     if (window.parent === window) {
-      console.log("RUN IN MAIN PAGE");
-      await injectFunction(
-        () => WIKIDOT?.page?.listeners?.editClick,
-        (fn) => (WIKIDOT.page.listeners.editClick = fn),
-        (fn) => (fn) => {
-          hooks.replacePageWith(() => <App {...settings}></App>);
+      const removeMenu = hooks.addMenu({
+        icon: () => <Icon path={mdiPencilPlus}></Icon>,
+        onClickIcon() {
+          openEditor();
         },
-      );
+      });
 
-      console.log("RUN IN MAIN PAGE 2");
+      function openEditor() {
+        removeMenu();
+        hooks.replacePageWith(() => <App customCss={settings.customCss}></App>);
+      }
+
+      WIKIDOT.page.listeners.editClick = () => {};
+      const openOnCtrlE = (e: KeyboardEvent) => {
+        if (e.key === "e" && e.ctrlKey) {
+          openEditor();
+          document.removeEventListener("keydown", openOnCtrlE);
+        }
+      };
+      document.addEventListener("keydown", openOnCtrlE);
+
       // if in an iframe
     } else {
       workerifyServerIframe("iframe", IframeBridge, window.parent);

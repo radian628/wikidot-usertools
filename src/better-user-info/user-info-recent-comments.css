@@ -1,0 +1,73 @@
+@import url("https://rsms.me/inter/inter.css");
+
+.recent-comments {
+  font-family: "Inter", sans-serif;
+  display: grid;
+  grid-template-areas:
+    "header"
+    "list";
+  grid-template-rows: 0fr 1fr;
+  height: 100%;
+}
+
+.recent-comments-header {
+  grid-area: header;
+  height: fit-content;
+  padding: 5px;
+  border-bottom: 1px solid #aaa;
+}
+
+.comments-list {
+  padding-bottom: 50vh;
+  overflow: auto;
+  grid-area: list;
+}
+
+.recent-comments .small {
+  width: 1lh;
+  height: 1lh;
+}
+
+.post {
+  margin-bottom: 1.5lh;
+}
+
+.post .short {
+  display: none;
+}
+
+.post .long .title {
+  font-weight: bold;
+  font-size: 120%;
+}
+
+.post .long .content {
+  padding: 5px;
+}
+
+.post .long .content p:nth-child(1) {
+  margin-top: 0;
+}
+
+.long .head {
+  background-color: #eee;
+  padding: 5px;
+  position: sticky;
+  top: 0;
+}
+
+.info br {
+  display: none;
+}
+
+.info {
+  font-size: 80%;
+  font-style: italic;
+}
+
+div.blockquote,
+blockquote {
+  background-color: #f5f5f5;
+  padding: 5px 30px;
+  border: 1px dashed #999;
+}

@@ -6,6 +6,7 @@ export const UnfuckAllCSSPlugin: UsertoolPlugin<{}> = {
   shouldRun: () => true,
   async onPageLoad(hooks, settings) {
     window.addEventListener("load", () => {
+      console.log("got here 2");
       const styles = Array.from(document.querySelectorAll("style"));
       for (const s of styles) {
         s.parentElement!.removeChild(s);

@@ -344,7 +344,6 @@ function AutoLocalizePopup(props: {
   return (
     <div className="autolocalize-widget">
       <style>{CSS}</style>
-      <button onClick={() => props.close()}>Close</button>
       <br></br>
       <EnumField
         value={mode}
@@ -368,24 +367,13 @@ export function autolocalizePopup(
   pageId: string,
   offsets: OffsetInfo[],
 ) {
-  const root = document.createElement("div");
-  document.body.appendChild(root);
-
-  const reactRoot = createRoot(root);
-
-  return new Promise<void>((resolve, reject) => {
-    reactRoot.render(
-      <AutoLocalizePopup
-        actions={actions}
-        done={resolve}
-        close={() => {
-          reactRoot.unmount();
-          document.body.removeChild(root);
-          resolve();
-        }}
-        pageId={pageId}
-        offsets={offsets}
-      ></AutoLocalizePopup>,
-    );
-  });
+  return () => (
+    <AutoLocalizePopup
+      actions={actions}
+      done={() => {}}
+      close={() => {}}
+      pageId={pageId}
+      offsets={offsets}
+    ></AutoLocalizePopup>
+  );
 }

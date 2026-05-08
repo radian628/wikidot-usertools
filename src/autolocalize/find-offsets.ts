@@ -4,7 +4,7 @@ export function findPotentialOffsetURLs(src: string) {
   const comments = src.match(/\[!--[\s\S]*?--\]/g) ?? [];
 
   const urls = comments
-    .map((c) => c.match(/https?\:\/\/\S*/) ?? [])
+    .map((c) => c.match(/https?\:\/\/\S*/g) ?? [])
     .flat(1)
     .map((u) => u.replace(/--\]$/g, ""));
 

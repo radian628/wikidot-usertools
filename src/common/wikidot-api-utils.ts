@@ -4,25 +4,57 @@ export function defaultThrottle<Params extends any[], Ret>(
   fn: (...params: Params) => Promise<Ret>,
 ) {
   return throttle(fn, {
-    maxConcurrentRequests: 5,
-    limits: [{ duration: 5, maxRequests: 10 }],
+    maxConcurrentRequests: 10,
+    limits: [{ duration: 5, maxRequests: 20 }],
   });
 }
-function _asyncRequestModule(module: string, params: any) {
-  return new Promise<any>((resolve, reject) => {
-    OZONE.ajax.requestModule(module, params, (e) => {
-      resolve(e);
-    });
+
+export function fastThrottle<Params extends any[], Ret>(
+  fn: (...params: Params) => Promise<Ret>,
+) {
+  return throttle(fn, {
+    maxConcurrentRequests: 20,
+    limits: [{ duration: 1, maxRequests: 20 }],
   });
+}
+
+async function _asyncRequestModule(module: string, params: any) {
+  // return new Promise<any>((resolve, reject) => {
+  //   OZONE.ajax.requestModule(module, params, (e) => {
+  //     resolve(e);
+  //   });
+  // });
+
+  return await (
+    await fetch("/ajax-module-connector.php", {
+      method: "POST",
+      headers: {
+        Accept: "*/*",
+      },
+      body: new URLSearchParams({
+        moduleName: module,
+        ...params,
+        callbackIndex: 999999999,
+        // @ts-expect-error
+        wikidot_token7: OZONE.utils.getCookie("wikidot_token7"),
+      }),
+    })
+  ).json();
 }
 
 let idcache = new Map<string, string>();
 export const asyncRequestModule = defaultThrottle(_asyncRequestModule);
+export const fastAsyncRequestModule = fastThrottle(_asyncRequestModule);
 
 export const getPageId = defaultThrottle(async function (url: string) {
   if (idcache.has(url)) return idcache.get(url);
-  const text = await (await fetch(url)).text();
-  const dom = new DOMParser().parseFromString(text, "text/html");
+  let dom: Document;
+  if (url === window.location.href) {
+    dom = document;
+  } else {
+    const text = await (await fetch(url)).text();
+    dom = new DOMParser().parseFromString(text, "text/html");
+  }
   const elems = dom.querySelectorAll("head script");
   for (const s of Array.from(elems) as HTMLElement[]) {
     const pageid = s.innerText.match(/WIKIREQUEST\.info\.pageId\s*\=\s*(\d+)/);

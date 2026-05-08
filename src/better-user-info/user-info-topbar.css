@@ -1,0 +1,81 @@
+@import url("https://rsms.me/inter/inter.css");
+
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+ul {
+  padding-inline-start: 0;
+}
+
+.topbar-container {
+  display: grid;
+  grid-template-areas: "navbar login";
+  border-bottom: 1px solid black;
+  font-family: "Inter", sans-serif;
+}
+
+.topbar-container ul {
+  margin: 0;
+}
+
+.login-status-container {
+  grid-area: login;
+}
+
+li.divider {
+  display: none;
+}
+
+.loginStatus {
+  display: flex;
+  justify-content: end;
+  align-items: center;
+}
+
+.loginStatus .btn.disabled {
+  display: none;
+}
+
+.loginStatus .printuser {
+  display: flex;
+  align-items: center;
+}
+
+.loginStatus img {
+  width: llh;
+  height: 1lh;
+  vertical-align: middle;
+}
+
+.loginStatus ul {
+  display: flex;
+  list-style: none;
+  flex-wrap: wrap;
+  padding-left: 20px;
+}
+
+.loginStatus li {
+  padding: 5px;
+  border-left: 1px solid #aaa;
+}
+
+.navbar-nav-container {
+  grid-area: navbar;
+}
+
+.navbar-nav {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  height: 100%;
+}
+
+.navbar-nav li {
+  padding: 5px;
+  border-right: 1px solid #aaa;
+}

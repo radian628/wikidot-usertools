@@ -1,0 +1,109 @@
+@import url("https://rsms.me/inter/inter.css");
+
+.recent-contribs {
+  font-family: "Inter", sans-serif;
+  padding-bottom: 50vh;
+  display: grid;
+  grid-template-areas:
+    "header"
+    "list";
+  height: 100%;
+  grid-template-rows: 0fr 1fr;
+}
+
+.recent-contribs-header {
+  grid-area: header;
+  padding: 5px;
+  box-sizing: border-box;
+}
+
+.recent-contribs-list {
+  grid-area: list;
+  overflow: auto;
+  padding: 5px;
+  box-sizing: border-box;
+}
+
+.recent-contribs ul.recent-contribs-top-level-list {
+  border-left: none;
+  padding-inline-start: 0;
+  margin: 0;
+}
+
+.recent-contribs ul {
+  list-style: none;
+  margin-inline-start: 5px;
+  padding-inline-start: 5px;
+  border-left: 1px solid #999;
+}
+
+.subheader {
+  font-weight: bold;
+  position: sticky;
+  top: -5px;
+  background-color: white;
+  z-index: 3;
+  display: block;
+}
+
+.subheader2 {
+  top: calc(1lh - 5px);
+  z-index: 2;
+}
+
+li.recent-contrib-row {
+  text-indent: 10px hanging;
+}
+
+li.recent-contrib-row .revno {
+  display: inline-block;
+  min-width: 2.5em;
+}
+
+li.recent-contrib-row .date {
+  display: inline-block;
+  min-width: 5em;
+}
+
+.comments {
+  font-size: 85%;
+  font-style: italic;
+  font-weight: normal;
+  color: #555;
+}
+
+a.comments {
+  color: #55e;
+}
+
+.recent-contribs-header {
+  padding-bottom: 0;
+  background-color: white;
+  border-bottom: 1px solid #aaa;
+  width: 100%;
+  height: fit-content;
+}
+
+.recent-contribs-header > div {
+  margin-bottom: 5px;
+}
+
+.recent-contribs-header .enum-ui {
+  display: inline-flex;
+}
+
+button.selected {
+  outline: 3px solid orange;
+}
+
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.highlighted {
+  background-color: #ff0;
+}

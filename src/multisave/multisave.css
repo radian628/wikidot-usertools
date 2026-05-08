@@ -27,13 +27,15 @@
   font-size: 200%;
 }
 
+.multisave-menu {
+  color: black;
+}
+
 .multisave-dialog {
   color: black;
-  position: fixed;
-  top: 15%;
-  left: 15%;
-  width: 70%;
-  height: 70%;
+  position: absolute;
+  width: 100%;
+  height: 100%;
   background-color: white;
   border: 1px solid #666666;
   border-radius: 10px;
@@ -72,6 +74,12 @@
 .multisave-image-preview {
   max-height: 100px;
   border: 1px dotted black;
+}
+
+.multisave-menu .multisave-header {
+  position: sticky;
+  top: -10px;
+  padding: 10px;
 }
 
 .multisave-header {

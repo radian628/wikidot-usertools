@@ -125,6 +125,7 @@ export async function performActionsLogic(params: {
     promises.push(
       (async () => {
         if (action.type === "find-replace") {
+          // defer find/replace operation until Page Source is ready to update
           updateStatusText("Waiting to update Page Source...", "in-progress");
           pageSourceTrigger.trigger([
             {
@@ -134,10 +135,11 @@ export async function performActionsLogic(params: {
             },
           ]);
         } else {
+          // fetch file from source
           updateStatusText("Fetching file...", "in-progress");
-
           let url = action.url;
           const purl = new URL(url, window.location.href);
+          // edge case: fix broken Wikimedia thumbnails
           if (
             purl.hostname === "upload.wikimedia.org" &&
             purl.pathname.startsWith("/wikipedia/commons/thumb")
@@ -153,12 +155,14 @@ export async function performActionsLogic(params: {
           let corsProxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`;
           let fetchUrl = url;
 
+          // enable CORS proxy for Wikidot-hosted files by default (they dont have CORS)
           if (
             new URL(url).hostname.endsWith("wikidot.com") ||
             new URL(url).hostname.endsWith("wdfiles.com")
           )
             fetchUrl = corsProxyUrl;
 
+          // fetch file, falling back to CORS proxy if failed
           const res = await (
             await fetch(fetchUrl)
               .catch(() => {
@@ -177,6 +181,7 @@ export async function performActionsLogic(params: {
 
           let file: Blob | null = res;
 
+          // ignore non-image files
           if (
             !file.type.startsWith("image") &&
             !action.newName.endsWith(".svg")
@@ -188,6 +193,7 @@ export async function performActionsLogic(params: {
             return;
           }
 
+          // rsize non-SVGs
           let newFileName = action.newName;
           if (
             file.type.startsWith("image") &&
@@ -196,6 +202,7 @@ export async function performActionsLogic(params: {
           ) {
             let skipResize = false;
 
+            // skip resizing animated webps
             if (file.type === "image/webp") {
               updateStatusText(
                 "Checking if webp image is animated...",
@@ -213,6 +220,7 @@ export async function performActionsLogic(params: {
                   "in-progress",
                 );
               }
+              // skip resizing animated gifs
             } else if (file.type === "image/gif") {
               updateStatusText(
                 "Checking if gif image is animated...",
@@ -232,8 +240,11 @@ export async function performActionsLogic(params: {
               }
             }
 
+            // resize image
             if (!skipResize) {
               updateStatusText("Parsing image for resize...", "in-progress");
+
+              // auto resize to fixed width
               if (autoResize === "auto") {
                 const bmp = await createImageBitmap(file);
                 const scaleFactor =
@@ -243,6 +254,8 @@ export async function performActionsLogic(params: {
                 updateStatusText("Resizing image...", "in-progress");
                 file = await getResized(bmp, newWidth, newHeight, 0.9, "webp");
                 newFileName = newFileName.replace(/\..+?$/g, "") + ".webp";
+
+                // manual resize to custom width
               } else if (autoResize === "manual") {
                 file = await imageResizePopup(file);
                 newFileName = (newFileName.replace(/\..+?$/g, "") +
@@ -255,6 +268,7 @@ export async function performActionsLogic(params: {
             }
           }
 
+          // prepend SVG metadata if necessary
           if (
             file &&
             (file.type.startsWith("image/svg+xml") ||
@@ -283,8 +297,10 @@ export async function performActionsLogic(params: {
             return;
           }
 
+          // determine new unique filename for file
           newFileName = encodeURIComponent(pickUniqueFilename(newFileName));
 
+          // upload file to wikidot
           updateStatusText(
             `Uploading file to Wikidot as '${newFileName}'...`,
             "in-progress",
@@ -301,12 +317,14 @@ export async function performActionsLogic(params: {
             return;
           }
 
+          // add licensebox entry for file
           licenseboxEntries.push({
             oldFilename: action.newName,
             filename: newFileName,
             sourceLink: url,
           });
 
+          // trigger Page Source update
           updateStatusText(
             "Waiting to update Page Source(s)...",
             "in-progress",
@@ -325,6 +343,7 @@ export async function performActionsLogic(params: {
           ]);
         }
 
+        // tell it it's ready to update Page Source
         await pageSourceStartedUpdatingTrigger;
         updateStatusText("Updating Page Source(s)...", "in-progress");
         const pageSourceUpdated = await pageSourceUpdatedTrigger;

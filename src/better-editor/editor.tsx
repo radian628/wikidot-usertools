@@ -49,8 +49,6 @@ export function Editor(props: {
         `data:application/javascript,${encodeURIComponent(WorkerSource)}`,
       );
 
-      console.log(worker);
-
       const extendedCSSParser = cssParser.parser.configure({
         wrap: parseMixed((node) => {
           if (node.name === "Comment")
@@ -122,7 +120,6 @@ export function Editor(props: {
                   const revnum2 = await getLatestRevisionNumber(
                     window.location.href,
                   );
-                  console.log("revs", revnum, revnum2);
                   if (revnum !== revnum2 && false) {
                     window.alert(
                       "This revision is out of date. Please merge your changes before continuing.",
@@ -219,7 +216,6 @@ function formatRevisions(body: string) {
 export async function getLatestRevisionNumber(url: string) {
   const pageid = await getPageId(url);
   const revs = (await getRevisions(pageid, 1, 1)) as any;
-  console.log("REVISIONS", revs);
   const fmted = await formatRevisions(revs.body);
   return fmted[0]?.number ?? "0";
 }
@@ -244,7 +240,6 @@ export function App(props: { customCss: string }) {
               const preprocessed = await preprocess(c, 0, true);
               await setPageSource(window.location.href, preprocessed.str);
               iframeRef.current?.contentWindow?.location.reload();
-              console.log("refreshed iframe");
             }}
             replaceIframeStylesheets={(sheets) => {
               if (!iframeRef.current || !iframeRef.current.contentWindow)

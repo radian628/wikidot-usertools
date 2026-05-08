@@ -1,45 +1,16 @@
 @import url("https://rsms.me/inter/inter.css");
 
-body {
-  padding: 0;
-  margin: 0;
-}
-
-.plugin-settings-page {
-  display: grid;
-  grid-template-areas:
-    "header header"
-    "list settings";
-  height: 100vh;
-  width: 100vw;
+.menu {
   font-family: "Inter", sans-serif;
-  box-sizing: border-box;
-  grid-template-rows: min-content auto;
-  grid-template-columns: minmax(0, max-content) auto;
+  width: max-content;
+  min-width: 250px;
 }
 
-h1 {
-  grid-area: header;
-  border-bottom: 1px solid black;
+.menu ul {
+  padding-inline-start: 0;
   margin: 0;
-  padding: 1rem;
 }
 
-h2 {
-  margin-top: 0;
-}
-
-.page-toggle-list {
-  grid-area: list;
-  overflow: auto;
+.menu li {
   list-style: none;
-  margin: 0;
-  padding: 1rem;
-}
-
-.plugin-settings {
-  grid-area: settings;
-  overflow: auto;
-  border-left: 1px solid black;
-  padding: 1rem;
 }

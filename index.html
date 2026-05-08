@@ -3,9 +3,12 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
+      @import url("https://rsms.me/inter/inter.css");
+
       body {
-        font-family: sans-serif;
+        font-family: "Inter", sans-serif;
         color: #333;
+        line-height: 1.4;
       }
 
       main {
@@ -16,9 +19,40 @@
         margin-top: 100px;
       }
 
+      @media (max-width: 600px) {
+        main {
+          margin-top: 10px;
+          padding: 10px;
+        }
+      }
+
       .usertool-divider {
         margin-top: 50px;
         margin-bottom: 50px;
+      }
+
+      h2,
+      h3 {
+        padding-top: 30px;
+        padding-bottom: 5px;
+        margin-bottom: 0;
+        border-bottom: 1px solid #aaa;
+      }
+
+      :target {
+        animation: flashred 0.4s;
+        animation-fill-mode: both;
+        animation-iteration-count: 5;
+        animation-direction: alternate;
+      }
+
+      @keyframes flashred {
+        0% {
+          color: red;
+        }
+        100% {
+          color: #800;
+        }
       }
     </style>
   </head>
@@ -45,254 +79,98 @@
         are a few UserScript managers I recommend.
       </p>
       <ul>
+        <li><a href="https://www.tampermonkey.net/">Tampermonkey</a></li>
         <li><a href="https://violentmonkey.github.io/">Violentmonkey</a></li>
         <li><a href="https://www.greasespot.net/">Greasemonkey</a></li>
-        <li><a href="https://www.tampermonkey.net/">Tampermonkey</a></li>
       </ul>
 
       <h2>Usertools</h2>
 
-      <hr class="usertool-divider" />
-
-      <h3>Bulk File Uploader</h3>
+      <h3>(REQUIRED FOR ALL TOOLS) Usertools Base</h3>
       <p>
-        <a href="build/multisave/multisave.user.js">Installation Link</a>
+        <a href="build/combined/usertools-base.user.js">Installation Link</a>
       </p>
       <p>
-        Upload, save, and delete multiple files to a Wikidot article at once.
+        This is a base extension that provides common functionality used by all
+        usertools (menus and such and such).
       </p>
 
-      <hr class="usertool-divider" />
-
-      <h3>Mirror Mainsite Formatting on Sandbox Site</h3>
+      <h3 id="standard">Standard Usertools Bundle</h3>
       <p>
-        <a
-          href="https://gist.github.com/radian628/ef3b781e83053da361fb41743acbd053/raw/276099ac7f9ebf2de63cab5f2c74b2e79ed139c9/scp-sandbox-mirrorer.user.js"
+        <a href="build/combined/radian628-wikidot-usertools.user.js"
           >Installation Link</a
         >
       </p>
       <p>
-        Switches out all the HTML and CSS on the SCP Sandbox site (<a
-          href="https://scp-sandbox-3.wikidot.com"
-          >scp-sandbox-3.wikidot.com</a
-        >) so that it exactly matches the main wiki (<a
-          href="https://scp-wiki.wikidot.com"
-          >scp-wiki.wikidot.com</a
-        >). This is mainly intended to make sure that themes, components, and
-        other technically complex pages work properly on the main site, without
-        actually having to upload them onto the main site.
-      </p>
-
-      <hr class="usertool-divider" />
-
-      <h3>Local Draft Backup</h3>
-      <p>
-        <a href="build/draft-backup/draft-backer-upper.user.js"
-          >Installation Link</a
-        >
-      </p>
-      <p>
-        Create <em>local</em> backups of your Wikidot drafts while editing, so
-        if Wikidot can't save your work, you won't lose your progress. Drafts
-        are saved every 60 seconds, and are stored locally, on your machine, so
-        you do not need an internet connection for this userscript to work.
-      </p>
-
-      <hr class="usertool-divider" />
-
-      <h3>Better Editor</h3>
-      <p>
-        <a href="build/better-editor/better-editor.user.js"
-          >Installation Link</a
-        >
-      </p>
-      <p>
-        Completely replaces Wikidot's editor with a CodeMirror-powered editor
-        that displays side-by-side with the page you are editing.
-      </p>
-      <p>
-        <strong>Press Ctrl-E to activate the editor.</strong> The "Edit" button
-        still activates Wikidot's regular editor in case you'd rather use that.
-      </p>
-      <p>Supports:</p>
-      <ul>
-        <li>
-          Syntax highlighting for <code>[[module css]]</code> and
-          <code>[[html]]</code> (but not for Wikitext yet, unfortunately).
-        </li>
-        <li>Resizeable layout.</li>
-        <li>
-          Hit <code>Ctrl-S</code> at any moment to save without exiting the
-          editor. The page on the right will automatically refresh.
-        </li>
-        <li>
-          Supports limited hot-reloading capabilities for CSS in CSS modules
-          only. Will likely break if you add/remove a CSS module.
-        </li>
-        <li>
-          Run JavaScript at compile time to generate complex or repetitive
-          instructions with relatively little code.
-          <em
-            >All JavaScript is run in a cross-origin-isolated sandboxed iframe
-            for security purposes. </em
-          >. JavaScript snippets are specified using WikiText or CSS comment
-          syntax, with the string <code>js</code> immediately following the
-          opening comment. So, for example,
-          <code>[!--js "Hello, world!" --]</code> will add the string
-          <code>Hello, world!</code> to your page's source.
-        </li>
-        <li>
-          This editor does <em>not</em> steal the edit lock. Thus, other users
-          can make edits while you're editing. If your version is out-of-date by
-          the time you save, you will see merge conflict markers, which you will
-          need to resolve before the save will go through.
-        </li>
-      </ul>
-
-      <hr class="usertool-divider" />
-
-      <h3>Custom CSS Widget</h3>
-      <p>
-        <a href="build/custom-css-widget/custom-css-widget.user.js"
-          >Installation Link</a
-        >
-      </p>
-      <p>
-        Adds a widget to the bottom right corner of every page, allowing you to
-        quickly and easily inject extra CSS into it. This is primarily intended
-        as a debugging tool for if you want to quickly add CSS to a page to see
-        how it'll affect it in practice, and in a way you can easily copy over
-        into a Wikidot CSS Module.
-      </p>
-      <p>
-        Also, if you highlight/select a CSS selector, all elements matching that
-        selector will be given an outline, thus allowing you to more easily
-        debug your CSS selectors.
-      </p>
-
-      <hr class="usertool-divider" />
-
-      <h3>Better Comments View</h3>
-      <p>
-        <a href="build/better-comments-view/better-comments-view.user.js"
-          >Installation Link</a
-        >
-      </p>
-      <p>
-        Changes comments in <code>user:info</code> profiles into
-        infinitely-scrolling feeds, which can be filtered by wiki.
-      </p>
-
-      <hr class="usertool-divider" />
-
-      <h3>Unfuck All CSS</h3>
-      <p>
-        <a href="build/unfuck-all-css/unfuck-all-css.user.js"
-          >Installation Link</a
-        >
-      </p>
-      <p>
-        This userscript forcibly refreshes all CSS on every Wikidot page you
-        visit, forcing the CSS to load properly. You likely don't need this
-        userscript unless (1) Wikidot pages frequently look broken for you, and
-        (2) clearing your cache does not fix the issue.
-      </p>
-
-      <hr class="usertool-divider" />
-
-      <h3>AutoHTTP</h3>
-      <p>
-        <a href="build/autohttp/autohttp.user.js">Installation Link</a>
-      </p>
-      <p>
-        This userscript automatically fetches files from a local or remote
-        HTTP(S) server and then (re)uploads them as Wikidot file attachments. It
-        is intended to assist in creating automated build pipelines for Wikidot
-        pages.
-      </p>
-      <h4>Usage Summary</h4>
-      <p>
-        This userscript is controlled by "directives" placed within a page's
-        source (they can be placed within comments). Once one or more directives
-        are in your page's source, a button will appear in the bottom left
-        corner allowing you to activate the userscript.
+        Contains the following usertools, which can all be toggled individually:
       </p>
       <ul>
         <li>
-          Use <code>!!!AUTOHTTP link filename!!!</code> to load the resource at
-          URL <code>link</code> to the Wikidot attachment with file name
-          <code>filename</code>. The userscript will refetch all files on each
-          page refresh, only reuploading them to Wikidot if their contents have
-          actually changed.
+          <b>Better Editor</b> - Replaces the SCP Wiki editor with a new editor
+          that supports syntax highlighting for CSS/HTML/JS, saving without
+          exiting the editor, CSS hot-reloading, and inline compile-time
+          JavaScript expressions.
         </li>
         <li>
-          (OPTIONAL) Use <code>!!!AUTOHTTP_BUILDPOLL link!!!</code> to
-          repeatedly poll the HTTP resource at URL <code>link</code>. If this
-          resource changes, the userscript will automatically refetch/reupload
-          the files and then refresh the page, instead of you having to refresh
-          it manually.
+          <b>Better User:Info</b> - Completely overhauls the layout of Wikidot
+          <code>user:info</code> pages, putting all info on one screen and
+          enabling search.
+        </li>
+        <li>
+          <b>Copy Page Source to Clipboard Button</b> - Adds a button, always
+          visible on the screen, that copies the current page's Page Source to
+          your clipboard.
+        </li>
+        <li>
+          <b>Custom CSS Widget</b> - Adds a window to the bottom-right of the
+          page, which allows you to inject CSS into the page.
+        </li>
+        <li>
+          <b>Minimalist Editor</b> - Replaces the Wikidot editor with an editor
+          that shows the text you're typing, and NOTHING else, for a
+          distraction-free experience. Auto-saves every 60 seconds, or whenever
+          you hit Ctrl-S.
+        </li>
+        <li>
+          <b>Multisave</b> - Upload, save, rename, and delete multiple files on
+          your pages at once.
+        </li>
+        <li>
+          <b>Smart History</b> - Replaces the Page History UI to make it nicer
+          to look at and easier to use.
+        </li>
+        <li>
+          <b>Unfuck All CSS</b> - Sometimes, these userscripts can inexplicably
+          cause Wikidot's CSS to break. If this occurs, just enable this tool to
+          fix it.
         </li>
       </ul>
-      <h4>Manual</h4>
-      <p>
-        To identify which pages to (re)upload, the userscript analyzes the page
-        source for "directives", which take the form
-        <code>!!!AUTOHTTP link filename!!!</code>. Do NOT include any extra
-        whitespace, as it will not work. Replace <code>link</code> with a full
-        URL to the file hosted on the HTTP(S) server, and replace
-        <code>filename</code> with the name you want the file to have when it is
-        attached.
-      </p>
-      <p>
-        For example, you could use
-        <code>!!!AUTOHTTP http://localhost:8080/hello.png world.png!!!</code> to
-        take the file hosted at the URL
-        <code>http://localhost:8080/hello.png</code> and upload it as the file
-        attachment <code>world.png</code>.
-      </p>
-      <p>
-        Once you create one of these directives (surround it with
-        <code>[!--</code> and <code>--]</code> so it doesn't actually display on
-        the page) and then save the page, a button should appear in the bottom
-        left corner of the screen, allowing you to enable AutoHTTP. This manual
-        step is here to prevent you from accidentally uploading files to other
-        articles.
-      </p>
-      <p>
-        Upon every subsequent page reload, all resources will be re-fetched from
-        your chosen HTTP(S) server(s), and will only be reuploaded to Wikidot if
-        their contents do not match the last-uploaded version.
-      </p>
-      <h5>Hot Reload</h5>
-      <p>
-        Normally, in order for this script to register changes to files you've
-        uploaded, you have to reload the page, at which point it will re-fetch
-        and compare the files to the versions currently hosted on Wikidot. If
-        you instead want it to automatically reupload the files and refresh the
-        page whenever they've changed, you can use hot reloading.
-      </p>
 
+      <h3 id="scp">SCP Usertools Bundle</h3>
       <p>
-        To enable hot reloading, use the
-        <code>!!!AUTOHTTP_BUILDPOLL link!!!</code> directive, where
-        <code>link</code> is a URL that returns a string representing a "build
-        version". If given, this directive instructs the userscript to
-        repeatedly poll this endpoint. If, while polling this endpoint, it
-        receives a response which is different from prior responses, it assumes
-        that a new build has been released, meaning that some files have
-        changed, meaning that it will re-fetch and re-upload them, before
-        refreshing the page.
+        <a href="build/combined/radian628-scp-wikidot-usertools.user.js"
+          >Installation Link</a
+        >
       </p>
       <p>
-        The reason why this endpoint is separate from the AUTOHTTP endpoint is
-        because some uploaded files might be large and would thus be impractical
-        to repeatedly poll.
+        Contains everything in
+        <a href="#standard">Standard Usertools Bundle</a>, plus the following
+        SCP-specific tools:
       </p>
-      <h5>Troubleshooting</h5>
-      <p>
-        Make sure the server you're using is CORS-enabled! And make sure you use
-        the full URL (<code>http://</code> or <code>https://</code> included!)
-      </p>
+      <ul>
+        <li>
+          <b>AutoLocalize</b> - Automatically reupload images from other sites
+          onto the SCP Wiki.
+        </li>
+        <li>
+          <b>SCP Sandbox Mirrorer</b> - Replicates the exact HTML layout of
+          <a href="https://scp-wiki.wikidot.com">scp-wiki.wikidot.com</a> onto
+          <a href="https://scp-sandbox-3.wikidot.com"
+            >scp-sandbox-3.wikidot.com</a
+          >
+          to help with testing site themes.
+        </li>
+      </ul>
     </main>
   </body>
 </html>

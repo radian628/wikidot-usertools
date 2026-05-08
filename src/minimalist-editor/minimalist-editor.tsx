@@ -4,20 +4,8 @@ import { injectFunction } from "r628";
 import EditorCSS from "./editor.css?raw";
 import { getPageSource, setPageSource } from "../common/wikidot-api-utils.js";
 import { UsertoolPlugin } from "../combined/plugin.js";
-
-// function initializeEditor() {
-//   document.body.innerHTML = "";
-//   document.head.innerHTML = "";
-//   document.body.style.margin = "0";
-//   document.body.style.padding = "0";
-//   document.body.style.overflow = "hidden";
-//   // @ts-expect-error
-//   OZONE.utils.addJavascriptUrl = () => {};
-//   const domRoot = document.createElement("div");
-//   document.body.appendChild(domRoot);
-//   const reactRoot = createRoot(domRoot);
-//   reactRoot.render(<App></App>);
-// }
+import { Icon } from "@mdi/react";
+import { mdiPencilOutline } from "@mdi/js";
 
 let lastSaved: string | undefined = undefined;
 
@@ -66,7 +54,6 @@ function App() {
 
     const keydown = (e: KeyboardEvent) => {
       if (e.ctrlKey && e.key === "s") {
-        console.log("savedd!!!!!");
         e.preventDefault();
         save(() => {
           setSaveNotif(true);
@@ -133,8 +120,6 @@ function App() {
                   editorCaretCheckerRef.current.getBoundingClientRect().height -
                   editorRootRef.current.scrollTop +
                   window.innerHeight * 0.25;
-
-                console.log("selectY", selectY);
 
                 if (
                   editorRef.current.selectionStart !==
@@ -205,12 +190,25 @@ export const MinimalistEditorPlugin: UsertoolPlugin<{}> = {
   defaultSettings: {},
   shouldRun: () => true,
   async onPageLoad(hooks, settings) {
-    await injectFunction(
-      () => WIKIDOT?.page?.listeners?.editClick,
-      (fn) => (WIKIDOT.page.listeners.editClick = fn),
-      (fn) => (fn) => {
-        hooks.replacePageWith(App);
+    const removeMenu = hooks.addMenu({
+      icon: () => <Icon path={mdiPencilOutline}></Icon>,
+      onClickIcon() {
+        openEditor();
       },
-    );
+    });
+
+    function openEditor() {
+      removeMenu();
+      hooks.replacePageWith(App);
+    }
+
+    WIKIDOT.page.listeners.editClick = () => {};
+    const openOnCtrlE = (e: KeyboardEvent) => {
+      if (e.key === "e" && e.ctrlKey) {
+        openEditor();
+        document.removeEventListener("keydown", openOnCtrlE);
+      }
+    };
+    document.addEventListener("keydown", openOnCtrlE);
   },
 };

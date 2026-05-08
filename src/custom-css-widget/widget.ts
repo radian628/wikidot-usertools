@@ -187,10 +187,6 @@ async function makeCodemirrorEditor(container: HTMLElement) {
     },
     onSave(cb: () => Promise<void>) {
       saveListeners.push(cb);
-      // syntaxTree(view.state);
-      // console.log("AAAAAA");
-      // foldAll(view);
-      // console.log("BBBBBB");
     },
     setDoc(doc: string, cursor = 0) {
       view.dispatch({
@@ -398,7 +394,6 @@ async function formatAllJavascript(src: string, pos: number, evalbox: Evalbox) {
       }
 
       if (result.success) {
-        console.log(result);
         const generatedFragment =
           `/*GENERATED START*/\n` +
           (result.data?.toString() ?? result.data) +
@@ -518,7 +513,6 @@ export const initCustomCssWidget = async () => {
       withFormattedJS.formatted,
       withFormattedJS.cursorOffset,
     );
-    console.log(css.cursorOffset);
     editor.setDoc(css.formatted, css.cursorOffset);
   });
 
@@ -600,7 +594,6 @@ async function fmtcss(css: string, pos: number) {
 
 async function fmtjs(js: string, pos: number) {
   try {
-    console.log(js, pos);
     let isAtEnd = pos === js.length;
     const res = await prettier.formatWithCursor(js, {
       cursorOffset: pos,

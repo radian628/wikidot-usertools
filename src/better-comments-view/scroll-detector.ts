@@ -11,7 +11,6 @@ export function scrollDetector(upwardsExtent: string): {
 
   const it = new IntersectionObserver(
     (r) => {
-      console.log("intersectionobserver callback", r);
       for (const e of r) {
         if (!e.isIntersecting) continue;
         _isVisible = true;
@@ -25,13 +24,12 @@ export function scrollDetector(upwardsExtent: string): {
     {
       root: null,
       threshold: 0.01,
-    }
+    },
   );
   it.observe(element);
 
   let _isVisible: boolean | undefined = undefined;
   function isVisible() {
-    console.log("isVisible", _isVisible);
     if (_isVisible === undefined) {
       for (const e of it.takeRecords()) {
         if (!e.isIntersecting) continue;
@@ -49,7 +47,6 @@ export function scrollDetector(upwardsExtent: string): {
       callbacks.add(cb);
       setTimeout(() => {
         if (isVisible() && callbacks.has(cb)) {
-          console.log("initially visible");
           cb();
         }
       });

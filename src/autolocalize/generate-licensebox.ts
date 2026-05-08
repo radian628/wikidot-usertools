@@ -69,8 +69,6 @@ async function getWikimediaAttribution(filename: string) {
 
   props.license = licenseCheck(dom.querySelector(".licensetpl"));
 
-  console.log(props);
-
   return props;
 }
 export type LicenseboxEntry = {

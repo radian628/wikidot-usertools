@@ -1,5 +1,5 @@
 import React from "react";
-import { UsertoolPlugin } from "../combined/plugin.js";
+import { PluginHooks, UsertoolPlugin } from "../combined/plugin.js";
 import {
   getPageId,
   getPageSource,
@@ -7,6 +7,8 @@ import {
 } from "../common/wikidot-api-utils.js";
 import { Action, autolocalizePopup } from "./autolocalize-widget.js";
 import { getOffsetSources } from "./find-offsets.js";
+import { Icon } from "@mdi/react";
+import { mdiImageMove } from "@mdi/js";
 
 export const HOSTNAMES = [
   // window.location.hostname,
@@ -24,7 +26,7 @@ export const HOSTNAMES = [
 ];
 HOSTNAMES.push(...HOSTNAMES.map((o) => o.replaceAll("wikidot", "wdfiles")));
 
-const main = async () => {
+const main = async (hooks: PluginHooks) => {
   const infobox = document.createElement("div");
   document.body.appendChild(infobox);
   infobox.style = `
@@ -98,8 +100,6 @@ const main = async () => {
           .replace(/("|')$/g, "")
           .replace("&amp;", "&"),
       );
-
-      console.log("AAAA", urls);
 
       urlInfo.push(
         ...urls.map((u) => ({
@@ -202,7 +202,17 @@ const main = async () => {
   }
 
   if (actions.length > 0) {
-    autolocalizePopup(actions, parentPageId, offsetSources);
+    hooks.toast(
+      () => (
+        <>
+          Some images on this page are not localized. See the menu in the bottom
+          left.
+        </>
+      ),
+      10000,
+      "warning",
+    );
+    return autolocalizePopup(actions, parentPageId, offsetSources);
   }
 };
 
@@ -211,7 +221,14 @@ export const AutoLocalizePlugin: UsertoolPlugin<{}> = {
   defaultSettings: {},
   shouldRun: () => true,
   async onPageLoad(hooks, settings) {
-    main();
+    await hooks.waitForPageLoad();
+    const Menu = await main(hooks);
+    if (Menu) {
+      hooks.addMenu({
+        icon: () => <Icon path={mdiImageMove}></Icon>,
+        menu: () => <Menu></Menu>,
+      });
+    }
   },
   settingsMenu: (props) => <div>(no settings available for this plugin)</div>,
 };

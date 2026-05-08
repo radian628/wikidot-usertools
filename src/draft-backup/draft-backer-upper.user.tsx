@@ -299,7 +299,6 @@ function DiffDisplay(props: { oldstr: string; newstr: string }) {
                 const dur = Duration.fromMillis(Date.now() - b.timestamp);
 
                 const prevBackupContent = backups[i + 1]?.content ?? "";
-                console.log(diffChars(prevBackupContent, b.content));
                 return (
                   <li key={b.id}>
                     <button

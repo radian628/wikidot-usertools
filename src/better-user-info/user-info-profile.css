@@ -1,0 +1,16 @@
+@import url("https://rsms.me/inter/inter.css");
+
+.user-info-profile {
+  font-family: "Inter", sans-serif;
+  padding: 5px;
+  padding-bottom: 50vh;
+}
+
+.user-info-profile h1 {
+  margin-top: 0;
+}
+
+.user-info-profile .owindow .modal-body > img {
+  float: right;
+  min-width: 100px;
+}

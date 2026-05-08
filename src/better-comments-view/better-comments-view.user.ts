@@ -10,8 +10,6 @@ import {
   listenForNoSelector,
 } from "r628";
 
-console.log("does it hide this msg");
-
 type GetUserPageResult = {
   status: "ok";
   jsInclude: unknown[];
@@ -138,7 +136,6 @@ function recentPostsInfiniteScroll(
   }
 
   const wikifilterUnsub = wikiFilter.subscribe((a) => {
-    console.log("test", a, wikiFilter.get());
     applyWikiFilter();
   });
 

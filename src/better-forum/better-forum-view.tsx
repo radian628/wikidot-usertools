@@ -7,6 +7,8 @@ import {
   useAsyncSequence,
   useGetSet,
   usePiecemealMemo,
+  virtualArrayController,
+  VirtualArrayField,
 } from "r628";
 import { UsertoolPlugin } from "../combined/plugin.js";
 import { asyncRequestModule } from "../common/wikidot-api-utils.js";
@@ -150,58 +152,87 @@ function postContains(post: ForumPost, str: string) {
 }
 
 function ForumView(props: { pageCount: number }) {
-  const posts = useGetSet<{
-    data: ForumPost[];
-    execIndex: number;
-    postIndexMin: number;
-    postIndexMax: number;
-    hasMore: boolean;
-  }>({
-    data: [],
-    execIndex: 0,
-    postIndexMin: 10,
-    postIndexMax: 11,
-    hasMore: true,
-  });
-  const [shouldPrependMoreRows, setShouldPrependMoreRows] = useState(false);
-  const [shouldPushMoreRows, setShouldPushMoreRows] = useState(false);
+  // const posts = useGetSet<{
+  //   data: ForumPost[];
+  //   execIndex: number;
+  //   postIndexMin: number;
+  //   postIndexMax: number;
+  //   hasMore: boolean;
+  // }>({
+  //   data: [],
+  //   execIndex: 0,
+  //   postIndexMin: 10,
+  //   postIndexMax: 11,
+  //   hasMore: true,
+  // });
+  // const [shouldPrependMoreRows, setShouldPrependMoreRows] = useState(false);
+  // const [shouldPushMoreRows, setShouldPushMoreRows] = useState(false);
 
   const searchQuery = useGetSet("");
 
-  useEffect(() => {
-    if ((shouldPushMoreRows || shouldPrependMoreRows) && posts.value.hasMore) {
-      (async () => {
-        const threadId = window.location.pathname.split("/")[2].slice(2);
+  // useEffect(() => {
+  //   if ((shouldPushMoreRows || shouldPrependMoreRows) && posts.value.hasMore) {
+  //     (async () => {
+  //       const threadId = window.location.pathname.split("/")[2].slice(2);
 
-        const nextForumPage = await getForumPageDom(
-          threadId,
-          posts.value.postIndexMax,
-        );
-        if (!nextForumPage) return;
-        const postData = await parseForumPosts(nextForumPage.body);
+  //       const nextForumPage = await getForumPageDom(
+  //         threadId,
+  //         posts.value.postIndexMax,
+  //       );
+  //       if (!nextForumPage) return;
+  //       const postData = await parseForumPosts(nextForumPage.body);
 
-        posts.setValue((v) => {
-          if (v.execIndex !== posts.value.execIndex) {
-            return v;
-          }
+  //       posts.setValue((v) => {
+  //         if (v.execIndex !== posts.value.execIndex) {
+  //           return v;
+  //         }
 
-          return {
-            data: [...v.data, ...postData],
-            execIndex: v.execIndex,
-            postIndexMin: v.postIndexMin,
-            postIndexMax: v.postIndexMax + 1,
-            hasMore: postData.length > 0,
-          };
-        });
-      })();
-    }
-  }, [posts, shouldPushMoreRows]);
+  //         return {
+  //           data: [...v.data, ...postData],
+  //           execIndex: v.execIndex,
+  //           postIndexMin: v.postIndexMin,
+  //           postIndexMax: v.postIndexMax + 1,
+  //           hasMore: postData.length > 0,
+  //         };
+  //       });
+  //     })();
+  //   }
+  // }, [posts, shouldPushMoreRows]);
 
   const [showEditor, setShowEditor] = useState<boolean>(false);
 
-  if (!posts) {
-    return <div>Loading...</div>;
+  // if (!posts) {
+  //   return <div>Loading...</div>;
+  // }
+
+  async function getPostPage(num: number) {
+    const threadId = window.location.pathname.split("/")[2].slice(2);
+    const nextForumPage = await getForumPageDom(threadId, num);
+    if (!nextForumPage) return;
+    const postData = await parseForumPosts(nextForumPage.body);
+    return postData;
   }
+
+  const controller = virtualArrayController({
+    load: async (x) => {
+      return { data: (await getPostPage(x)) ?? [] };
+    },
+    estimatedElementSize: 200,
+    loadDependencies: [searchQuery],
+    initIndex: 1,
+    minOffset: 5000,
+    maxOffset: 10000,
+    escapeOffset: 15000,
+    overscan: 2000,
+    lowest: 0,
+    highest: props.pageCount,
+    Element: (props) => {
+      return <ForumListView {...props}></ForumListView>;
+    },
+    refetchInterval: 250,
+    startRegionSize: 1000,
+    endRegionSize: 1000,
+  });
 
   return (
     <div
@@ -233,85 +264,7 @@ function ForumView(props: { pageCount: number }) {
         };
       }}
     >
-      <div
-        style={
-          {
-            // position: "sticky",
-            // backgroundColor: "white",
-            // padding: "20px",
-            // top: "0",
-            // zIndex: "999",
-          }
-        }
-      >
-        <StringField {...searchQuery}></StringField>
-        <p>
-          Loaded Pages {posts.value.postIndexMin} - {posts.value.postIndexMax} /{" "}
-          {props.pageCount} Loaded
-        </p>
-      </div>
-      <div
-        style={{
-          height: "50vh",
-          transform: "translateY(50%)",
-          position: "relative",
-          zIndex: -1,
-        }}
-        ref={(e) => {
-          if (!e) return;
-
-          const observer = new IntersectionObserver(async (x) => {
-            for (const [n, e] of x.entries()) {
-              if (e.isIntersecting) {
-                setShouldPrependMoreRows(true);
-              } else {
-                setShouldPrependMoreRows(false);
-              }
-            }
-          });
-
-          observer.observe(e);
-
-          return () => {
-            observer.disconnect();
-          };
-        }}
-      ></div>
-      <div>
-        {
-          <ForumListView
-            {...posts.prop("data")}
-            filter={(p) => postContains(p, searchQuery.value)}
-          ></ForumListView>
-        }
-      </div>
-      <div
-        style={{
-          height: "50vh",
-          transform: "translateY(-50%)",
-          position: "relative",
-          zIndex: -1,
-        }}
-        ref={(e) => {
-          if (!e) return;
-
-          const observer = new IntersectionObserver(async (x) => {
-            for (const [n, e] of x.entries()) {
-              if (e.isIntersecting) {
-                setShouldPushMoreRows(true);
-              } else {
-                setShouldPushMoreRows(false);
-              }
-            }
-          });
-
-          observer.observe(e);
-
-          return () => {
-            observer.disconnect();
-          };
-        }}
-      ></div>
+      <VirtualArrayField controller={controller}></VirtualArrayField>
       {!showEditor && (
         <button
           onClick={() => {

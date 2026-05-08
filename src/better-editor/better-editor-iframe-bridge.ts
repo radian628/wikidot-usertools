@@ -6,12 +6,11 @@ export const IframeBridge = {
   async replaceStylesheets(sheets: string[]) {
     const c = sheets.join("");
     if (c === concattedSheets) return;
-    console.log("got here");
     concattedSheets = c;
     for (const style of Array.from(document.head?.querySelectorAll("style"))) {
       if (
         style.innerText.includes(
-          `/*${window.location.pathname.split("/")[1]}*/`
+          `/*${window.location.pathname.split("/")[1]}*/`,
         )
       ) {
         style.textContent = (

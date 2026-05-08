@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
-import { requestModuleAsync } from "../common/request-module-async.js";
 import {
   deleteFile,
+  getAllFileInfo,
   getFileInfo,
   renameFile,
   uploadFile,
 } from "../common/file-io.js";
+import MultisaveCSS from "./multisave.css?raw";
 
 function fileSizePreview(size: number) {
   if (size > 2 ** 30) {
@@ -52,7 +53,7 @@ function SingleFileTableRow(props: {
   const lowercase = name.toLowerCase();
 
   const isImage = [".png", ".jpg", ".jpeg", ".webp", ".gif", ".avif"].some(
-    (e) => lowercase.endsWith(e)
+    (e) => lowercase.endsWith(e),
   );
 
   return (
@@ -158,7 +159,10 @@ export function MultisaveProgressBar(props: ProgressBarProps) {
   );
 }
 
-export function MultisaveDialog(props: { exit: () => void }) {
+export function MultisaveDialog(props: {
+  exit: () => void;
+  rootClass: string;
+}) {
   const [stagedFiles, setStagedFiles] = useState<FileInfo[]>([]);
 
   const [hasFetchedUploads, setHasFetchedUploads] = useState(false);
@@ -173,7 +177,7 @@ export function MultisaveDialog(props: { exit: () => void }) {
     if (hasFetchedUploads) return;
 
     (async () => {
-      const fileInfo = await getFileInfo(window.WIKIREQUEST.info.pageId);
+      const fileInfo = await getAllFileInfo(WIKIREQUEST.info.pageId);
 
       const uploadedFiles: FileInfo[] = [...fileInfo.info.values()].map(
         (f) => ({
@@ -181,7 +185,7 @@ export function MultisaveDialog(props: { exit: () => void }) {
           name: f.name,
           size: f.size,
           uploadedFileId: f.id,
-        })
+        }),
       );
 
       setHasFetchedUploads(true);
@@ -196,7 +200,8 @@ export function MultisaveDialog(props: { exit: () => void }) {
       {uploadProgress && (
         <MultisaveProgressBar {...uploadProgress}></MultisaveProgressBar>
       )}
-      <div className="multisave-dialog">
+      <div className={props.rootClass}>
+        <style>{MultisaveCSS}</style>
         <div className="multisave-header">
           <input
             type="file"
@@ -247,7 +252,7 @@ export function MultisaveDialog(props: { exit: () => void }) {
                     renameFile(file.uploadedFileId, file.name).then((e) => {
                       currentFilesRenamed++;
                       updateUploadProgress();
-                    })
+                    }),
                   );
                   totalFilesRenamed++;
                 } else if (!file.uploadedFileId && file.file) {
@@ -256,12 +261,12 @@ export function MultisaveDialog(props: { exit: () => void }) {
                       file.name,
                       file.file,
                       "",
-                      WIKIREQUEST.info.pageId
+                      WIKIREQUEST.info.pageId,
                     ).then((e) => {
                       currentFilesTransferred++;
                       updateUploadProgress();
                       currentBytes += file.size;
-                    })
+                    }),
                   );
                   totalFilesTransferred++;
                   totalBytes += file.size;
@@ -286,7 +291,7 @@ export function MultisaveDialog(props: { exit: () => void }) {
             onClick={() => {
               // delete all uploaded files (so we can then refetch them)
               setStagedFiles(
-                stagedFiles.filter((f) => f.uploadedFileId === undefined)
+                stagedFiles.filter((f) => f.uploadedFileId === undefined),
               );
 
               // refetch files
@@ -323,13 +328,12 @@ export function MultisaveDialog(props: { exit: () => void }) {
                         newFile.nameChange = { oldName: f.name };
                       }
                       setStagedFiles(
-                        stagedFiles.map((f2, j) => (i === j ? newFile : f2))
+                        stagedFiles.map((f2, j) => (i === j ? newFile : f2)),
                       );
                     }}
                     delete={async () => {
                       // if it's uploaded...
                       if (f.uploadedFileId) {
-                        console.log("staged files!", stagedFiles);
                         // remove the file from the list
                         // so that there's instant feedback
                         setStagedFiles(stagedFiles.filter((f2, j) => i !== j));
@@ -340,8 +344,8 @@ export function MultisaveDialog(props: { exit: () => void }) {
                         // delete all uploaded files (so we can then refetch them)
                         setStagedFiles(
                           stagedFiles.filter(
-                            (f) => f.uploadedFileId === undefined
-                          )
+                            (f) => f.uploadedFileId === undefined,
+                          ),
                         );
 
                         // refetch files

@@ -5,116 +5,299 @@ import * as fs from "node:fs/promises";
 import { watch } from "chokidar";
 import expressWs from "express-ws";
 import { WebSocket } from "ws";
-import { Command } from "commander";
+import * as path from "node:path";
+import { WikidotDevopsFileMessage, WikidotDevopsMessage } from "./common-defs";
 
-const program = new Command();
+export type FileDeploymentSpec =
+  | {
+      type: "on-disk";
+      pathOnDisk: string;
+      name: string;
+      comments?: string;
+      index: number;
+    }
+  | {
+      type: "data";
+      data: ArrayBuffer | string;
+      name: string;
+      comments?: string;
+    };
 
-program
-  .command("run")
-  .description("Runs the server.")
-  .action(async (options) => {
-    const configFile = JSON.parse(
-      (await fs.readFile("./wds-config.json")).toString()
-    );
+export type PageDeploymentSpec = {
+  site: string;
+  slug: string;
+  title: string;
+  tags: string[];
+  files: FileDeploymentSpec[];
+  source: string;
+};
 
-    const app = express();
+export type WikidotDevopsDeploymentSpec = {
+  pages: PageDeploymentSpec[];
+};
 
-    const appws = expressWs(app);
+export type WikidotDevopsDeploymentServerConfig = {
+  rootDir?: string;
+  port?: number;
+  hostname?: string;
+  onListen?: () => void;
+};
 
-    app.use(cors());
+export type WikidotDevopsDeploymentServer = {
+  pushUpdate(spec: WikidotDevopsDeploymentSpec): void;
+};
 
-    app.use("/static", express.static("static"));
+export type MapDeploymentSpec = Map<
+  string,
+  {
+    pagesBySlug: Map<
+      string,
+      {
+        title: string;
+        tags: string[];
+        files: Map<string, FileDeploymentSpec>;
+        source: string;
+      }
+    >;
+  }
+>;
 
-    app.use("/files", express.static("files"));
+function mapifySpec(spec: WikidotDevopsDeploymentSpec): MapDeploymentSpec {
+  const pagesBySite: MapDeploymentSpec = new Map();
+  for (const page of spec.pages) {
+    const map = pagesBySite.get(page.site) ?? {
+      pagesBySlug: new Map(),
+    };
+    pagesBySite.set(page.site, map);
 
-    app.use("/filenames.json", async (req, res) => {
-      res.end(JSON.stringify(await fs.readdir("files")));
-    });
+    const pageInfo = {
+      title: page.title,
+      tags: page.tags,
+      files: new Map(),
+      source: page.source,
+    };
 
-    let clients: Set<WebSocket> = new Set();
+    map.pagesBySlug.set(page.slug, pageInfo);
 
-    appws.app.ws("/changes", (ws, req) => {
-      clients.add(ws);
+    for (const file of page.files) {
+      pageInfo.files.set(file.name, file);
+    }
+  }
+  return pagesBySite;
+}
 
-      ws.on("close", () => {
-        clients.delete(ws);
-      });
-    });
+function diffFiles(
+  sitename: string,
+  pageslug: string,
+  before: Map<string, FileDeploymentSpec> | undefined,
+  after: Map<string, FileDeploymentSpec>,
+  config: {
+    hostname: string;
+    port: number;
+  },
+) {
+  const fileList: WikidotDevopsFileMessage[] = [];
 
-    function onTryRefresh() {
-      for (const c of clients) {
-        c.send(JSON.stringify({ type: "full-refresh" }));
+  for (const [filename, afterFile] of after) {
+    const beforeFile = before?.get(filename);
+
+    let shouldIncludeFile = false;
+
+    if (!beforeFile) {
+      shouldIncludeFile = true;
+    }
+
+    if (beforeFile?.type === "on-disk" && afterFile.type === "on-disk") {
+      if (
+        beforeFile.index !== afterFile.index ||
+        beforeFile.pathOnDisk !== afterFile.pathOnDisk
+      ) {
+        shouldIncludeFile = true;
       }
     }
 
-    watch("static", { usePolling: true }).on("all", () => {
-      onTryRefresh();
-    });
-    watch("files", { usePolling: true }).on("all", () => {
-      onTryRefresh();
-    });
+    if (beforeFile?.type === "data" && afterFile?.type === "data") {
+      if (beforeFile.data !== afterFile.data) {
+        shouldIncludeFile = true;
+      } else if (
+        beforeFile instanceof ArrayBuffer &&
+        afterFile instanceof ArrayBuffer &&
+        beforeFile.byteLength === afterFile.byteLength
+      ) {
+        let beforeBytes = new Uint8Array(beforeFile);
+        let afterBytes = new Uint8Array(afterFile);
+        for (let i = 0; i < beforeBytes.length; i++) {
+          if (beforeBytes[i] !== afterBytes[i]) {
+            shouldIncludeFile = true;
+            break;
+          }
+        }
+      }
+    }
 
-    app.listen(configFile.port, () => {
-      console.log(`Server started on http://localhost:${configFile.port}`);
+    if (shouldIncludeFile) {
+      fileList.push({
+        name: filename,
+        comments: afterFile.comments,
+        fetchUrl: `http://${config.hostname}:${config.port}/files/${sitename}/${pageslug}/${filename}`,
+      });
+    }
+  }
+
+  return fileList;
+}
+
+function diffSpecs(
+  before: MapDeploymentSpec,
+  after: MapDeploymentSpec,
+  config: {
+    hostname: string;
+    port: number;
+  },
+) {
+  const msg: WikidotDevopsMessage = {
+    updatedPages: [],
+  };
+
+  for (const [sitename, site] of after) {
+    for (const [pageslug, afterPage] of site.pagesBySlug) {
+      const beforePage = before.get(sitename)?.pagesBySlug.get(pageslug);
+
+      const files = diffFiles(
+        sitename,
+        pageslug,
+        beforePage?.files,
+        afterPage.files,
+        config,
+      );
+
+      const pageSourceChanged = beforePage?.source !== afterPage.source;
+      const titleChanged = beforePage?.title !== afterPage.title;
+      const tagsChanged = beforePage?.tags !== afterPage.tags;
+      const filesChanged = files.length > 0;
+
+      const anyChanged =
+        pageSourceChanged || titleChanged || tagsChanged || filesChanged;
+
+      if (!anyChanged) continue;
+
+      msg.updatedPages.push({
+        site: sitename,
+        slug: pageslug,
+        updatedContent:
+          pageSourceChanged || titleChanged
+            ? {
+                title: afterPage.title,
+                updatedSourceUrl: `http://${config.hostname}:${config.port}/source/${sitename}/${pageslug}`,
+              }
+            : undefined,
+        updatedFiles: files,
+      });
+    }
+  }
+
+  return msg;
+}
+
+export function createWikidotDevopsServer(
+  config: WikidotDevopsDeploymentServerConfig,
+): WikidotDevopsDeploymentServer {
+  const app = express();
+  const appws = expressWs(app);
+  app.use(cors());
+
+  const port = config.port ?? 6969;
+  const hostname = config.hostname ?? "localhost";
+
+  // do not allow any file access outside of this directory
+  const enforcedRootDir = config.rootDir
+    ? path.resolve(config.rootDir)
+    : path.resolve(process.cwd(), "assets");
+
+  /*
+    for page with slug SLUG on site SITE with attached file FILENAME,
+    the following resources are present:
+
+    path: /SITE/SLUG/source
+    path: /SITE/SLUG/files/FILENAME
+  */
+
+  let pagesBySite: MapDeploymentSpec = new Map();
+
+  // ...
+  app.get("/source/:site/:slug", (req, res) => {
+    if (!pagesBySite) {
+      res.status(400);
+      res.end("Pages are not loaded yet.");
+      return;
+    }
+    const page = pagesBySite
+      .get(req.params.site)
+      ?.pagesBySlug.get(req.params.slug);
+    if (!page) {
+      res.status(404).end("Page does not exist.");
+      return;
+    }
+
+    res.end(page.source);
+  });
+
+  app.get("/files/:site/:slug/:filename", (req, res) => {
+    if (!pagesBySite) {
+      res.status(400);
+      res.end("Pages are not loaded yet.");
+      return;
+    }
+    const page = pagesBySite
+      .get(req.params.site)
+      ?.pagesBySlug.get(req.params.slug);
+    if (!page) {
+      res.status(404).end("Pages does not exist.");
+      return;
+    }
+
+    const file = page.files.get(req.params.filename);
+    if (!file) {
+      res.status(404).end("File does not exist.");
+      return;
+    }
+
+    if (file.type === "data") {
+      res.end(file.data);
+    } else {
+      const abspath = path.resolve(process.cwd(), file.pathOnDisk);
+      if (!abspath.startsWith(enforcedRootDir)) {
+        res.status(403).end("Invalid path.");
+        return;
+      }
+      console.log("abspath", abspath);
+      res.sendFile(abspath);
+    }
+  });
+
+  let clients: Set<WebSocket> = new Set();
+
+  appws.app.ws("/changes", (ws, req) => {
+    clients.add(ws);
+    ws.send(
+      JSON.stringify(diffSpecs(new Map(), pagesBySite, { port, hostname })),
+    );
+
+    ws.on("close", () => {
+      clients.delete(ws);
     });
   });
 
-program
-  .command("init")
-  .argument("<slug>", "Wikidot page slug.")
-  .argument("<port>", "Server port.")
-  .description("Creates a project template for a CI/CD-driven Wikidot page.")
-  .action(async (slug, port, options) => {
-    await Promise.all([
-      fs.mkdir("files"),
-      fs.mkdir("static"),
-      fs.writeFile(
-        "wds-config.json",
-        JSON.stringify(
-          {
-            port,
-          },
-          undefined,
-          2
-        )
-      ),
-    ]);
-    await Promise.all([
-      fs.writeFile(
-        "static/manifest.json",
-        JSON.stringify(
-          [
-            {
-              pageSlug: slug,
-              sourceTextUrl: `http://localhost:${port}/static/source.txt`,
-              metadataUrl: `http://localhost:${port}/static/metadata.json`,
-              fileAttachmentNamesUrl: `http://localhost:${port}/filenames.json`,
-              filesBaseUrl: `http://localhost:${port}/files`,
-              changesUrl: `ws://localhost:${port}/changes`,
-            },
-          ],
-          undefined,
-          2
-        )
-      ),
-      fs.writeFile(
-        "static/metadata.json",
-        JSON.stringify(
-          {
-            tags: [],
-            title: "Page Title",
-          },
+  app.listen(port, hostname, config.onListen);
 
-          undefined,
-          2
-        )
-      ),
-      fs.writeFile(
-        "static/source.txt",
-        `[!--devops:http://localhost:${port}/static/manifest.json--]
-Wikidot Devops Server Example`
-      ),
-    ]);
-  });
-
-program.parseAsync();
+  return {
+    pushUpdate(spec) {
+      const oldSpec = pagesBySite;
+      pagesBySite = mapifySpec(spec);
+      const diff = diffSpecs(oldSpec, pagesBySite, { port, hostname });
+      for (const c of clients) {
+        c.send(JSON.stringify(diff));
+      }
+    },
+  };
+}
