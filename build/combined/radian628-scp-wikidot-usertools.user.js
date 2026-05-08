@@ -1,15 +1,15 @@
 /*!
-  // ==UserScript==
-  // @name        Radian628 SCP Wikidot Usertools
-  // @match       *://*.wikidot.com/*
-  // @grant       GM.getValue 
-  // @grant       GM.setValue
-  // @version     0.1.0
-  // @author      radian628
-  // @description all the usertools in one!
-  // @run-at      document-body
-  // ==/UserScript==
-  */"use strict";
+// ==UserScript==
+// @name        Radian628 SCP Wikidot Usertools
+// @match       *://*.wikidot.com/*
+// @grant       GM.getValue 
+// @grant       GM.setValue
+// @version     0.1.0
+// @author      radian628
+// @description all the usertools in one!
+// @run-at      document-body
+// ==/UserScript==
+*/"use strict";
 (() => {
   var __create = Object.create;
   var __defProp = Object.defineProperty;
@@ -12303,15 +12303,6 @@ ${e}`, s), i = r;
   var require_react_development = __commonJS({
     "node_modules/react/cjs/react.development.js"(exports, module) {
       "use strict";
-      /**
-       * @license React
-       * react.development.js
-       *
-       * Copyright (c) Meta Platforms, Inc. and affiliates.
-       *
-       * This source code is licensed under the MIT license found in the
-       * LICENSE file in the root directory of this source tree.
-       */
       (function() {
         function defineDeprecationWarning(methodName, info) {
           Object.defineProperty(Component.prototype, methodName, {
@@ -13313,15 +13304,6 @@ ${e}`, s), i = r;
   var require_scheduler_development = __commonJS({
     "node_modules/scheduler/cjs/scheduler.development.js"(exports) {
       "use strict";
-      /**
-       * @license React
-       * scheduler.development.js
-       *
-       * Copyright (c) Meta Platforms, Inc. and affiliates.
-       *
-       * This source code is licensed under the MIT license found in the
-       * LICENSE file in the root directory of this source tree.
-       */
       (function() {
         function performWorkUntilDeadline() {
           needsPaint = false;
@@ -13593,15 +13575,6 @@ ${e}`, s), i = r;
   var require_react_dom_development = __commonJS({
     "node_modules/react-dom/cjs/react-dom.development.js"(exports) {
       "use strict";
-      /**
-       * @license React
-       * react-dom.development.js
-       *
-       * Copyright (c) Meta Platforms, Inc. and affiliates.
-       *
-       * This source code is licensed under the MIT license found in the
-       * LICENSE file in the root directory of this source tree.
-       */
       (function() {
         function noop() {
         }
@@ -13876,15 +13849,6 @@ ${e}`, s), i = r;
   var require_react_dom_client_development = __commonJS({
     "node_modules/react-dom/cjs/react-dom-client.development.js"(exports) {
       "use strict";
-      /**
-       * @license React
-       * react-dom-client.development.js
-       *
-       * Copyright (c) Meta Platforms, Inc. and affiliates.
-       *
-       * This source code is licensed under the MIT license found in the
-       * LICENSE file in the root directory of this source tree.
-       */
       (function() {
         function findHook(fiber, id3) {
           for (fiber = fiber.memoizedState; null !== fiber && 0 < id3; )
@@ -33814,14 +33778,6 @@ ${e}`, s), i = r;
   var require_react_is_development = __commonJS({
     "node_modules/react-is/cjs/react-is.development.js"(exports) {
       "use strict";
-      /** @license React v16.13.1
-       * react-is.development.js
-       *
-       * Copyright (c) Facebook, Inc. and its affiliates.
-       *
-       * This source code is licensed under the MIT license found in the
-       * LICENSE file in the root directory of this source tree.
-       */
       if (true) {
         (function() {
           "use strict";
@@ -33989,11 +33945,6 @@ ${e}`, s), i = r;
   var require_object_assign = __commonJS({
     "node_modules/object-assign/index.js"(exports, module) {
       "use strict";
-      /*
-      object-assign
-      (c) Sindre Sorhus
-      @license MIT
-      */
       var getOwnPropertySymbols = Object.getOwnPropertySymbols;
       var hasOwnProperty2 = Object.prototype.hasOwnProperty;
       var propIsEnumerable = Object.prototype.propertyIsEnumerable;
@@ -80752,6 +80703,69 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
   }
 
   // src/combined/radian628-scp-wikidot-usertools.user.ts
-  
   loadUsertoolsBundle(SCP_USERTOOLS_BUNDLE);
 })();
+
+/*! Bundled license information:
+
+react/cjs/react.development.js:
+  (**
+   * @license React
+   * react.development.js
+   *
+   * Copyright (c) Meta Platforms, Inc. and affiliates.
+   *
+   * This source code is licensed under the MIT license found in the
+   * LICENSE file in the root directory of this source tree.
+   *)
+
+scheduler/cjs/scheduler.development.js:
+  (**
+   * @license React
+   * scheduler.development.js
+   *
+   * Copyright (c) Meta Platforms, Inc. and affiliates.
+   *
+   * This source code is licensed under the MIT license found in the
+   * LICENSE file in the root directory of this source tree.
+   *)
+
+react-dom/cjs/react-dom.development.js:
+  (**
+   * @license React
+   * react-dom.development.js
+   *
+   * Copyright (c) Meta Platforms, Inc. and affiliates.
+   *
+   * This source code is licensed under the MIT license found in the
+   * LICENSE file in the root directory of this source tree.
+   *)
+
+react-dom/cjs/react-dom-client.development.js:
+  (**
+   * @license React
+   * react-dom-client.development.js
+   *
+   * Copyright (c) Meta Platforms, Inc. and affiliates.
+   *
+   * This source code is licensed under the MIT license found in the
+   * LICENSE file in the root directory of this source tree.
+   *)
+
+react-is/cjs/react-is.development.js:
+  (** @license React v16.13.1
+   * react-is.development.js
+   *
+   * Copyright (c) Facebook, Inc. and its affiliates.
+   *
+   * This source code is licensed under the MIT license found in the
+   * LICENSE file in the root directory of this source tree.
+   *)
+
+object-assign/index.js:
+  (*
+  object-assign
+  (c) Sindre Sorhus
+  @license MIT
+  *)
+*/

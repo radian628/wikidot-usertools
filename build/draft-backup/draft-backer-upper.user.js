@@ -1,13 +1,13 @@
 /*!
-  // ==UserScript==
-  // @name        Wikidot Draft Backup 
-  // @match       *://*.wikidot.com/*
-  // @grant       none
-  // @version     1.0
-  // @author      radian628
-  // @description Automatically generate backups of your Wikidot drafts. 
-  // ==/UserScript==
-  */"use strict";
+// ==UserScript==
+// @name        Wikidot Draft Backup 
+// @match       *://*.wikidot.com/*
+// @grant       none
+// @version     1.0
+// @author      radian628
+// @description Automatically generate backups of your Wikidot drafts. 
+// ==/UserScript==
+*/"use strict";
 (() => {
   var __create = Object.create;
   var __defProp = Object.defineProperty;
@@ -39,15 +39,6 @@
   var require_react_development = __commonJS({
     "node_modules/react/cjs/react.development.js"(exports, module) {
       "use strict";
-      /**
-       * @license React
-       * react.development.js
-       *
-       * Copyright (c) Meta Platforms, Inc. and affiliates.
-       *
-       * This source code is licensed under the MIT license found in the
-       * LICENSE file in the root directory of this source tree.
-       */
       (function() {
         function defineDeprecationWarning(methodName, info) {
           Object.defineProperty(Component.prototype, methodName, {
@@ -1049,15 +1040,6 @@
   var require_scheduler_development = __commonJS({
     "node_modules/scheduler/cjs/scheduler.development.js"(exports) {
       "use strict";
-      /**
-       * @license React
-       * scheduler.development.js
-       *
-       * Copyright (c) Meta Platforms, Inc. and affiliates.
-       *
-       * This source code is licensed under the MIT license found in the
-       * LICENSE file in the root directory of this source tree.
-       */
       (function() {
         function performWorkUntilDeadline() {
           needsPaint = false;
@@ -1329,15 +1311,6 @@
   var require_react_dom_development = __commonJS({
     "node_modules/react-dom/cjs/react-dom.development.js"(exports) {
       "use strict";
-      /**
-       * @license React
-       * react-dom.development.js
-       *
-       * Copyright (c) Meta Platforms, Inc. and affiliates.
-       *
-       * This source code is licensed under the MIT license found in the
-       * LICENSE file in the root directory of this source tree.
-       */
       (function() {
         function noop() {
         }
@@ -1612,15 +1585,6 @@
   var require_react_dom_client_development = __commonJS({
     "node_modules/react-dom/cjs/react-dom-client.development.js"(exports) {
       "use strict";
-      /**
-       * @license React
-       * react-dom-client.development.js
-       *
-       * Copyright (c) Meta Platforms, Inc. and affiliates.
-       *
-       * This source code is licensed under the MIT license found in the
-       * LICENSE file in the root directory of this source tree.
-       */
       (function() {
         function findHook(fiber, id2) {
           for (fiber = fiber.memoizedState; null !== fiber && 0 < id2; )
@@ -28666,7 +28630,6 @@
   var import_react22 = __toESM(require_react2());
 
   // src/draft-backup/draft-backer-upper.user.tsx
-  
   function splitByLine(diff2, lac) {
     let i = 0;
     return diff2.flatMap((d) => {
@@ -28956,3 +28919,50 @@
     }
   );
 })();
+
+/*! Bundled license information:
+
+react/cjs/react.development.js:
+  (**
+   * @license React
+   * react.development.js
+   *
+   * Copyright (c) Meta Platforms, Inc. and affiliates.
+   *
+   * This source code is licensed under the MIT license found in the
+   * LICENSE file in the root directory of this source tree.
+   *)
+
+scheduler/cjs/scheduler.development.js:
+  (**
+   * @license React
+   * scheduler.development.js
+   *
+   * Copyright (c) Meta Platforms, Inc. and affiliates.
+   *
+   * This source code is licensed under the MIT license found in the
+   * LICENSE file in the root directory of this source tree.
+   *)
+
+react-dom/cjs/react-dom.development.js:
+  (**
+   * @license React
+   * react-dom.development.js
+   *
+   * Copyright (c) Meta Platforms, Inc. and affiliates.
+   *
+   * This source code is licensed under the MIT license found in the
+   * LICENSE file in the root directory of this source tree.
+   *)
+
+react-dom/cjs/react-dom-client.development.js:
+  (**
+   * @license React
+   * react-dom-client.development.js
+   *
+   * Copyright (c) Meta Platforms, Inc. and affiliates.
+   *
+   * This source code is licensed under the MIT license found in the
+   * LICENSE file in the root directory of this source tree.
+   *)
+*/

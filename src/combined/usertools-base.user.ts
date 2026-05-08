@@ -1,6 +1,6 @@
 /*!
 // ==UserScript==
-// @name        R628 WD UT Base 
+// @name        Radian628 Wikidot Usertools Base 
 // @match       *://*.wikidot.com/*
 // @grant       GM.getValue 
 // @grant       GM.setValue

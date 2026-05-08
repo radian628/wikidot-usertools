@@ -93,7 +93,14 @@ const ctx = await esbuild.context({
           const files = await glob("build/**/*.user.js");
           await Promise.all([
             files.map(async (f: string) => {
-              const file = (await fs.readFile(f)).toString();
+              const file = await fs
+                .readFile(f)
+                .then((t) => t.toString())
+                .catch((e) => {
+                  console.error(e);
+                  return undefined;
+                });
+              if (!file) return;
               const noSES = file.includes("/*!NO_SES*/");
               const userscriptCommentRegex =
                 /\/\*!\s*?\/\/\s*==UserScript==[\s\S]*?\/\/\s*==\/UserScript==[\s\S]*?\*\//g;
@@ -113,7 +120,6 @@ const ctx = await esbuild.context({
               //   try {
               //     ${noSES ? "" : `lockdown();`}
               //   }  catch (e) { console.warn(e); }
-
               // ` +
               //               file.replaceAll(userscriptCommentRegex, "") +
               //               " });",
@@ -126,7 +132,7 @@ const ctx = await esbuild.context({
   ],
   minify: false,
   // sourcemap: "inline",
-  legalComments: "inline",
+  legalComments: "eof",
 });
 
 await ctx.watch();
