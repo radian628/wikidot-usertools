@@ -1,4 +1,15 @@
-"use strict";
+/*!
+  // ==UserScript==
+  // @name        Radian628 SCP Wikidot Usertools
+  // @match       *://*.wikidot.com/*
+  // @grant       GM.getValue 
+  // @grant       GM.setValue
+  // @version     0.1.0
+  // @author      radian628
+  // @description all the usertools in one!
+  // @run-at      document-body
+  // ==/UserScript==
+  */"use strict";
 (() => {
   var __create = Object.create;
   var __defProp = Object.defineProperty;
@@ -80741,17 +80752,6 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
   }
 
   // src/combined/radian628-scp-wikidot-usertools.user.ts
-  /*!
-  // ==UserScript==
-  // @name        Radian628 SCP Wikidot Usertools
-  // @match       *://*.wikidot.com/*
-  // @grant       GM.getValue 
-  // @grant       GM.setValue
-  // @version     0.1.0
-  // @author      radian628
-  // @description all the usertools in one!
-  // @run-at      document-body
-  // ==/UserScript==
-  */
+  
   loadUsertoolsBundle(SCP_USERTOOLS_BUNDLE);
 })();
