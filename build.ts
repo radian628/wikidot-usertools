@@ -97,7 +97,12 @@ const ctx = await esbuild.context({
               const noSES = file.includes("/*!NO_SES*/");
               const userscriptCommentRegex =
                 /\/\*!\s*?\/\/\s*==UserScript==[\s\S]*?\/\/\s*==\/UserScript==[\s\S]*?\*\//g;
-              //           const matches = [...file.matchAll(userscriptCommentRegex)];
+              const matches = [...file.matchAll(userscriptCommentRegex)];
+              fs.writeFile(
+                f,
+                matches.map((m) => m[0]).join("\n") +
+                  file.replaceAll(userscriptCommentRegex, ""),
+              );
               //           fs.writeFile(
               //             f,
               //             matches.map((m) => m[0]).join("\n") +

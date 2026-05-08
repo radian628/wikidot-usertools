@@ -80743,7 +80743,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
   // src/combined/radian628-scp-wikidot-usertools.user.ts
   /*!
   // ==UserScript==
-  // @name        (BETA WIP UNFINISHED) Radian628 Wikidot Usertools
+  // @name        Radian628 SCP Wikidot Usertools
   // @match       *://*.wikidot.com/*
   // @grant       GM.getValue 
   // @grant       GM.setValue

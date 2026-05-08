@@ -1,4 +1,14 @@
-"use strict";
+/*!
+  // ==UserScript==
+  // @name        Wikidot DevOps 
+  // @namespace   Violentmonkey Scripts
+  // @grant       none
+  // @match       *://*.wikidot.com/*
+  // @version     2.0.1
+  // @author      radian628
+  // @description 9/13/2025, 12:35:21 PM
+  // ==/UserScript==
+  */"use strict";
 (() => {
   var __create = Object.create;
   var __defProp = Object.defineProperty;
@@ -34384,17 +34394,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
   var mdiDeveloperBoard = "M22,9V7H20V5A2,2 0 0,0 18,3H4A2,2 0 0,0 2,5V19A2,2 0 0,0 4,21H18A2,2 0 0,0 20,19V17H22V15H20V13H22V11H20V9H22M18,19H4V5H18V19M6,13H11V17H6V13M12,7H16V10H12V7M6,7H11V12H6V7M12,11H16V17H12V11Z";
 
   // src/wikidot-devops/wikidot-devops.user.tsx
-  /*!
-  // ==UserScript==
-  // @name        Wikidot DevOps 
-  // @namespace   Violentmonkey Scripts
-  // @grant       none
-  // @match       *://*.wikidot.com/*
-  // @version     2.0.1
-  // @author      radian628
-  // @description 9/13/2025, 12:35:21 PM
-  // ==/UserScript==
-  */
+  
   async function applyUpdateToPageContent(pagesite, pageslug, content, ctx) {
     const url2 = `http://${pagesite}.wikidot.com/${pageslug}`;
     ctx.pushInfo(

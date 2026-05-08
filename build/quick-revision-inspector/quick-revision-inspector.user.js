@@ -1,4 +1,13 @@
-"use strict";
+/*!
+  // ==UserScript==
+  // @name        Quick Revision Inspector BETA 
+  // @match       *://*.wikidot.com/*
+  // @grant       none
+  // @version     0.1.0
+  // @author      radian628
+  // @description Inspect wikidot page revisions quickly.
+  // ==/UserScript==
+  */"use strict";
 (() => {
   var __create = Object.create;
   var __defProp = Object.defineProperty;
@@ -33560,16 +33569,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
   }
 
   // src/quick-revision-inspector/quick-revision-inspector.user.ts
-  /*!
-  // ==UserScript==
-  // @name        Quick Revision Inspector BETA 
-  // @match       *://*.wikidot.com/*
-  // @grant       none
-  // @version     0.1.0
-  // @author      radian628
-  // @description Inspect wikidot page revisions quickly.
-  // ==/UserScript==
-  */
+  
   var ui = quickRevisionInspectorUI();
   document.body.appendChild(ui.elem);
 })();

@@ -1,4 +1,14 @@
-"use strict";
+/*!
+  // ==UserScript==
+  // @name        Change Font on Better Wikidot Editor
+  // @namespace   Violentmonkey Scripts
+  // @grant       none
+  // @match       *://*.wikidot.com/*
+  // @version     1.0
+  // @author      radian628
+  // @description 9/13/2025, 12:35:21 PM
+  // ==/UserScript==
+  */"use strict";
 (() => {
   var __create = Object.create;
   var __defProp = Object.defineProperty;
@@ -21615,17 +21625,7 @@
   var import_react22 = __toESM(require_react2());
 
   // src/better-editor/change-better-editor-font.user.ts
-  /*!
-  // ==UserScript==
-  // @name        Change Font on Better Wikidot Editor
-  // @namespace   Violentmonkey Scripts
-  // @grant       none
-  // @match       *://*.wikidot.com/*
-  // @version     1.0
-  // @author      radian628
-  // @description 9/13/2025, 12:35:21 PM
-  // ==/UserScript==
-  */
+  
   (async () => {
     if (window.parent !== window) return;
     await injectFunction(

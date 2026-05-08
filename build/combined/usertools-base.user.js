@@ -1,4 +1,15 @@
-"use strict";
+/*!
+  // ==UserScript==
+  // @name        R628 WD UT Base 
+  // @match       *://*.wikidot.com/*
+  // @grant       GM.getValue 
+  // @grant       GM.setValue
+  // @version     0.1.0
+  // @author      radian628
+  // @description Basic functionality required for all radian628 wikidot usertools. 
+  // @run-at      document-body
+  // ==/UserScript==
+  */"use strict";
 (() => {
   var __create = Object.create;
   var __defProp = Object.defineProperty;
@@ -22978,17 +22989,6 @@
   }
 
   // src/combined/usertools-base.user.ts
-  /*!
-  // ==UserScript==
-  // @name        R628 WD UT Base 
-  // @match       *://*.wikidot.com/*
-  // @grant       GM.getValue 
-  // @grant       GM.setValue
-  // @version     0.1.0
-  // @author      radian628
-  // @description Basic functionality required for all radian628 wikidot usertools. 
-  // @run-at      document-body
-  // ==/UserScript==
-  */
+  
   createWikidotUsertoolsBase();
 })();

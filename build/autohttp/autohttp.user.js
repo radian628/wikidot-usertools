@@ -1,4 +1,14 @@
-"use strict";
+/*!
+  // ==UserScript==
+  // @name        Wikidot Automatic HTTP File Uploads 
+  // @namespace   Violentmonkey Scripts
+  // @grant       none
+  // @match *://*.wikidot.com/*
+  // @version     1.0
+  // @author      radian628
+  // @description 9/13/2025, 12:35:21 PM
+  // ==/UserScript==
+  */"use strict";
 (() => {
   var __create = Object.create;
   var __defProp = Object.defineProperty;
@@ -21867,17 +21877,7 @@
   }
 
   // src/autohttp/autohttp.user.ts
-  /*!
-  // ==UserScript==
-  // @name        Wikidot Automatic HTTP File Uploads 
-  // @namespace   Violentmonkey Scripts
-  // @grant       none
-  // @match *://*.wikidot.com/*
-  // @version     1.0
-  // @author      radian628
-  // @description 9/13/2025, 12:35:21 PM
-  // ==/UserScript==
-  */
+  
   var AUTOHTTP_DIRECTIVE = /\!\!\!AUTOHTTP (\S+) (\S+)\!\!\!/g;
   var BUILDPOLL_DIRECTIVE = /\!\!\!AUTOHTTP_BUILDPOLL (\S+)\!\!\!/g;
   var autohttpLocalStorage = registerStorageItem(

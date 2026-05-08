@@ -1,4 +1,13 @@
-"use strict";
+/*!
+  // ==UserScript==
+  // @name        05Command Thread Search 
+  // @match       *://05command.wikidot.com/*
+  // @grant       none
+  // @version     0.1.0
+  // @author      radian628
+  // @description Adds search functionality to 05command. 
+  // ==/UserScript==
+  */"use strict";
 (() => {
   var __create = Object.create;
   var __defProp = Object.defineProperty;
@@ -21633,16 +21642,7 @@
   }
 
   // src/05command-thread-search/05command-thread-search.user.ts
-  /*!
-  // ==UserScript==
-  // @name        05Command Thread Search 
-  // @match       *://05command.wikidot.com/*
-  // @grant       none
-  // @version     0.1.0
-  // @author      radian628
-  // @description Adds search functionality to 05command. 
-  // ==/UserScript==
-  */
+  
   function isDescendantOf(child, parent) {
     if (!child) return false;
     if (child === parent) return true;

@@ -1,6 +1,6 @@
 /*!
 // ==UserScript==
-// @name        (BETA WIP UNFINISHED) Radian628 Wikidot Usertools
+// @name        Radian628 SCP Wikidot Usertools
 // @match       *://*.wikidot.com/*
 // @grant       GM.getValue 
 // @grant       GM.setValue

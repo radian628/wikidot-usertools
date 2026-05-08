@@ -1,4 +1,13 @@
-"use strict";
+/*!
+  // ==UserScript==
+  // @name        Wikidot Draft Backup 
+  // @match       *://*.wikidot.com/*
+  // @grant       none
+  // @version     1.0
+  // @author      radian628
+  // @description Automatically generate backups of your Wikidot drafts. 
+  // ==/UserScript==
+  */"use strict";
 (() => {
   var __create = Object.create;
   var __defProp = Object.defineProperty;
@@ -28657,16 +28666,7 @@
   var import_react22 = __toESM(require_react2());
 
   // src/draft-backup/draft-backer-upper.user.tsx
-  /*!
-  // ==UserScript==
-  // @name        Wikidot Draft Backup 
-  // @match       *://*.wikidot.com/*
-  // @grant       none
-  // @version     1.0
-  // @author      radian628
-  // @description Automatically generate backups of your Wikidot drafts. 
-  // ==/UserScript==
-  */
+  
   function splitByLine(diff2, lac) {
     let i = 0;
     return diff2.flatMap((d) => {
