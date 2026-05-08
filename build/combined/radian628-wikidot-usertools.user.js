@@ -65363,7 +65363,7 @@ ${licenseInfo.filename !== licenseInfo.oldFilename ? `> **Name:** ${licenseInfo.
   // src/autolocalize/autolocalize.tsx
   var import_react30 = __toESM(require_Icon(), 1);
   var HOSTNAMES = [
-    // window.location.hostname,
+    window.location.hostname,
     "scpwiki.com",
     "scp-wiki.net",
     "scp-wiki.wikidot.com",

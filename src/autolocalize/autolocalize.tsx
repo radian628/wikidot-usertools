@@ -11,7 +11,7 @@ import { Icon } from "@mdi/react";
 import { mdiImageMove } from "@mdi/js";
 
 export const HOSTNAMES = [
-  // window.location.hostname,
+  window.location.hostname,
   "scpwiki.com",
   "scp-wiki.net",
   "scp-wiki.wikidot.com",
